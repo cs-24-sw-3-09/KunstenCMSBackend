@@ -5,11 +5,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class clientRouter {
+public class Router {
 
     @GetMapping("/")
     String home() {
         System.out.println("Hello");
         return "Hello World!";
+    }
+
+    @GetMapping("/test")
+    String test() {
+        System.out.println("Hello");
+        return "test123!";
     }
 }
