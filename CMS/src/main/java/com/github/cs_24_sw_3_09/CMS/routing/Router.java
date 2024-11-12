@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.cs_24_sw_3_09.CMS.modelClasses.DisplayDevice;
+import com.github.cs_24_sw_3_09.CMS.modelClasses.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,16 @@ public class Router {
         ddList.add(ddBuilder.getDisplayDevice());
 
         return ddList;
+    }
+
+    @GetMapping("/api/time_slots")
+    List<TimeSlot> allTimeSlots() {
+        TimeSlot.TimeSlotBuilder tsBuilder = new TimeSlot.TimeSlotBuilder();
+        tsBuilder.setName("new ts");
+        TimeSlot ts = tsBuilder.getTimeSlot();
+        ArrayList<TimeSlot> tsList = new ArrayList<TimeSlot>();
+        tsList.add(ts);
+        return tsList;
     }
 
     @GetMapping("/")
