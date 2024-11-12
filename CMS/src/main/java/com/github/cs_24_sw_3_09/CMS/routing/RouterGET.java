@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class Router {
+public class RouterGET {
 
     @GetMapping("/api/display_devices")
     List<DisplayDevice> allDisplayDevices() {

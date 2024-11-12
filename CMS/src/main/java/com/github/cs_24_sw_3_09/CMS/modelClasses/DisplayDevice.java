@@ -7,7 +7,6 @@ public class DisplayDevice {
 
         public DisplayDeviceBuilder() {
             d = new DisplayDevice();
-            d.id = 123;
         }
 
         public void setName(String name) {

@@ -1,4 +1,4 @@
-package com.github.cs_24_sw_3_09.CMS;
+package com.github.cs_24_sw_3_09.CMS.DB;
 
 import java.sql.Connection;
 import java.sql.SQLException;

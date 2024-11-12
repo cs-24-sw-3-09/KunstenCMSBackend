@@ -10,7 +10,6 @@ public class TimeSlot {
 
         public TimeSlotBuilder() {
             ts = new TimeSlot();
-            ts.id = 123; // huh?
         }
 
         public void setId(int id) {
