@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 //import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.commons.io.IOUtils;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 //import org.apache.tomcat.util.http.parser.MediaType;
 //import org.springframework.stereotype.Controller;
@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class Router {
+
+    @Autowired
+    private MyResourceHttpRequestHandler handler;
 
     @GetMapping("/")
     String home() {
@@ -27,13 +30,33 @@ public class Router {
 
     @GetMapping(value = "/visual_media/{mediaId}", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
-    public byte[] test(@PathVariable String mediaId) throws IOException {
+    public byte[] visual_media(@PathVariable String mediaId) throws IOException {
         System.out.println("ID: " + mediaId);
 
         InputStream in = getClass()
                 .getResourceAsStream("/visual_media/" + mediaId + ".jpg");
         return IOUtils.toByteArray(in);
     }
+
+    /*@GetMapping(value = "/visual_media/vid/{mediaId}", produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    public byte[] test(@PathVariable String mediaId) throws IOException {
+        System.out.println("ID: " + mediaId);
+
+        InputStream in = getClass()
+                .getResourceAsStream("/visual_media/" + mediaId + ".jpg");
+        return IOUtils.toByteArray(in);
+    }*/
+
+    /*@GetMapping(value = "/visual_media2/{mediaId}", produces = MediaType.IMAGE_GIF_VALUE)
+    @ResponseBody
+    public byte[] test2(@PathVariable String mediaId) throws IOException {
+        System.out.println("ID: " + mediaId);
+
+        InputStream in = getClass()
+                .getResourceAsStream("/visual_media/" + mediaId + ".jpg");
+        return IOUtils.toByteArray(in);
+    }*/
 
     // Example of how to make rest with varible path
     @GetMapping("/test/{testid}")
