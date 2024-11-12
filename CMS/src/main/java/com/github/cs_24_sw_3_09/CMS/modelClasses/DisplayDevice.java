@@ -1,5 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.modelClasses;
 
+import jakarta.validation.constraints.*;
+
 public class DisplayDevice {
     // Using builderpattern from OOP
     public static class DisplayDeviceBuilder {
@@ -39,13 +41,20 @@ public class DisplayDevice {
         }
     }
 
+    // fields and their validation constraints
     protected int id = -1;
+    @Size(min = 1, max = 50, message = "a name must be between 1 and 50 characters")
     private String name;
+    @Size(min = 1, max = 100, message = "a location must be between 1 and 100 characters")
     private String location;
+    @Size(min = 1, max = 50, message = "a model must be between 1 and 50 characters")
     private String model;
+    @Pattern(regexp = "^(vertical|horizontal)$")
     private String displayOrientation;
+    @Pattern(regexp = "^\\d+x\\d+$", message = "Resolution must be in the format 'widthxheight' (e.g., 1920x1080)")
     private String resolution;
-    private int fallbackId;
+    private int fallbackId; // fallback valididation is not necessary, springboot checks whether an int was
+                            // received
     private boolean connectionState = false;
 
     public int getId() {
