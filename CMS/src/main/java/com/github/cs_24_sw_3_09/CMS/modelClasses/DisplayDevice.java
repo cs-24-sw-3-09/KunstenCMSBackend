@@ -11,6 +11,10 @@ public class DisplayDevice {
             d = new DisplayDevice();
         }
 
+        public void setId(int id) {
+            d.id = id;
+        }
+
         public void setName(String name) {
             d.setName(name);
         }
@@ -31,8 +35,12 @@ public class DisplayDevice {
             d.setResolution(resolution);
         }
 
-        public void setId(int id) {
-            d.id = id;
+        public void setFallbackId(Integer fallbackId) {
+            d.setFallbackId(fallbackId);
+        }
+
+        public void setConnectedState(boolean connectionState) {
+            d.setConnectedState(connectionState);
         }
 
         public DisplayDevice getDisplayDevice() {
@@ -53,9 +61,9 @@ public class DisplayDevice {
     private String displayOrientation;
     @Pattern(regexp = "^\\d+x\\d+$", message = "Resolution must be in the format 'widthxheight' (e.g., 1920x1080)")
     private String resolution;
-    private int fallbackId; // fallback valididation is not necessary, springboot checks whether an int was
-                            // received
-    private boolean connectionState = false;
+    private Integer fallbackId; // fallback valididation is not necessary, springboot checks whether an int was
+    // received
+    private boolean connectedState = false;
 
     public int getId() {
         return id;
@@ -101,19 +109,34 @@ public class DisplayDevice {
         this.resolution = resolution;
     }
 
-    public int getFallbackId() {
+    public Integer getFallbackId() {
         return fallbackId;
     }
 
-    public void setFallbackId(int fallbackId) {
+    public void setFallbackId(Integer fallbackId) {
         this.fallbackId = fallbackId;
     }
 
-    public boolean isConnectionState() {
-        return connectionState;
+    public boolean getConnectedState() {
+        return connectedState;
     }
 
-    public void setConnectionState(boolean connectionState) {
-        this.connectionState = connectionState;
+    public void setConnectedState(boolean connectionState) {
+        this.connectedState = connectionState;
+    }
+
+    public String toJSON() {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{")
+                .append("\"id\":").append(id).append(",")
+                .append("\"name\":\"").append(name).append("\",")
+                .append("\"location\":\"").append(location).append("\",")
+                .append("\"model\":\"").append(model).append("\",")
+                .append("\"displayOrientation\":\"").append(displayOrientation).append("\",")
+                .append("\"resolution\":\"").append(resolution).append("\",")
+                .append("\"fallbackId\":").append(fallbackId).append(",")
+                .append("\"connectedState\":").append(connectedState)
+                .append("}");
+        return jsonBuilder.toString();
     }
 }

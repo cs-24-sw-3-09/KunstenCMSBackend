@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class RouterPOST {
+public class RouterDELETE {
 
-    @PostMapping("/api/display_devices")
+    /*@PostMapping("/api/display_devices")
     public String createDisplayDevice(@Valid @RequestBody DisplayDevice d) throws SQLException {
         System.out.println("POST /api/display_devices");
 
@@ -45,5 +45,5 @@ public class RouterPOST {
             return "Display Device did not get added to the Database error: " + e.getMessage();
         }
         return "Display Device have been added to the Database";
-    }
+    }*/
 }
