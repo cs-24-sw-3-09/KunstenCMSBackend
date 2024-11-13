@@ -1,27 +1,13 @@
-package com.github.cs_24_sw_3_09.CMS.routing;
+package com.github.cs_24_sw_3_09.CMS.Controllers;
 
 //import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 //import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 //import org.apache.tomcat.util.http.parser.MediaType;
 //import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
 
 @RestController
 public class Router {
@@ -34,15 +20,11 @@ public class Router {
         return "index.jpg";
     }
 
-    @GetMapping(value = "/visual_media/{mediaId}", produces = MediaType.IMAGE_PNG_VALUE)
-    @ResponseBody
-    public byte[] visual_media(@PathVariable String mediaId) throws IOException {
-        InputStream in = getClass()
-                .getResourceAsStream("/visual_media/" + mediaId + ".jpg");
-        return IOUtils.toByteArray(in);
-    }
 
-    @GetMapping(value = {"/visual_media2/{mediaId}"})
+
+
+
+   /* @GetMapping(value = {"/visual_media2/{mediaId}"})
     public ResponseEntity<StreamingResponseBody> getVideo(@PathVariable String mediaId,
                                                           @RequestParam("jpg") boolean jpg
     ) throws IOException {
@@ -83,7 +65,7 @@ public class Router {
 
         return result;
     }
-
+*/
     /*@GetMapping(value = "/visual_media/vid/{mediaId}", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] test(@PathVariable String mediaId) throws IOException {
