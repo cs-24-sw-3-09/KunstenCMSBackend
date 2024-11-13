@@ -31,41 +31,30 @@ import java.util.List;
 @RestController
 public class RouterPATCH {
 
-    private DisplayDevice applyPatchToDisplayDevice(DisplayDevice patch, DisplayDevice targetDisplayDevice)
+    // Genreal method to take JsonPatch and change them into targetObj
+    private <T> T applyPatchToObj(JsonPatch patch, T targetObj, Class<T> targetClass)
             throws JsonPatchException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println("part 0");
-        JsonPatch patchJson = objectMapper.convertValue(patch, JsonPatch.class); // Converts from dd class into
-                                                                                 // JsonPatch class
-        System.out.println("part 1");
-        JsonNode patched = patchJson.apply(objectMapper.convertValue(targetDisplayDevice, JsonNode.class));
-        System.out.println("part 2");
-        return objectMapper.treeToValue(patched, DisplayDevice.class);
+        // convert targetObj from object to JsonNode, and apply the patch
+        JsonNode patched = patch.apply(objectMapper.convertValue(targetObj, JsonNode.class));
+        // convert from JsonNode to object again
+        return objectMapper.treeToValue(patched, targetClass);
     }
 
-    @PatchMapping(path = "/api/display_devices/{id}", consumes = "application/json-patch+json")
-    public String updateDisplayDevice(@PathVariable int id, @RequestBody DisplayDevice patch)
+    @PatchMapping(path = "/api/display_devices/{id}")
+    public String updateDisplayDevice(@PathVariable int id, @RequestBody JsonPatch patch)
             throws SQLException {
-        System.out.println("PATCH /api/display_devices/{id}");
-
-        Connection db = HikariCPDataSource.getConnection();
+        System.out.println("PATCH /api/display_devices/" + id);
         try {
-            System.out.println("Før db læsnigs");
             DisplayDevice dd = GetSingleObj.getDisplayDeviceById(id);
-            System.out.println("Efter db læsning");
             if (dd == null) {
                 throw new Error();
             }
-            DisplayDevice ddPatched = applyPatchToDisplayDevice(patch, dd);
-            System.out.println("patched");
-            if (UpdateSingleObj.updateDisplayDeviceById(id, ddPatched)) {
-                System.out.println("Got updated");
-            } else {
-                System.out.println("Did not update");
-            }
+            DisplayDevice ddPatched = applyPatchToObj(patch, dd, DisplayDevice.class);
+            UpdateSingleObj.updateDisplayDeviceById(id, ddPatched);
+            return "Display Device with id " + id + " got updated";
         } catch (JsonPatchException | JsonProcessingException e) {
             return ("something went wrong with JSON formatting: " + e.getMessage());
         }
-        return "hej";
     }
 }

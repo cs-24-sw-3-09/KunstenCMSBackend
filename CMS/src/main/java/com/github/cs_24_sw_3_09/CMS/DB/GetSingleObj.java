@@ -40,7 +40,6 @@ public class GetSingleObj {
             System.err.println("Error retrieving display device: " + e.getMessage());
             return null;
         }
-        System.out.println(dd.toJSON());
         return dd;
     }
 }
