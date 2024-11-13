@@ -26,6 +26,7 @@ public class RouterDELETE {
 
     @DeleteMapping("/api/display_devices/{id}")
     public String deleteDisplayDevice(@PathVariable int id) throws SQLException {
+        System.out.println("DELETE /api/display_devices/"+id);
         try {
             DeleteSingleObj.deleteById(id, "display_devices");
         } catch (Exception e) {

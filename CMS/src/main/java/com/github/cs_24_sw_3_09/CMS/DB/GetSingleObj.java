@@ -8,42 +8,7 @@ import java.sql.SQLException;
 import com.github.cs_24_sw_3_09.CMS.modelClasses.DisplayDevice;
 
 public class GetSingleObj {
-    static public DisplayDevice getDisplayDeviceById(int id) throws SQLException {
-        Connection db = HikariCPDataSource.getConnection();
-        DisplayDevice dd = null;
-        DisplayDevice.DisplayDeviceBuilder ddBuilder = new DisplayDevice.DisplayDeviceBuilder();
-
-        String query = """
-                SELECT name, location, model, display_orientation, resolution, fallback_id, connected_state
-                FROM display_devices
-                WHERE id = ?
-                """;
-
-        try (PreparedStatement statement = db.prepareStatement(query)) {
-            statement.setInt(1, id);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    ddBuilder.setName(resultSet.getString("name"));
-                    ddBuilder.setLocation(resultSet.getString("location"));
-                    ddBuilder.setModel(resultSet.getString("model"));
-                    ddBuilder.setDisplayOrientation(resultSet.getString("display_orientation"));
-                    ddBuilder.setResolution(resultSet.getString("resolution"));
-                    ddBuilder.setFallbackId(
-                            resultSet.getObject("fallback_id") != null ? resultSet.getInt("fallback_id") : null);
-                    ddBuilder.setConnectedState(resultSet.getBoolean("connected_state"));
-                    ddBuilder.setId(id);
-                    dd = ddBuilder.getDisplayDevice();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error retrieving display device: " + e.getMessage());
-            return null;
-        }
-        return dd;
-    }
-
-    static public ResultSet getObjById(int id, String tableName) throws SQLException {
+    static private ResultSet getObjById(int id, String tableName) throws SQLException {
         Connection db = HikariCPDataSource.getConnection();
 
         String query = "SELECT * FROM " + tableName + " WHERE id = ? ";
@@ -57,7 +22,7 @@ public class GetSingleObj {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error retrieving display device: " + e.getMessage());
+            System.err.println("Error retrieving a single object: " + e.getMessage());
             return null;
         }
         return null;

@@ -46,7 +46,7 @@ public class RouterPATCH {
             throws SQLException {
         System.out.println("PATCH /api/display_devices/" + id);
         try {
-            DisplayDevice dd = GetSingleObj.getDisplayDeviceById(id);
+            DisplayDevice dd = GetSingleObj.buildDisplayDeviceById(id);
             if (dd == null) {
                 throw new Error();
             }

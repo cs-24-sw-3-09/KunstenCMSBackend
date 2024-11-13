@@ -5,8 +5,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.cs_24_sw_3_09.CMS.DB.GetAllObj;
+import com.github.cs_24_sw_3_09.CMS.DB.GetSingleObj;
+import com.github.cs_24_sw_3_09.CMS.DB.HikariCPDataSource;
 import com.github.cs_24_sw_3_09.CMS.modelClasses.*;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,21 +21,17 @@ import java.util.List;
 public class RouterGET {
 
     @GetMapping("/api/display_devices")
-    List<DisplayDevice> allDisplayDevices() {
-        System.out.println("/api/display_devices");
-
-        // TODO: Replace code below with db dds - you must create a new builder for
-        // every device
-        DisplayDevice.DisplayDeviceBuilder ddBuilder = new DisplayDevice.DisplayDeviceBuilder();
-        ddBuilder.setName("hej");
-        DisplayDevice d = ddBuilder.getDisplayDevice();
-        System.out.println(d);
-        ArrayList<DisplayDevice> ddList = new ArrayList<DisplayDevice>();
-        ddList.add(d);
-        ddBuilder.setName("2");
-        ddList.add(ddBuilder.getDisplayDevice());
-
+    List<DisplayDevice> allDisplayDevices() throws SQLException {
+        System.out.println("GET /api/display_devices");
+        List<DisplayDevice> ddList = GetAllObj.buildDisplayDeviceAll();
         return ddList;
+    }
+
+    @GetMapping("/api/display_devices/{id}")
+    DisplayDevice getsingleDisplayDevice(@PathVariable int id) throws SQLException {
+        System.out.println("GET /api/display_devices/" + id);
+        DisplayDevice dd = GetSingleObj.buildDisplayDeviceById(id);
+        return dd;
     }
 
     @GetMapping("/api/time_slots")
@@ -40,35 +43,30 @@ public class RouterGET {
         tsList.add(ts);
         return tsList;
     }
-
-    @GetMapping("/")
-    String home() {
-        System.out.println("/");
-        // return "Hello World!";
-        return "redirect:/index.jpg";
-    }
-
-    @GetMapping("/test")
-    String test() {
-        System.out.println("/test");
-        // app.getModule().
-        return "test123!";
-    }
-
-    // Example of how to make rest with varible path
-    @GetMapping("/test/{testid}")
-    String testID(@PathVariable String testid) {
-        System.out.println("/test with ID " + testid);
-        return "test your id:" + testid;
-    }
-
-    /*
-     * @Override
-     * public void addResourceHandlers(ResourceHandlerRegistry registry) {
-     * registry
-     * .addResourceHandler("/files/**")
-     * .addResourceLocations("file://");
-     * }
-     */
-
 }
+
+/*
+ * 
+ * @GetMapping("/")
+ * String home() {
+ * System.out.println("/");
+ * // return "Hello World!";
+ * return "redirect:/index.jpg";
+ * }
+ * 
+ * @GetMapping("/test")
+ * String test() {
+ * System.out.println("/test");
+ * // app.getModule().
+ * return "test123!";
+ * }
+ * 
+ * // Example of how to make rest with varible path
+ * 
+ * @GetMapping("/test/{testid}")
+ * String testID(@PathVariable String testid) {
+ * System.out.println("/test with ID " + testid);
+ * return "test your id:" + testid;
+ * }
+ * 
+ */
