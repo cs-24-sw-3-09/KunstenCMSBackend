@@ -2,12 +2,14 @@ package com.github.cs_24_sw_3_09.CMS.routing;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 //import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.cs_24_sw_3_09.CMS.DB.DeleteSingleObj;
 import com.github.cs_24_sw_3_09.CMS.DB.HikariCPDataSource;
 import com.github.cs_24_sw_3_09.CMS.modelClasses.*;
 
@@ -22,28 +24,43 @@ import java.util.List;
 @RestController
 public class RouterDELETE {
 
-    /*@PostMapping("/api/display_devices")
-    public String createDisplayDevice(@Valid @RequestBody DisplayDevice d) throws SQLException {
-        System.out.println("POST /api/display_devices");
-
-        Connection db = HikariCPDataSource.getConnection();
-
-        try (PreparedStatement statement = db.prepareStatement(
-                """
-                          INSERT INTO display_devices(name, location, model, display_orientation, resolution, fallback_id, connected_state)
-                          VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """)) {
-            statement.setString(1, d.getName());
-            statement.setString(2, d.getLocation());
-            statement.setString(3, d.getModel());
-            statement.setString(4, d.getDisplayOrientation());
-            statement.setString(5, d.getResolution());
-            statement.setNull(6, d.getFallbackId(), "int");
-            statement.setBoolean(7, d.getConnectedState());
-            int rowsInserted = statement.executeUpdate();
+    @DeleteMapping("/api/display_devices/{id}")
+    public String deleteDisplayDevice(@PathVariable int id) throws SQLException {
+        try {
+            DeleteSingleObj.deleteById(id, "display_devices");
         } catch (Exception e) {
-            return "Display Device did not get added to the Database error: " + e.getMessage();
+            return "Got error while deleting: " + e.getMessage();
         }
-        return "Display Device have been added to the Database";
-    }*/
+
+        return "succesfully deleted";
+    }
+    /*
+     * @PostMapping("/api/display_devices")
+     * public String createDisplayDevice(@Valid @RequestBody DisplayDevice d) throws
+     * SQLException {
+     * System.out.println("POST /api/display_devices");
+     * 
+     * Connection db = HikariCPDataSource.getConnection();
+     * 
+     * try (PreparedStatement statement = db.prepareStatement(
+     * """
+     * INSERT INTO display_devices(name, location, model, display_orientation,
+     * resolution, fallback_id, connected_state)
+     * VALUES (?, ?, ?, ?, ?, ?, ?)
+     * """)) {
+     * statement.setString(1, d.getName());
+     * statement.setString(2, d.getLocation());
+     * statement.setString(3, d.getModel());
+     * statement.setString(4, d.getDisplayOrientation());
+     * statement.setString(5, d.getResolution());
+     * statement.setNull(6, d.getFallbackId(), "int");
+     * statement.setBoolean(7, d.getConnectedState());
+     * int rowsInserted = statement.executeUpdate();
+     * } catch (Exception e) {
+     * return "Display Device did not get added to the Database error: " +
+     * e.getMessage();
+     * }
+     * return "Display Device have been added to the Database";
+     * }
+     */
 }

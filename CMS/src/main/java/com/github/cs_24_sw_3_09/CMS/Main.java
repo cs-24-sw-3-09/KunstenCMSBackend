@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 
+import com.github.cs_24_sw_3_09.CMS.DB.GetSingleObj;
 import com.github.cs_24_sw_3_09.CMS.DB.HikariCPDataSource;
 import com.github.cs_24_sw_3_09.CMS.modelClasses.DisplayDevice;
 
@@ -28,19 +29,21 @@ public class Main {
         // DisplayDevice d = ddBuilder.getDisplayDevice();
         // System.out.println(d);
 
-        Connection db = HikariCPDataSource.getConnection();
-        try (PreparedStatement statement = db.prepareStatement("""
-                    SELECT *
-                    FROM display_devices
-                """)) {
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                String val1 = resultSet.getString("name"); // by column index
-                // int val2 = resultSet.getInt("column2"); // by column name
-                // ... use val1 and val2 ...
-                System.out.println(val1);
-            }
-        }
-        db.close();
+        /*
+         * Connection db = HikariCPDataSource.getConnection();
+         * try (PreparedStatement statement = db.prepareStatement("""
+         * SELECT *
+         * FROM display_devices
+         * """)) {
+         * ResultSet resultSet = statement.executeQuery();
+         * while (resultSet.next()) {
+         * String val1 = resultSet.getString("name"); // by column index
+         * // int val2 = resultSet.getInt("column2"); // by column name
+         * // ... use val1 and val2 ...
+         * System.out.println(val1);
+         * }
+         * }
+         */
+        System.out.println(GetSingleObj.buildDisplayDeviceById(8).toJSON());
     }
 }

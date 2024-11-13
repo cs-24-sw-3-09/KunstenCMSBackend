@@ -42,4 +42,46 @@ public class GetSingleObj {
         }
         return dd;
     }
+
+    static public ResultSet getObjById(int id, String tableName) throws SQLException {
+        Connection db = HikariCPDataSource.getConnection();
+
+        String query = "SELECT * FROM " + tableName + " WHERE id = ? ";
+
+        try (PreparedStatement statement = db.prepareStatement(query)) {
+            statement.setInt(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error retrieving display device: " + e.getMessage());
+            return null;
+        }
+        return null;
+    }
+
+    static public DisplayDevice buildDisplayDeviceById(int id) throws SQLException {
+        DisplayDevice dd = null;
+        DisplayDevice.DisplayDeviceBuilder ddBuilder = new DisplayDevice.DisplayDeviceBuilder();
+
+        try (ResultSet resultSet = getObjById(id, "display_devices")) {
+            ddBuilder.setName(resultSet.getString("name"));
+            ddBuilder.setLocation(resultSet.getString("location"));
+            ddBuilder.setModel(resultSet.getString("model"));
+            ddBuilder.setDisplayOrientation(resultSet.getString("display_orientation"));
+            ddBuilder.setResolution(resultSet.getString("resolution"));
+            ddBuilder.setFallbackId(
+                    resultSet.getObject("fallback_id") != null ? resultSet.getInt("fallback_id") : null);
+            ddBuilder.setConnectedState(resultSet.getBoolean("connected_state"));
+            ddBuilder.setId(id);
+            dd = ddBuilder.getDisplayDevice();
+        } catch (Exception e) {
+            System.err.println("Error retrieving display device: " + e.getMessage());
+            return null;
+        }
+        return dd;
+    }
 }

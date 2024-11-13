@@ -38,7 +38,12 @@ public class RouterPOST {
             statement.setString(3, d.getModel());
             statement.setString(4, d.getDisplayOrientation());
             statement.setString(5, d.getResolution());
-            statement.setNull(6, d.getFallbackId(), "int");
+            // Check if fallbackId is null
+            if (d.getFallbackId() != null) {
+                statement.setInt(6, d.getFallbackId());
+            } else {
+                statement.setNull(6, java.sql.Types.INTEGER);
+            }
             statement.setBoolean(7, d.getConnectedState());
             int rowsInserted = statement.executeUpdate();
         } catch (Exception e) {

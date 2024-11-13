@@ -41,7 +41,7 @@ public class RouterPATCH {
         return objectMapper.treeToValue(patched, targetClass);
     }
 
-    @PatchMapping(path = "/api/display_devices/{id}")
+    @PatchMapping("/api/display_devices/{id}")
     public String updateDisplayDevice(@PathVariable int id, @RequestBody JsonPatch patch)
             throws SQLException {
         System.out.println("PATCH /api/display_devices/" + id);
