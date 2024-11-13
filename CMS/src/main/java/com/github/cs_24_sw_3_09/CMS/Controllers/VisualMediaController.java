@@ -1,7 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.Controllers;
 
+import com.github.cs_24_sw_3_09.CMS.services.IVisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.VisualMediaServiceImpl;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,10 @@ import java.io.InputStream;
 @RequestMapping("/visual_media")
 
 public class VisualMediaController {
+
+    @Autowired
+    IVisualMediaService visualMediaService;
+
     @GetMapping(value = "/{mediaId}", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] visual_media(@PathVariable String mediaId) throws IOException {
@@ -26,16 +33,12 @@ public class VisualMediaController {
 
 
     @PostMapping(value = "/upload")
-    public ResponseEntity<String> uploadFileRoute(@RequestParam("file") MultipartFile file)
+    public ResponseEntity<Object> uploadFileRoute(@RequestParam("file") MultipartFile file)
             throws IOException {
-
-        //If no file was in body
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is empty");
-        }
-        File uploadedFile = FileUtils.createVisualMediaFile(file);
-
-        return ResponseEntity.ok("File uploaded successfully");
+         
+        System.out.println("here");
+        visualMediaService.createVisualMedia(file);
+        return new ResponseEntity<>("File uploaded successfully", HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete")
