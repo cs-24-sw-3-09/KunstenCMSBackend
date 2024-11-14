@@ -19,6 +19,7 @@ public class DisplayDeviceDaoImpl implements IDisplayDeviceDao {
 
     @Override
     public void delete(int id) {
+
         String updateQuery = "DELETE FROM display_devices WHERE id = ?";
 
         try (PreparedStatement statement = db.prepareStatement(updateQuery)) {
@@ -28,5 +29,7 @@ public class DisplayDeviceDaoImpl implements IDisplayDeviceDao {
         } catch (Exception e) {
             System.err.println("Error deleteing display_devices: " + e.getMessage());
         }
+
+         
     }
 }

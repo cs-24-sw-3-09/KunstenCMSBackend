@@ -14,13 +14,11 @@ import java.util.Optional;
 
 @Component
 public class VisualMediaDaoImpl implements IVisualMediaDao {
-/*
     private final Connection db;
 
     public VisualMediaDaoImpl() throws SQLException {
         this.db = HikariCPDataSource.getConnection();
     }
-*/
     @Override
     public void create(VisualMedia VM) {
     }

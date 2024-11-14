@@ -79,7 +79,7 @@ public class DisplayDeviceController {
     public ResponseEntity<Object> deleteDisplayDevice(@PathVariable int id) throws SQLException {
         System.out.println("DELETE /api/display_devices/" + id);
         displayDeviceService.deleteDisplayDevice(id);
-        return new ResponseEntity<>("File uploaded successfully", HttpStatus.OK);
+        return new ResponseEntity<>("File deleted successfully", HttpStatus.OK);
     }
 /*
 
