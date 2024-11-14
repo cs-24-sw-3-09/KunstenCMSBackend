@@ -1,7 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.dao.IVisualMediaDao;
-import com.github.cs_24_sw_3_09.CMS.dao.daoImpl.VisualMediaDaoImpl;
+import com.github.cs_24_sw_3_09.CMS.model.VisualMedia;
 import com.github.cs_24_sw_3_09.CMS.services.IVisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.io.IOException;
 @Service
 public class VisualMediaServiceImpl implements IVisualMediaService {
 
-    private final IVisualMediaDaogit visualMediaDao;
+    private final IVisualMediaDao visualMediaDao;
 
     @Autowired
     public VisualMediaServiceImpl(IVisualMediaDao visualMediaDao) {
@@ -31,6 +31,9 @@ public class VisualMediaServiceImpl implements IVisualMediaService {
         FileUtils.createVisualMediaFile(file);
 
         /* Add to database */
+        VisualMedia testVM = new VisualMedia();
+
+        visualMediaDao.create(testVM);
 
     }
 
