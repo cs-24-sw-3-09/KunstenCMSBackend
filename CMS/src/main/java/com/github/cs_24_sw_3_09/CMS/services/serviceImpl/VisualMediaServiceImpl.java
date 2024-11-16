@@ -1,58 +1,38 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.dao.IVisualMediaDao;
-import com.github.cs_24_sw_3_09.CMS.model.VisualMedia;
-import com.github.cs_24_sw_3_09.CMS.services.IVisualMediaService;
-import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
-public class VisualMediaServiceImpl implements IVisualMediaService {
+public class VisualMediaServiceImpl implements VisualMediaService {
 
-    private final IVisualMediaDao visualMediaDao;
 
-    @Autowired
-    public VisualMediaServiceImpl(IVisualMediaDao visualMediaDao) {
-        this.visualMediaDao = visualMediaDao;
+    private VisualMediaRepository visualMediaRepository;
+
+    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository) {
+        this.visualMediaRepository = visualMediaRepository;
     }
 
     @Override
-    public void createVisualMedia(MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            return;
-        }
-        FileUtils.createVisualMediaFile(file);
-
-        /* Add to database */
-        VisualMedia testVM = new VisualMedia();
-
-        visualMediaDao.create(testVM);
-
+    public VisualMediaEntity createVisualMedia(VisualMediaEntity visualMedia) {
+        return visualMediaRepository.save(visualMedia);
     }
 
     @Override
-    public ResponseEntity<Object> deleteVisualMedia(String path) {
+    public List<VisualMediaEntity> findAll() {
+        return StreamSupport.stream(visualMediaRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
 
-        /* Delete file from folder */
-        File fileToDelete = FileUtils.createFileFromRoot(path);
-
-        if (!fileToDelete.exists()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
-        }
-
-        if (!fileToDelete.delete()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not delete file");
-        }
-
-        /* Update in database */
-
-        return ResponseEntity.status(HttpStatus.OK).body("File successfully deleted");
+    @Override
+    public Optional<VisualMediaEntity> findOne(Long id) {
+        return visualMediaRepository.findById(Math.toIntExact(id));
     }
 }

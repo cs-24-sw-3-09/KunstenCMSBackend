@@ -1,32 +1,41 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.dao.IDisplayDeviceDao;
-import com.github.cs_24_sw_3_09.CMS.services.IDisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 @Service
-public class DisplayDeviceServiceImpl implements IDisplayDeviceService {
+public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
-    IDisplayDeviceDao displayDeviceDao;
+    private DisplayDeviceRepository displayDeviceRepository;
 
-    @Autowired
-    public DisplayDeviceServiceImpl(IDisplayDeviceDao displayDeviceDao) {
-        this.displayDeviceDao = displayDeviceDao;
+    @Override
+    public Optional<DisplayDeviceEntity> findOne(Long id) {
+        return displayDeviceRepository.findById(Math.toIntExact(id));
     }
 
     @Override
-    public ResponseEntity<Object> deleteDisplayDevice(int id) {
-        // Delete from database
-        try {
-            displayDeviceDao.delete(id);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Got error while deleting: " + e.getMessage());
-        }
+    public List<DisplayDeviceEntity> findAll() {
+        //return itterable, so we convert it to list.
+        return StreamSupport.stream(displayDeviceRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).body("succesfully deleted");
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository) {
+        this.displayDeviceRepository = displayDeviceRepository;
+    }
+
+    @Override
+    public DisplayDeviceEntity createDisplayDevice(DisplayDeviceEntity displayDevice) {
+        // Er basically bare en pass through method i dette tilfælde.
+        return displayDeviceRepository.save(displayDevice);
     }
 }
