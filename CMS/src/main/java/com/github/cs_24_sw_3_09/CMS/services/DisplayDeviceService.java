@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DisplayDeviceService {
-    DisplayDeviceEntity createDisplayDevice(DisplayDeviceEntity displayDevice);
+    DisplayDeviceEntity save(DisplayDeviceEntity displayDevice);
     List<DisplayDeviceEntity> findAll();
     Optional<DisplayDeviceEntity> findOne(Long id);
+
+    boolean isExists(Long id);
+
+    DisplayDeviceEntity partialUpdate(Long id, DisplayDeviceEntity displayDeviceEntity);
 }

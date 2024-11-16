@@ -134,8 +134,8 @@ public class DisplayDeviceDto {
             return this;
         }
 
-        public DisplayDeviceEntity build() {
-            return new DisplayDeviceEntity(id, name, location, model, displayOrientation, resolution, connectedState);
+        public DisplayDeviceDto build() {
+            return new DisplayDeviceDto(id, name, location, model, displayOrientation, resolution, connectedState);
         }
     }
 

@@ -2,11 +2,11 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,7 +81,7 @@ public class DisplayDeviceControllerIntegrationTests {
     @Test
     public void testThatGetDisplayDeviceSuccessfullyReturnsListOfVisualMedia() throws Exception {
         DisplayDeviceEntity testDisplayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.createDisplayDevice(testDisplayDeviceEntity);
+        displayDeviceService.save(testDisplayDeviceEntity);
 
 
         mockMvc.perform(
@@ -99,7 +99,7 @@ public class DisplayDeviceControllerIntegrationTests {
     @Test
     public void testThatGetDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.createDisplayDevice(displayDeviceEntity);
+        displayDeviceService.save(displayDeviceEntity);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/display_devices/1")
@@ -111,7 +111,7 @@ public class DisplayDeviceControllerIntegrationTests {
     @Test
     public void testThatGetDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.createDisplayDevice(displayDeviceEntity);
+        displayDeviceService.save(displayDeviceEntity);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/display_devices/100000")
@@ -123,7 +123,7 @@ public class DisplayDeviceControllerIntegrationTests {
     @Test
     public void testThatGetDisplayDeviceReturnsDisplayDeviceWhenDisplayDeviceExists() throws Exception {
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.createDisplayDevice(displayDeviceEntity);
+        displayDeviceService.save(displayDeviceEntity);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/display_devices/1")
@@ -135,6 +135,42 @@ public class DisplayDeviceControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.location").value(displayDeviceEntity.getLocation())
         );
+    }
+
+    @Test
+    public void testThatFullUpdateDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
+        DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
+        String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
+
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/display_devices/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(displayDeviceDtoJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void testThatFullUpdateDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
+        DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
+        DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+
+        DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
+        String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
+
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/display_devices/" + savedDisplayDeviceEntity.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(displayDeviceDtoJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatFullUpdateUpdatesExistingDisplayDevice() throws Exception {
+       // Not yet implemented.
     }
 
 }

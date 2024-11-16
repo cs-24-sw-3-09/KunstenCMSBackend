@@ -22,7 +22,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public VisualMediaEntity createVisualMedia(VisualMediaEntity visualMedia) {
+    public VisualMediaEntity save(VisualMediaEntity visualMedia) {
         return visualMediaRepository.save(visualMedia);
     }
 
@@ -34,5 +34,24 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public Optional<VisualMediaEntity> findOne(Long id) {
         return visualMediaRepository.findById(Math.toIntExact(id));
+    }
+
+    @Override
+    public boolean isExists(Long id) {
+        return visualMediaRepository.existsById(Math.toIntExact(id));
+    }
+
+    @Override
+    public VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity) {
+        visualMediaEntity.setId(Math.toIntExact(id));
+        return visualMediaRepository.findById(Math.toIntExact(id)).map(existingVisualMedia -> {
+            // if display device from request has name, we set it to the existing display device. (same with other atts)
+            Optional.ofNullable(visualMediaEntity.getName()).ifPresent(existingVisualMedia::setName);
+            Optional.ofNullable(visualMediaEntity.getLocation()).ifPresent(existingVisualMedia::setLocation);
+            Optional.ofNullable(visualMediaEntity.getDescription()).ifPresent(existingVisualMedia::setDescription);
+            Optional.ofNullable(visualMediaEntity.getFileType()).ifPresent(existingVisualMedia::setFileType);
+            Optional.ofNullable(visualMediaEntity.getLastDateModified()).ifPresent(existingVisualMedia::setLastDateModified);
+            return visualMediaRepository.save(existingVisualMedia);
+        }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }
 }

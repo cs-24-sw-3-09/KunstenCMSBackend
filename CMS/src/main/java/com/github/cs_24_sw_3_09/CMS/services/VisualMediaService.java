@@ -7,8 +7,12 @@ import java.util.Optional;
 
 public interface VisualMediaService {
 
-    VisualMediaEntity createVisualMedia(VisualMediaEntity visualMedia);
+    VisualMediaEntity save(VisualMediaEntity visualMedia);
     List<VisualMediaEntity> findAll();
 
     Optional<VisualMediaEntity> findOne(Long id);
+
+    boolean isExists(Long id);
+
+    VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity);
 }
