@@ -17,6 +17,9 @@ public class VisualMediaEntity {
     private String description;
     private String lastDateModified;
 
+
+
+
     // No-argument constructor
     public VisualMediaEntity() {
     }

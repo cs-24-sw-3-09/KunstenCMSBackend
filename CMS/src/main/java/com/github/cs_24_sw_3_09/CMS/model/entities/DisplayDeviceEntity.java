@@ -17,6 +17,9 @@ public class DisplayDeviceEntity {
     private String displayOrientation;
     private String resolution;
     private Boolean connectedState;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "falback_id")
+    private VisualMediaEntity fallbackVisualMedia;
 
     // No-argument constructor
     public DisplayDeviceEntity() {
@@ -24,12 +27,13 @@ public class DisplayDeviceEntity {
 
     // All-arguments constructor
     public DisplayDeviceEntity(Integer id, String name, String location, String model,
-                               String displayOrientation, String resolution, Boolean connectedState) {
+                               String displayOrientation, String resolution, Boolean connectedState, VisualMediaEntity fallbackVisualMedia) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.model = model;
         this.displayOrientation = displayOrientation;
+        this.fallbackVisualMedia = fallbackVisualMedia;
         this.resolution = resolution;
         this.connectedState = connectedState;
     }
@@ -91,6 +95,14 @@ public class DisplayDeviceEntity {
         this.connectedState = connectedState;
     }
 
+    public VisualMediaEntity getFallbackVisualMedia() {
+        return fallbackVisualMedia;
+    }
+
+    public void setFallbackVisualMedia(VisualMediaEntity fallbackVisualMedia) {
+        this.fallbackVisualMedia = fallbackVisualMedia;
+    }
+
     // Builder Pattern (manual implementation)
     public static class Builder {
         private Integer id;
@@ -100,6 +112,7 @@ public class DisplayDeviceEntity {
         private String displayOrientation;
         private String resolution;
         private Boolean connectedState;
+        private VisualMediaEntity fallbackVisualMedia;
 
         public Builder setId(Integer id) {
             this.id = id;
@@ -136,8 +149,13 @@ public class DisplayDeviceEntity {
             return this;
         }
 
+        public Builder setFallbackVisualMedia(VisualMediaEntity fallbackVisualMedia) {
+            this.fallbackVisualMedia = fallbackVisualMedia;
+            return this;
+        }
+
         public DisplayDeviceEntity build() {
-            return new DisplayDeviceEntity(id, name, location, model, displayOrientation, resolution, connectedState);
+            return new DisplayDeviceEntity(id, name, location, model, displayOrientation, resolution, connectedState, fallbackVisualMedia);
         }
     }
 
@@ -151,6 +169,7 @@ public class DisplayDeviceEntity {
                 ", displayOrientation='" + displayOrientation + '\'' +
                 ", resolution='" + resolution + '\'' +
                 ", connectedState=" + connectedState +
+                ", fallbackVisualMedia=" + fallbackVisualMedia +
                 '}';
     }
 
@@ -161,11 +180,12 @@ public class DisplayDeviceEntity {
         DisplayDeviceEntity that = (DisplayDeviceEntity) o;
         return id.equals(that.id) && name.equals(that.name) && location.equals(that.location) &&
                 model.equals(that.model) && displayOrientation.equals(that.displayOrientation) &&
-                resolution.equals(that.resolution) && connectedState.equals(that.connectedState);
+                resolution.equals(that.resolution) && connectedState.equals(that.connectedState) &&
+                fallbackVisualMedia.equals(that.fallbackVisualMedia);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, location, model, displayOrientation, resolution, connectedState);
+        return java.util.Objects.hash(id, name, location, model, displayOrientation, resolution, connectedState, fallbackVisualMedia);
     }
 }

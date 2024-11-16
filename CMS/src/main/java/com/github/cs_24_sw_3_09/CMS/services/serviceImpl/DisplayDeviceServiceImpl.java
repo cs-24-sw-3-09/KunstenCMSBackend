@@ -55,7 +55,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             Optional.ofNullable(displayDeviceEntity.getLocation()).ifPresent(existingDisplayDevice::setLocation);
             Optional.ofNullable(displayDeviceEntity.getModel()).ifPresent(existingDisplayDevice::setModel);
             Optional.ofNullable(displayDeviceEntity.getResolution()).ifPresent(existingDisplayDevice::setResolution);
-
+            Optional.ofNullable(displayDeviceEntity.getFallbackVisualMedia()).ifPresent(existingDisplayDevice::setFallbackVisualMedia);
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }
