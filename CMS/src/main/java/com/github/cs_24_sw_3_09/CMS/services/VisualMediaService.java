@@ -15,4 +15,6 @@ public interface VisualMediaService {
     boolean isExists(Long id);
 
     VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity);
+
+    void delete(Long id);
 }

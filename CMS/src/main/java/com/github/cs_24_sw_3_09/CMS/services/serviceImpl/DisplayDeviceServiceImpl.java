@@ -59,4 +59,10 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }
+
+    @Override
+    public void delete(Long id) {
+
+        displayDeviceRepository.deleteById(Math.toIntExact(id));
+    }
 }

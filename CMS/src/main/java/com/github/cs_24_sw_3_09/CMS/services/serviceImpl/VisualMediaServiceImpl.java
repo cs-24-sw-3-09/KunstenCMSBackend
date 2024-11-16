@@ -54,4 +54,9 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             return visualMediaRepository.save(existingVisualMedia);
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }
+
+    @Override
+    public void delete(Long id) {
+        visualMediaRepository.deleteById(Math.toIntExact(id));
+    }
 }

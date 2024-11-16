@@ -75,4 +75,13 @@ public class DisplayDeviceController {
         return new ResponseEntity<>(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity), HttpStatus.OK);
     }
 
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity deleteDisplayDevice(@PathVariable("id") Long id) {
+        if (!displayDeviceService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        displayDeviceService.delete(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
 }

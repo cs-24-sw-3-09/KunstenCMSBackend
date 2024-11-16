@@ -13,4 +13,6 @@ public interface DisplayDeviceService {
     boolean isExists(Long id);
 
     DisplayDeviceEntity partialUpdate(Long id, DisplayDeviceEntity displayDeviceEntity);
+
+    void delete(Long id);
 }
