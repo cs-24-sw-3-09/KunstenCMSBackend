@@ -3,6 +3,8 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public List<VisualMediaEntity> findAll() {
         return StreamSupport.stream(visualMediaRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<VisualMediaEntity> findAll(Pageable pageable) {
+        return visualMediaRepository.findAll(pageable);
     }
 
     @Override

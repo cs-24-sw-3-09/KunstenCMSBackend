@@ -6,6 +6,8 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +39,9 @@ public class DisplayDeviceController {
     }
 
     @GetMapping
-    public List<DisplayDeviceDto> getDisplayDevices() {
-        List<DisplayDeviceEntity> displayDeviceEntities = displayDeviceService.findAll();
-        return displayDeviceEntities.stream().map(displayDeviceMapper::mapTo).collect(Collectors.toList());
+    public Page<DisplayDeviceDto> getDisplayDevices(Pageable pageable) {
+        Page<DisplayDeviceEntity> displayDeviceEntities = displayDeviceService.findAll(pageable);
+        return displayDeviceEntities.map(displayDeviceMapper::mapTo);
     }
 
     @GetMapping(path = "/{id}")

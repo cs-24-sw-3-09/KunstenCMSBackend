@@ -6,6 +6,8 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +37,9 @@ public class VisualMediaController {
     }
 
     @GetMapping
-    public List<VisualMediaDto> getVisualMedias() {
-        List<VisualMediaEntity> visualMediaEntities = visualMediaService.findAll();
-        return visualMediaEntities.stream().map(visualMediaMapper::mapTo).collect(Collectors.toList());
+    public Page<VisualMediaDto> getVisualMedias(Pageable pageable) {
+        Page<VisualMediaEntity> visualMediaEntities = visualMediaService.findAll(pageable);
+        return visualMediaEntities.map(visualMediaMapper::mapTo);
     }
 
     @GetMapping(path = "/{id}")

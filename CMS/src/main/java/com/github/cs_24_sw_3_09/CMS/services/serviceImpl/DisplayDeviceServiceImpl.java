@@ -4,6 +4,8 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,11 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     public List<DisplayDeviceEntity> findAll() {
         //return itterable, so we convert it to list.
         return StreamSupport.stream(displayDeviceRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<DisplayDeviceEntity> findAll(Pageable pageable) {
+        return displayDeviceRepository.findAll(pageable);
     }
 
     public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository) {
