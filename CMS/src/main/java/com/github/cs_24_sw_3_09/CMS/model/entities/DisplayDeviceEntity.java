@@ -17,7 +17,7 @@ public class DisplayDeviceEntity {
     private String displayOrientation;
     private String resolution;
     private Boolean connectedState;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "falback_id")
     private VisualMediaEntity fallbackVisualMedia;
 
@@ -161,7 +161,7 @@ public class DisplayDeviceEntity {
 
     @Override
     public String toString() {
-        return "DisplayDevice{" +
+        return "DisplayDeviceEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", location='" + location + '\'' +

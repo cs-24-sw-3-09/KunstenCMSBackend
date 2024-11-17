@@ -1,6 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.model.dto;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import jakarta.persistence.*;
+
+import java.util.Set;
 
 public class VisualMediaDto {
 
@@ -11,6 +14,7 @@ public class VisualMediaDto {
     private String fileType;
     private String description;
     private String lastDateModified;
+    private Set<TagEntity> tags;
 
     // No-argument constructor
     public VisualMediaDto() {
@@ -18,13 +22,14 @@ public class VisualMediaDto {
 
     // All-arguments constructor
     public VisualMediaDto(Integer id, String name, String location, String fileType,
-                             String description, String lastDateModified) {
+                          String description, String lastDateModified, Set<TagEntity> tags) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.fileType = fileType;
         this.description = description;
         this.lastDateModified = lastDateModified;
+        this.tags = tags;
     }
 
     // Getters and Setters
@@ -76,6 +81,14 @@ public class VisualMediaDto {
         this.lastDateModified = lastDateModified;
     }
 
+    public Set<TagEntity> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<TagEntity> tags) {
+        this.tags = tags;
+    }
+
     // Builder Pattern (manual implementation)
     public static class Builder {
         private Integer id;
@@ -84,6 +97,7 @@ public class VisualMediaDto {
         private String fileType;
         private String description;
         private String lastDateModified;
+        private Set<TagEntity> tags;
 
         public Builder setId(Integer id) {
             this.id = id;
@@ -115,20 +129,26 @@ public class VisualMediaDto {
             return this;
         }
 
+        public Builder setTags(Set<TagEntity> tags) {
+            this.tags = tags;
+            return this;
+        }
+
         public VisualMediaDto build() {
-            return new VisualMediaDto(id, name, location, fileType, description, lastDateModified);
+            return new VisualMediaDto(id, name, location, fileType, description, lastDateModified, tags);
         }
     }
 
     @Override
     public String toString() {
-        return "VisualMediaEntity{" +
+        return "VisualMediaDto{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", location='" + location + '\'' +
                 ", fileType='" + fileType + '\'' +
                 ", description='" + description + '\'' +
                 ", lastDateModified='" + lastDateModified + '\'' +
+                ", tags=" + tags +
                 '}';
     }
 
@@ -139,12 +159,12 @@ public class VisualMediaDto {
         VisualMediaDto that = (VisualMediaDto) o;
         return id.equals(that.id) && name.equals(that.name) && location.equals(that.location) &&
                 fileType.equals(that.fileType) && description.equals(that.description) &&
-                lastDateModified.equals(that.lastDateModified);
+                lastDateModified.equals(that.lastDateModified) && tags.equals(that.tags);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, location, fileType, description, lastDateModified);
+        return java.util.Objects.hash(id, name, location, fileType, description, lastDateModified, tags);
     }
 
 }

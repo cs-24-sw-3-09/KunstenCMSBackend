@@ -2,6 +2,9 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "visual_medias")
 public class VisualMediaEntity {
@@ -16,8 +19,13 @@ public class VisualMediaEntity {
     private String fileType;
     private String description;
     private String lastDateModified;
-
-
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "visual_media_tag",
+            joinColumns = {@JoinColumn(name = "visual_media_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
+    )
+    private Set<TagEntity> tags = new HashSet<TagEntity>();
 
 
     // No-argument constructor
@@ -26,13 +34,14 @@ public class VisualMediaEntity {
 
     // All-arguments constructor
     public VisualMediaEntity(Integer id, String name, String location, String fileType,
-                             String description, String lastDateModified) {
+                             String description, String lastDateModified, Set<TagEntity> tags) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.fileType = fileType;
         this.description = description;
         this.lastDateModified = lastDateModified;
+        this.tags = tags;
     }
 
     // Getters and Setters
@@ -84,6 +93,14 @@ public class VisualMediaEntity {
         this.lastDateModified = lastDateModified;
     }
 
+    public Set<TagEntity> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<TagEntity> tags) {
+        this.tags = tags;
+    }
+
     // Builder Pattern (manual implementation)
     public static class Builder {
         private Integer id;
@@ -92,6 +109,7 @@ public class VisualMediaEntity {
         private String fileType;
         private String description;
         private String lastDateModified;
+        private Set<TagEntity> tags;
 
         public Builder setId(Integer id) {
             this.id = id;
@@ -123,8 +141,13 @@ public class VisualMediaEntity {
             return this;
         }
 
+        public Builder setTags(Set<TagEntity> tags) {
+            this.tags = tags;
+            return this;
+        }
+
         public VisualMediaEntity build() {
-            return new VisualMediaEntity(id, name, location, fileType, description, lastDateModified);
+            return new VisualMediaEntity(id, name, location, fileType, description, lastDateModified, tags);
         }
     }
 
@@ -137,6 +160,7 @@ public class VisualMediaEntity {
                 ", fileType='" + fileType + '\'' +
                 ", description='" + description + '\'' +
                 ", lastDateModified='" + lastDateModified + '\'' +
+                ", tags=" + tags +
                 '}';
     }
 
@@ -147,12 +171,12 @@ public class VisualMediaEntity {
         VisualMediaEntity that = (VisualMediaEntity) o;
         return id.equals(that.id) && name.equals(that.name) && location.equals(that.location) &&
                 fileType.equals(that.fileType) && description.equals(that.description) &&
-                lastDateModified.equals(that.lastDateModified);
+                lastDateModified.equals(that.lastDateModified) && tags.equals(that.tags);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, location, fileType, description, lastDateModified);
+        return java.util.Objects.hash(id, name, location, fileType, description, lastDateModified, tags);
     }
 
 }

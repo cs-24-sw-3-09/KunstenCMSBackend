@@ -58,6 +58,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             Optional.ofNullable(visualMediaEntity.getDescription()).ifPresent(existingVisualMedia::setDescription);
             Optional.ofNullable(visualMediaEntity.getFileType()).ifPresent(existingVisualMedia::setFileType);
             Optional.ofNullable(visualMediaEntity.getLastDateModified()).ifPresent(existingVisualMedia::setLastDateModified);
+            Optional.ofNullable(visualMediaEntity.getTags()).ifPresent(existingVisualMedia::setTags);
             return visualMediaRepository.save(existingVisualMedia);
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }

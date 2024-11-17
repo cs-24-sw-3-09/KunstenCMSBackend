@@ -1,11 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEntity, Integer>,
-        PagingAndSortingRepository<DisplayDeviceEntity, Integer> {
+public interface TagRepository extends CrudRepository<TagEntity, Long>,
+        PagingAndSortingRepository<TagEntity, Long> {
 }

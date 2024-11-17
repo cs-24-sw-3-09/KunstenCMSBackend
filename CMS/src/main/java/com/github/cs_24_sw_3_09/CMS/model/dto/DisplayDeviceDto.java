@@ -158,7 +158,7 @@ public class DisplayDeviceDto {
 
     @Override
     public String toString() {
-        return "DisplayDevice{" +
+        return "DisplayDeviceDto{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", location='" + location + '\'' +

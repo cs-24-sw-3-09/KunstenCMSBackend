@@ -21,6 +21,10 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
     private DisplayDeviceRepository displayDeviceRepository;
 
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository) {
+        this.displayDeviceRepository = displayDeviceRepository;
+    }
+
     @Override
     public Optional<DisplayDeviceEntity> findOne(Long id) {
         return displayDeviceRepository.findById(Math.toIntExact(id));
@@ -37,9 +41,6 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
         return displayDeviceRepository.findAll(pageable);
     }
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository) {
-        this.displayDeviceRepository = displayDeviceRepository;
-    }
 
     @Override
     public DisplayDeviceEntity save(DisplayDeviceEntity displayDevice) {
