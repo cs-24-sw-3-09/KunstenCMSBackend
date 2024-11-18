@@ -14,6 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class VisualMediaInclusionDto {
+
     protected Integer id;
     private Integer slideDuration;
     private Integer slideshowPosition;

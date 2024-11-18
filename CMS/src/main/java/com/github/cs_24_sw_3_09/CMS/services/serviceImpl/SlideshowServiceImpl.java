@@ -53,7 +53,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         return slideshowRepository.findById(Math.toIntExact(id)).map(existingSlideshow -> {
             // if display device from request has name, we set it to the existing display device. (same with other atts)
             Optional.ofNullable(slideshowEntity.getName()).ifPresent(existingSlideshow::setName);
-            Optional.ofNullable(slideshowEntity.getIsArchived()).ifPresent(existingSlideshow::setArchived);
+            Optional.ofNullable(slideshowEntity.getIsArchived()).ifPresent(existingSlideshow::setIsArchived);
             Optional.ofNullable(slideshowEntity.getVisualMediaInclusionCollection()).ifPresent(existingSlideshow::setVisualMediaInclusionCollection);
 
             return slideshowRepository.save(existingSlideshow);
