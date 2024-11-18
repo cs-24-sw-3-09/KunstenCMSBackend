@@ -14,7 +14,7 @@ public class SlideshowEntity {
     @SequenceGenerator(name = "slideshows_id_seq", sequenceName = "slideshows_id_seq", allocationSize = 1)
     protected Integer id;
     private String name;
-    private boolean isArchived;
+    private Boolean isArchived;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "visual_media_inclusion_id")
     private Set<VisualMediaInclusionEntity> visualMediaInclusionCollection;
@@ -44,11 +44,11 @@ public class SlideshowEntity {
         this.name = name;
     }
 
-    public boolean getIsArchived() {
+    public Boolean getIsArchived() {
         return isArchived;
     }
 
-    public void setArchived(boolean isArchived) {
+    public void setArchived(Boolean isArchived) {
         this.isArchived = isArchived;
     }
 

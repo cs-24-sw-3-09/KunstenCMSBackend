@@ -10,7 +10,7 @@ import java.util.Set;
 public class SlideshowDto {
     protected Integer id;
     private String name;
-    private boolean isArchived;
+    private Boolean isArchived;
     private Set<VisualMediaInclusionEntity> visualMediaInclusionCollection;
 
     public SlideshowDto(Integer id, String name, boolean isArchived, Set<VisualMediaInclusionEntity> visualMediaInclusionCollection) {
@@ -38,11 +38,11 @@ public class SlideshowDto {
         this.name = name;
     }
 
-    public boolean isArchived() {
+    public Boolean isArchived() {
         return isArchived;
     }
 
-    public void setArchived(boolean isArchived) {
+    public void setArchived(Boolean isArchived) {
         this.isArchived = isArchived;
     }
 

@@ -20,14 +20,12 @@ import java.util.Optional;
 @RequestMapping("/api/slideshows")
 public class SlideshowController {
 
-    private final SlideshowRepository slideshowRepository;
     private SlideshowMapperImpl slideshowMapper;
     private SlideshowService slideshowService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService, SlideshowRepository slideshowRepository) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
-        this.slideshowRepository = slideshowRepository;
     }
 
     @GetMapping(path = "/{id}")
