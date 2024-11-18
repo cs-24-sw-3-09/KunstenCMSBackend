@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "display_devices")
 public class DisplayDeviceEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "display_device_id_seq")
     @SequenceGenerator(name = "display_device_id_seq", sequenceName = "display_device_id_seq", allocationSize = 1)
