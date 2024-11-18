@@ -1,14 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
 import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
-import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
-
-import java.util.Collection;
-import java.util.List;
+import jakarta.annotation.PreDestroy;
 
 public class SocketIOModule {
     private final SocketIOServer server;
@@ -17,16 +14,12 @@ public class SocketIOModule {
         Configuration configuration = new Configuration();
         configuration.setHostname(hostname);
         configuration.setPort(port);
+        SocketConfig socketConfiguration = new SocketConfig();
+        socketConfiguration.setReuseAddress(true);
+        configuration.setSocketConfig(socketConfiguration);
         this.server = new SocketIOServer(configuration);
         server.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
-        server.addEventListener("sendMessage", SocketIOMessage.class, this.receiveMessage());
-    }
-
-    private DataListener<SocketIOMessage> receiveMessage() {
-        return ((client, data, ackSender) -> {
-            System.out.println("Got message: " + data.getMessage());
-        });
     }
 
     private ConnectListener onConnected() {
@@ -43,34 +36,15 @@ public class SocketIOModule {
         });
     }
 
-    private void broadcastMessage(String event, String message) {
-        server.getBroadcastOperations().sendEvent(event, message);
-    }
-
-    public Collection<SocketIOClient> getClients() {
-        return server.getAllClients();
-    }
-
-    public void clearDisplay(String uuid) {
-        getClients().stream().filter(client -> client.getSessionId().toString().equals(uuid)).findAny()
-                .ifPresent(client -> client.sendEvent("clear"));
-    }
-
-    public void startCarousel(String uuid, List<String> images) {
-        getClients().stream().filter(client -> client.getSessionId().toString().equals(uuid)).findAny()
-                .ifPresent(client -> client.sendEvent("carousel-images", images));
-    }
-
-    public void setImage(String uuid, String image) {
-        getClients().stream().filter(client -> client.getSessionId().toString().equals(uuid)).findAny()
-                .ifPresent(client -> client.sendEvent("set-image", image));
-    }
-
     public void start() {
         server.start();
     }
 
+    @PreDestroy
     public void stop() {
-        server.stop();
+        if (server != null) {
+            System.out.println("Stopping SocketIO server...");
+            server.stop();
+        }
     }
 }
