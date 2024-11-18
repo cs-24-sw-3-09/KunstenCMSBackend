@@ -46,4 +46,54 @@ public class TimeSlotController {
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public Page<TimeSlotDto> getTimeSlots(Pageable pageable) {
+        Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
+        return timeSlotEntities.map(timeSlotMapper::mapTo);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<TimeSlotDto> getTimeSlot(@PathVariable("id") Long id) {
+        Optional<TimeSlotEntity> foundTimeSlot = timeSlotService.findOne(id);
+
+        return foundTimeSlot.map(timeSlotEntity -> {
+            TimeSlotDto timeSlotDto = timeSlotMapper.mapTo(timeSlotEntity);
+            return new ResponseEntity<>(timeSlotDto, HttpStatus.OK);
+        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<TimeSlotDto> fullUpdateTimeSlot(@PathVariable("id") Long id,
+            @Valid @RequestBody TimeSlotDto timeSlotDto) {
+        if (!timeSlotService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        timeSlotDto.setId(Math.toIntExact(id));
+        TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
+        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.OK);
+    }
+
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<TimeSlotDto> partialUpdateTimeSlot(@PathVariable("id") Long id,
+            @Valid @RequestBody TimeSlotDto timeSlotDto) {
+        if (!timeSlotService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
+        TimeSlotEntity updatedTimeSlotEntity = timeSlotService.partialUpdate(id, timeSlotEntity);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlotEntity), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity deleteTimeSlot(@PathVariable("id") Long id) {
+        if (!timeSlotService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        timeSlotService.delete(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
 }
