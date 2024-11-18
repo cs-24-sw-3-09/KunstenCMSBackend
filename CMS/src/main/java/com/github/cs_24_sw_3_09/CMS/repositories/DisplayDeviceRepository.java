@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEntity, Integer>,
         PagingAndSortingRepository<DisplayDeviceEntity, Integer> {
+
+
 }
