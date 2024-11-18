@@ -19,7 +19,7 @@ public interface VisualMediaInclusionService {
 
     boolean isExists(Long id);
 
-    VisualMediaEntity partialUpdate(Long id, VisualMediaInclusionEntity visualMediaInclusionEntity);
+    VisualMediaInclusionEntity partialUpdate(Long id, VisualMediaInclusionEntity visualMediaInclusionEntity);
 
     void delete(Long id);
 }

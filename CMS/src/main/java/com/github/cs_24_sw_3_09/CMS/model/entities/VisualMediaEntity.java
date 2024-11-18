@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;

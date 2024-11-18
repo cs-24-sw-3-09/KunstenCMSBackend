@@ -4,7 +4,9 @@ import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VisualMediaInclusionMapperImpl implements Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> {
 
     private final ModelMapper modelMapper;

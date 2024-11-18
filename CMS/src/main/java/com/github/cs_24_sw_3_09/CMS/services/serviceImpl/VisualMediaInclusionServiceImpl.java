@@ -7,13 +7,15 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionService {
 
-    private VisualMediaInclusionRepository visualMediaInclusionRepository;
+    private final VisualMediaInclusionRepository visualMediaInclusionRepository;
 
     public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
@@ -31,26 +33,34 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     @Override
     public Page<VisualMediaInclusionEntity> findAll(Pageable pageable) {
-        return null;
+        return visualMediaInclusionRepository.findAll(pageable);
     }
 
     @Override
     public Optional<VisualMediaInclusionEntity> findOne(Long id) {
-        return Optional.empty();
+        return visualMediaInclusionRepository.findById(Math.toIntExact(id));
     }
 
     @Override
     public boolean isExists(Long id) {
-        return false;
+        return visualMediaInclusionRepository.existsById(Math.toIntExact(id));
     }
 
     @Override
-    public VisualMediaEntity partialUpdate(Long id, VisualMediaInclusionEntity visualMediaInclusionEntity) {
-        return null;
+    public VisualMediaInclusionEntity partialUpdate(Long id, VisualMediaInclusionEntity visualMediaInclusionEntity) {
+        visualMediaInclusionEntity.setId(Math.toIntExact(id));
+        return visualMediaInclusionRepository.findById(Math.toIntExact(id)).map(existingVisualMediaInclusion -> {
+            // if display device from request has name, we set it to the existing display device. (same with other atts)
+            Optional.ofNullable(visualMediaInclusionEntity.getId()).ifPresent(existingVisualMediaInclusion::setId);
+            Optional.ofNullable(visualMediaInclusionEntity.getSlideDuration()).ifPresent(existingVisualMediaInclusion::setSlideDuration);
+            Optional.ofNullable(visualMediaInclusionEntity.getSlideshowPosition()).ifPresent(existingVisualMediaInclusion::setSlideshowPosition);
+            Optional.ofNullable(visualMediaInclusionEntity.getVisualMedia()).ifPresent(existingVisualMediaInclusion::setVisualMedia);
+            return visualMediaInclusionRepository.save(existingVisualMediaInclusion);
+        }).orElseThrow(() -> new RuntimeException("Visual Media Inclusion does not exist"));
     }
 
     @Override
     public void delete(Long id) {
-
+        visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
     }
 }

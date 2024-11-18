@@ -71,8 +71,8 @@ public class VisualMediaController {
         }
 
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
-        VisualMediaEntity updatedDisplayDeviceEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
-        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedDisplayDeviceEntity), HttpStatus.OK);
+        VisualMediaEntity updatedVisualMediaEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
