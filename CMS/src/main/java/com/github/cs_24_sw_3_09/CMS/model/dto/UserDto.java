@@ -2,8 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import java.sql.Date;
 
-import io.micrometer.common.lang.NonNull;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +16,7 @@ public class UserDto {
     @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z0-9.-]+$", message = "Invalid email format")
     private String email;
     @Size(min = 8, message = "a must be at least 8 characters long")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private Date pauseNotificationStart;
     private Date pauseNotificationEnd;

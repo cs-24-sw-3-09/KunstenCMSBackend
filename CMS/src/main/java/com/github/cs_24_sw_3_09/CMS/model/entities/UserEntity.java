@@ -2,18 +2,12 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import java.sql.Date;
 
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
-import org.checkerframework.checker.nullness.compatqual.NonNullType;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.lang.NonNull;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
