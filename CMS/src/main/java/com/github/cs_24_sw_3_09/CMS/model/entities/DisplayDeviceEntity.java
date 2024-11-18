@@ -2,7 +2,6 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import jakarta.persistence.*;
 
-
 @Entity
 @Table(name = "display_devices")
 public class DisplayDeviceEntity {
@@ -27,7 +26,8 @@ public class DisplayDeviceEntity {
 
     // All-arguments constructor
     public DisplayDeviceEntity(Integer id, String name, String location, String model,
-                               String displayOrientation, String resolution, Boolean connectedState, VisualMediaEntity fallbackVisualMedia) {
+            String displayOrientation, String resolution, Boolean connectedState,
+            VisualMediaEntity fallbackVisualMedia) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -155,7 +155,8 @@ public class DisplayDeviceEntity {
         }
 
         public DisplayDeviceEntity build() {
-            return new DisplayDeviceEntity(id, name, location, model, displayOrientation, resolution, connectedState, fallbackVisualMedia);
+            return new DisplayDeviceEntity(id, name, location, model, displayOrientation, resolution, connectedState,
+                    fallbackVisualMedia);
         }
     }
 
@@ -175,8 +176,10 @@ public class DisplayDeviceEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         DisplayDeviceEntity that = (DisplayDeviceEntity) o;
         return id.equals(that.id) && name.equals(that.name) && location.equals(that.location) &&
                 model.equals(that.model) && displayOrientation.equals(that.displayOrientation) &&
@@ -186,6 +189,7 @@ public class DisplayDeviceEntity {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, location, model, displayOrientation, resolution, connectedState, fallbackVisualMedia);
+        return java.util.Objects.hash(id, name, location, model, displayOrientation, resolution, connectedState,
+                fallbackVisualMedia);
     }
 }

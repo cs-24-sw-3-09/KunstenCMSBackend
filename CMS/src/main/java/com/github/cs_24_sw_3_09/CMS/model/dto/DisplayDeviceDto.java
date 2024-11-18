@@ -1,19 +1,25 @@
 package com.github.cs_24_sw_3_09.CMS.model.dto;
 
-
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class DisplayDeviceDto {
 
     protected Integer id;
+    @Size(min = 1, max = 50, message = "a name must be between 1 and 50 characters")
     private String name;
+    @Size(min = 1, max = 100, message = "a location must be between 1 and 100 characters")
     private String location;
+    @Size(min = 1, max = 50, message = "a model must be between 1 and 50 characters")
     private String model;
+    @Pattern(regexp = "^(vertical|horizontal)$", message = "a display orientationing must be vertical or horizontal")
     private String displayOrientation;
+    @Pattern(regexp = "^\\d+x\\d+$", message = "Resolution must be in the format 'widthxheight' (e.g., 1920x1080)")
     private String resolution;
     private Boolean connectedState;
     private VisualMediaEntity fallbackVisualMedia;
@@ -24,7 +30,8 @@ public class DisplayDeviceDto {
 
     // All-arguments constructor
     public DisplayDeviceDto(Integer id, String name, String location, String model,
-                            String displayOrientation, String resolution, Boolean connectedState, VisualMediaEntity fallbackVisualMedia) {
+            String displayOrientation, String resolution, Boolean connectedState,
+            VisualMediaEntity fallbackVisualMedia) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -152,7 +159,8 @@ public class DisplayDeviceDto {
         }
 
         public DisplayDeviceDto build() {
-            return new DisplayDeviceDto(id, name, location, model, displayOrientation, resolution, connectedState, fallbackVisualMedia);
+            return new DisplayDeviceDto(id, name, location, model, displayOrientation, resolution, connectedState,
+                    fallbackVisualMedia);
         }
     }
 
@@ -172,8 +180,10 @@ public class DisplayDeviceDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         DisplayDeviceDto that = (DisplayDeviceDto) o;
         return id.equals(that.id) && name.equals(that.name) && location.equals(that.location) &&
                 model.equals(that.model) && displayOrientation.equals(that.displayOrientation) &&
@@ -183,6 +193,7 @@ public class DisplayDeviceDto {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, location, model, displayOrientation, resolution, connectedState, fallbackVisualMedia);
+        return java.util.Objects.hash(id, name, location, model, displayOrientation, resolution, connectedState,
+                fallbackVisualMedia);
     }
 }

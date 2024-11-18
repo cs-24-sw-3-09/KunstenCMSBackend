@@ -1,10 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
-
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +26,17 @@ public class DisplayDeviceController {
     private Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
 
     @Autowired
-    public DisplayDeviceController(DisplayDeviceService displayDeviceService, Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
+    public DisplayDeviceController(DisplayDeviceService displayDeviceService,
+            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceMapper = displayDeviceMapper;
     }
 
     @PostMapping
-    public ResponseEntity<DisplayDeviceDto> createDisplayDevice(@RequestBody DisplayDeviceDto displayDevice) {
+    public ResponseEntity<DisplayDeviceDto> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
 
-        //Done to decouple the persistence layer from the presentation and service layer.
+        // Done to decouple the persistence layer from the presentation and service
+        // layer.
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
         DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity), HttpStatus.CREATED);
@@ -55,7 +59,8 @@ public class DisplayDeviceController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<DisplayDeviceDto> fullUpdateDisplayDevice(@PathVariable("id") Long id, @RequestBody DisplayDeviceDto displayDeviceDto) {
+    public ResponseEntity<DisplayDeviceDto> fullUpdateDisplayDevice(@PathVariable("id") Long id,
+            @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -67,7 +72,8 @@ public class DisplayDeviceController {
     }
 
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<DisplayDeviceDto> partialUpdateDisplayDevice(@PathVariable("id") Long id, @RequestBody DisplayDeviceDto displayDeviceDto) {
+    public ResponseEntity<DisplayDeviceDto> partialUpdateDisplayDevice(@PathVariable("id") Long id,
+            @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
