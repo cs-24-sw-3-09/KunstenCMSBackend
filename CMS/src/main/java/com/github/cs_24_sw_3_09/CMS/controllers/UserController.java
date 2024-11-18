@@ -35,6 +35,15 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
+    @PostMapping
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto user) {
+        // Done to decouple the persistence layer from the presentation and service
+        // layer.
+        UserEntity userEntity = userMapper.mapFrom(user);
+        UserEntity savedUserEntity = userService.save(userEntity);
+        return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.CREATED);
+    }
+
     @GetMapping
     public Page<UserDto> getDisplayDevices(Pageable pageable) {
         Page<UserEntity> userEntities = userService.findAll(pageable);

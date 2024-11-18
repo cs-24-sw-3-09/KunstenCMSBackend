@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 
 public interface UserService {
+    UserEntity save(UserEntity user);
+
     List<UserEntity> findAll();
 
     Page<UserEntity> findAll(Pageable pageable);

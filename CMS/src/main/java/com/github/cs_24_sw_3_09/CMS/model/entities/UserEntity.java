@@ -2,9 +2,16 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import java.sql.Date;
 
+import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NonNullType;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.lang.NonNull;
+
 import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -16,14 +23,21 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
     @SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", allocationSize = 1)
     protected Integer id;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
     private Date pauseNotificationStart;
     private Date pauseNotificationEnd;
+    @ColumnDefault("false")
     private boolean notificationState;
+    @ColumnDefault("false")
     private boolean mediaPlanner;
+    @ColumnDefault("false")
     private boolean admin;
 
     // No-argument constructor

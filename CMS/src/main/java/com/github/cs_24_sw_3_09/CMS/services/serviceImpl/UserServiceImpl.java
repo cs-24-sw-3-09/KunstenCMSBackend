@@ -28,6 +28,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity save(UserEntity user) {
+        return userRepository.save(user);
+    }
+
+    @Override
     public List<UserEntity> findAll() {
         // return itterable, so we convert it to list.
         return StreamSupport.stream(userRepository.findAll().spliterator(), false).collect(Collectors.toList());

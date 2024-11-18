@@ -2,6 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import java.sql.Date;
 
+import io.micrometer.common.lang.NonNull;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
