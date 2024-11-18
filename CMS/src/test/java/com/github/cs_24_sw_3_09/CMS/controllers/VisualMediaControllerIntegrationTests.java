@@ -82,14 +82,14 @@ public class VisualMediaControllerIntegrationTests {
         visualMediaService.save(testVisualMediaEntity);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/visual_medias")
+                MockMvcRequestBuilders.get("/api/visual_medias")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+                MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].name").value(testVisualMediaEntity.getName())
+                MockMvcResultMatchers.jsonPath("content.[0].name").value(testVisualMediaEntity.getName())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].location").value(testVisualMediaEntity.getLocation())
+                MockMvcResultMatchers.jsonPath("content.[0].location").value(testVisualMediaEntity.getLocation())
         );
     }
 
@@ -108,11 +108,8 @@ public class VisualMediaControllerIntegrationTests {
 
     @Test
     public void testThatFindAllVisualMediaReturnsHttpStatus404WhenNoVisualMediaExists() throws Exception {
-        VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
-
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias/" + testVisualMediaEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get("/api/visual_medias/1")
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );

@@ -8,7 +8,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 public class TestDataUtil {
 
     public static DisplayDeviceDto createDisplayDeviceDto() {
-        return new DisplayDeviceDto.Builder().setDisplayOrientation("Horizontal")
+        return new DisplayDeviceDto.Builder().setDisplayOrientation("horizontal")
                 .setConnectedState(false)
                 .setLocation("Esbjerg")
                 .setModel("Samsung")
@@ -20,7 +20,7 @@ public class TestDataUtil {
     public static DisplayDeviceEntity createDisplayDeviceEntity() {
 
         return new DisplayDeviceEntity.Builder()
-                .setDisplayOrientation("Horizontal")
+                .setDisplayOrientation("horizontal")
                 .setConnectedState(false)
                 .setLocation("Esbjerg")
                 .setModel("Samsung")

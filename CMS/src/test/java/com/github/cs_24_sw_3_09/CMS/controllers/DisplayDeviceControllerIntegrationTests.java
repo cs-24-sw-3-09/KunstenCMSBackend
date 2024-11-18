@@ -88,11 +88,11 @@ public class DisplayDeviceControllerIntegrationTests {
                 MockMvcRequestBuilders.get("/api/display_devices")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+                MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].name").value(testDisplayDeviceEntity.getName())
+                MockMvcResultMatchers.jsonPath("content.[0].name").value(testDisplayDeviceEntity.getName())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].location").value(testDisplayDeviceEntity.getLocation())
+                MockMvcResultMatchers.jsonPath("content.[0].location").value(testDisplayDeviceEntity.getLocation())
         );
     }
 
