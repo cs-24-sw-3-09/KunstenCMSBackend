@@ -70,7 +70,6 @@ public class VisualMediaControllerIntegrationTests {
     public void testThatFindAllVisualMediaReturnsHttpStatus200() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/visual_medias")
-                        .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -83,7 +82,6 @@ public class VisualMediaControllerIntegrationTests {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/visual_medias")
-                        .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
         ).andExpect(
@@ -100,7 +98,6 @@ public class VisualMediaControllerIntegrationTests {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/visual_medias/" + testVisualMediaEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
