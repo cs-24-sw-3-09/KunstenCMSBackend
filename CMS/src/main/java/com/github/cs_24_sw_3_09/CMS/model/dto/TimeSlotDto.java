@@ -6,30 +6,33 @@ import java.sql.Time;
 import jakarta.validation.constraints.Size;
 
 public class TimeSlotDto {
-    
-    protected Integer id; 
-    @Size(min= 1, max = 50, message = "a time slot name must be between 1 and 50 characters")
-    private String name; 
+
+    protected Integer id;
+    @Size(min = 1, max = 50, message = "a time slot name must be between 1 and 50 characters")
+    private String name;
     private Date startDate;
     private Date endDate;
     private Time startTime;
     private Time endTime;
-    private int weekdaysChosen; 
+    @Size(min = 0, max = 127, message = "invalid weekdays")
+    private int weekdaysChosen;
     private Integer contentId;
 
     // No-argument constructor
-    public TimeSlotDto(){
+    public TimeSlotDto() {
     }
 
     // All-arguments constructor
-    private TimeSlotDto(Integer id, String name, Date startDate, Date endDate, Time startTime, Time endTime, int weekdaysChosen, Integer contentId) {
+    private TimeSlotDto(Integer id, String name, Date startDate, Date endDate, Time startTime, Time endTime,
+            int weekdaysChosen, Integer contentId) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.weekdaysChosen = weekdaysChosen;;
+        this.weekdaysChosen = weekdaysChosen;
+        ;
         this.contentId = contentId;
     }
 
@@ -100,13 +103,13 @@ public class TimeSlotDto {
 
     // Builder class
     public static class Builder {
-        private Integer id; 
-        private String name; 
+        private Integer id;
+        private String name;
         private Date startDate;
         private Date endDate;
         private Time startTime;
         private Time endTime;
-        private int weekdaysChosen; 
+        private int weekdaysChosen;
         private Integer contentId;
 
         public Builder setId(Integer id) {
@@ -186,5 +189,5 @@ public class TimeSlotDto {
         return java.util.Objects.hash(id, name, startDate, endDate, startTime, endTime, weekdaysChosen,
                 contentId);
     }
-    
+
 }
