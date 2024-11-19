@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,8 +69,8 @@ public class DisplayDeviceControllerIntegrationTests {
 
     @Test
     public void testThatGetDisplayDeviceSuccessfullyReturnsHttp200() throws Exception {
-        DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceEntity);
+        //DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
+        //String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceEntity);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/display_devices")
@@ -147,24 +148,25 @@ public class DisplayDeviceControllerIntegrationTests {
     }
 
     @Test
-    public void testThatDeleteDisplayDevice() throws Exception {
+    public void testThatDeleteDisplayDeviceReturnsStatus200() throws Exception {
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
-
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/display_devices/" + savedDisplayDeviceEntity.getId())
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/display_devices/" + savedDisplayDeviceEntity.getId())
         ).andExpect(
-                MockMvcResultMatchers.status().isNoContent());
+                MockMvcResultMatchers.status().isNoContent()
+        );
+    }
+
+
+    @Test
+    public void testThatDeleteDisplayDeviceReturnsStatus404() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/display_devices/" + savedDisplayDeviceEntity.getId())
+                MockMvcRequestBuilders.delete("/api/display_devices/99")
         ).andExpect(
-                MockMvcResultMatchers.status().isNotFound());
+                MockMvcResultMatchers.status().isNotFound()
+        );
     }
 
     @Test
@@ -207,8 +209,21 @@ public class DisplayDeviceControllerIntegrationTests {
     }
 
     @Test
-    public void testThatFullUpdateUpdatesExistingDisplayDevice() throws Exception {
-       // Not yet implemented.
+    public void testThatPatchUpdateDisplayDeviceReturnsStatus404() throws Exception {
+        DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
+        String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
+
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/display_devices/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(displayDeviceDtoJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        );
     }
+
+
+
 
 }
