@@ -2,7 +2,12 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.Set;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
 public class TimeSlotDto {
@@ -14,9 +19,11 @@ public class TimeSlotDto {
     private Date endDate;
     private Time startTime;
     private Time endTime;
-    @Size(min = 0, max = 127, message = "invalid weekdays")
+    @Min(0)
+    @Max(127)
     private int weekdaysChosen;
     private Integer contentId;
+    private Set<DisplayDeviceEntity> displayDevices;
 
     // No-argument constructor
     public TimeSlotDto() {
@@ -24,7 +31,7 @@ public class TimeSlotDto {
 
     // All-arguments constructor
     private TimeSlotDto(Integer id, String name, Date startDate, Date endDate, Time startTime, Time endTime,
-            int weekdaysChosen, Integer contentId) {
+            int weekdaysChosen, Integer contentId, Set<DisplayDeviceEntity> displayDevices) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -34,6 +41,7 @@ public class TimeSlotDto {
         this.weekdaysChosen = weekdaysChosen;
         ;
         this.contentId = contentId;
+        this.displayDevices = displayDevices;
     }
 
     // Getters and Setters
@@ -101,8 +109,17 @@ public class TimeSlotDto {
         this.contentId = contentId;
     }
 
+    public void setDisplayDevices(Set<DisplayDeviceEntity> displayDevices){
+        this.displayDevices = displayDevices;
+    }
+
+    public Set<DisplayDeviceEntity> getDisplayDevices(Set<DisplayDeviceEntity> displayDevices){
+        return displayDevices;
+    }
+    
+
     // Builder class
-    public static class Builder {
+    /*public static class Builder {
         private Integer id;
         private String name;
         private Date startDate;
@@ -155,7 +172,7 @@ public class TimeSlotDto {
         public TimeSlotDto build() {
             return new TimeSlotDto(id, name, startDate, endDate, startTime, endTime, weekdaysChosen, contentId);
         }
-    }
+    }*/
 
     @Override
     public String toString() {

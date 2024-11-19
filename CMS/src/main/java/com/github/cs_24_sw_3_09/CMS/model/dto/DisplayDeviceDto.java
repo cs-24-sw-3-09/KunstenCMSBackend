@@ -1,6 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.model.dto;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +28,7 @@ public class DisplayDeviceDto {
     private String resolution;
     private Boolean connectedState;
     private VisualMediaEntity fallbackVisualMedia;
+    private Set<TimeSlotEntity> timeSlots = new HashSet<>();
 
     // No-argument constructor
     public DisplayDeviceDto() {
@@ -32,7 +37,7 @@ public class DisplayDeviceDto {
     // All-arguments constructor
     public DisplayDeviceDto(Integer id, String name, String location, String model,
             String displayOrientation, String resolution, Boolean connectedState,
-            VisualMediaEntity fallbackVisualMedia) {
+            VisualMediaEntity fallbackVisualMedia, Set<TimeSlotEntity> timeSlots) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -41,6 +46,7 @@ public class DisplayDeviceDto {
         this.resolution = resolution;
         this.connectedState = connectedState;
         this.fallbackVisualMedia = fallbackVisualMedia;
+        this.timeSlots = timeSlots;
     }
 
     // Getters and Setters
@@ -108,6 +114,15 @@ public class DisplayDeviceDto {
         this.fallbackVisualMedia = fallbackVisualMedia;
     }
 
+    public Set<TimeSlotEntity> getTimeSlots(Set<TimeSlotEntity> timeSlots){
+        return timeSlots;
+    }
+
+    public void setTimeSlots(Set<TimeSlotEntity> timeSlots){
+        this.timeSlots = timeSlots;
+    }
+
+
     // Builder Pattern (manual implementation)
     public static class Builder {
         private Integer id;
@@ -118,6 +133,7 @@ public class DisplayDeviceDto {
         private String resolution;
         private Boolean connectedState;
         private VisualMediaEntity fallbackVisualMedia;
+        private Set<TimeSlotEntity> timeSlots;
 
         public Builder setId(Integer id) {
             this.id = id;
@@ -159,9 +175,14 @@ public class DisplayDeviceDto {
             return this;
         }
 
+        public Builder setTimeSlots(Set<TimeSlotEntity> timeslots){
+            this.timeSlots = timeslots;
+            return this;
+        }
+
         public DisplayDeviceDto build() {
             return new DisplayDeviceDto(id, name, location, model, displayOrientation, resolution, connectedState,
-                    fallbackVisualMedia);
+                    fallbackVisualMedia, timeSlots);
         }
     }
 

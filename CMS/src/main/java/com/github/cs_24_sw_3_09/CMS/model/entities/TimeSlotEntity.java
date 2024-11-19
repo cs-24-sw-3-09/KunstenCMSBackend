@@ -2,6 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -33,21 +35,25 @@ public class TimeSlotEntity {
     private int weekdaysChosen; 
     @NotNull
     private Integer contentId;
+     @ManyToMany(mappedBy = "timeSlots")
+    private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
+
 
     // No-argument constructor
     public TimeSlotEntity(){
     }
 
     // All-arguments constructor
-    private TimeSlotEntity(Integer id, String name, Date startDate, Date endDate, Time startTime, Time endTime, int weekdaysChosen, Integer contentId) {
+    private TimeSlotEntity(Integer id, String name, Date startDate, Date endDate, Time startTime, Time endTime, int weekdaysChosen, Integer contentId, Set<DisplayDeviceEntity> displayDevices) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.weekdaysChosen = weekdaysChosen;;
+        this.weekdaysChosen = weekdaysChosen;
         this.contentId = contentId;
+        this.displayDevices = displayDevices;
     }
 
     // Getters and Setters
@@ -125,6 +131,7 @@ public class TimeSlotEntity {
         private Time endTime;
         private int weekdaysChosen; 
         private Integer contentId;
+        private Set<DisplayDeviceEntity> displayDevices;
 
         public Builder setId(Integer id) {
             this.id = id;
@@ -166,8 +173,13 @@ public class TimeSlotEntity {
             return this;
         }
 
+        public Builder setDisplayDevices(Set<DisplayDeviceEntity> displayDevices){
+            this.displayDevices = displayDevices;
+            return this;
+        }
+
         public TimeSlotEntity build() {
-            return new TimeSlotEntity(id, name, startDate, endDate, startTime, endTime, weekdaysChosen, contentId);
+            return new TimeSlotEntity(id, name, startDate, endDate, startTime, endTime, weekdaysChosen, contentId, displayDevices);
         }
     }
 
