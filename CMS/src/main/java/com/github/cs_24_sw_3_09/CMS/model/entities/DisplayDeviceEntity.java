@@ -25,7 +25,7 @@ public class DisplayDeviceEntity {
     private String resolution;
     private Boolean connectedState;
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "falback_id")
-    private VisualMediaEntity fallbackVisualMedia;
+    @JoinColumn(name = "fallback_id")
+    private ContentEntity fallbackContent;
 
 }

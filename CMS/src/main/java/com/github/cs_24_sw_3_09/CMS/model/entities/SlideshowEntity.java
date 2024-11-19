@@ -15,12 +15,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SlideshowEntity {
+public class SlideshowEntity extends ContentEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "slideshows_id_seq")
-    @SequenceGenerator(name = "slideshows_id_seq", sequenceName = "slideshows_id_seq", allocationSize = 1)
-    protected Integer id;
+
     private String name;
     private Boolean isArchived;
     @OneToMany(cascade = CascadeType.ALL)

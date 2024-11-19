@@ -14,12 +14,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VisualMediaEntity {
+public class VisualMediaEntity extends ContentEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "visual_media_id_seq")
-    @SequenceGenerator(name = "visual_media_id_seq", sequenceName = "visual_media_id_seq", allocationSize = 1)
-    private Integer id;
+
     private String name;
     private String location;
     private String fileType;

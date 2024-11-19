@@ -14,9 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SlideshowDto {
+public class SlideshowDto extends ContentDto {
 
-    protected Integer id;
     private String name;
     private Boolean isArchived;
     private Set<VisualMediaInclusionEntity> visualMediaInclusionCollection;

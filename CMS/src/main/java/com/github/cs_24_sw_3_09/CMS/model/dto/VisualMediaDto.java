@@ -12,9 +12,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VisualMediaDto {
+public class VisualMediaDto extends ContentDto {
 
-    private Integer id;
     private String name;
     private String location;
     private String fileType;
