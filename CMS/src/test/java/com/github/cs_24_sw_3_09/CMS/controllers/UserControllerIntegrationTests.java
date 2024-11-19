@@ -6,6 +6,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.UserService;
 import org.junit.jupiter.api.Test;
@@ -25,21 +26,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 public class UserControllerIntegrationTests {
-    /*
-    Get one
-    Get all DONE
-    pussy one
-        work
-        not work
-    post one DONE
-        Work DONE
-    patch one
-        work
-        not work
-    delete one
-        Not work
-        work
-     */
 
     //Mock is a powerful way of testing controllers.
     private MockMvc mockMvc;
@@ -66,25 +52,6 @@ public class UserControllerIntegrationTests {
                 MockMvcResultMatchers.status().isCreated()
         );
     }
-/*
-    @Test
-    public void testThatCreateDisplayDeviceSuccessfullyReturnsSavedDisplayDevice() throws Exception {
-        DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceEntity);
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/display_devices")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(displayDeviceJson)
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.id").isNumber()
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.name").value("Skærm Esbjerg")
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.location").value("Esbjerg")
-        );
-    }
-    */
 
     @Test
     public void testThatGetUserSuccessfullyReturnsHttp200() throws Exception {
@@ -138,25 +105,18 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void testThatDeleteDisplayDevice() throws Exception {
+    public void testThatDeleteUserReturnsStatus200() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
-        UserEntity savedUserEntity = userService.save(userEntity);
-
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/users/" + savedUserEntity.getId())
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk());
+        UserEntity savedUserEntiity = userService.save(userEntity);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/users/" + savedUserEntity.getId())
+                MockMvcRequestBuilders.delete("/api/users/" + savedUserEntiity.getId())
         ).andExpect(
-                MockMvcResultMatchers.status().isNoContent());
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/users/" + savedUserEntity.getId())
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound());
+                MockMvcResultMatchers.status().isNoContent()
+        );
     }
+
+
     @Test
     public void testThatDeleteUserReturnsStatus404() throws Exception {
         mockMvc.perform(

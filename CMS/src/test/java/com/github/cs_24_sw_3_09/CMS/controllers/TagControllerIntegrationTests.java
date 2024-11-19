@@ -25,12 +25,10 @@ public class TagControllerIntegrationTests {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
-    private VisualMediaService visualMediaService;
 
     @Autowired
-    public TagControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService) {
+    public TagControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper) {
         this.mockMvc = mockMvc;
-        this.visualMediaService = visualMediaService;
         this.objectMapper = objectMapper;
     }
 
