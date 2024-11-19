@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/KunstenCMSBackend.iml" filepath="$PROJECT_DIR$/.idea/KunstenCMSBackend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CMS/CMS.iml" filepath="$PROJECT_DIR$/CMS/CMS.iml" />
     </modules>
   </component>
 </project>
