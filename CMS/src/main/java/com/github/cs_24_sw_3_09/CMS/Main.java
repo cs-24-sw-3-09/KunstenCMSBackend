@@ -12,6 +12,7 @@ public class Main {
         ApplicationContext context = SpringApplication.run(Main.class, args);
         // Start SocketIO server
         SocketIOConfig socketConfig = context.getBean(SocketIOConfig.class);
-        socketConfig.socketIOModule().start(); // SocketIO will automatically gracefully shutdown due to PreDestroy annotation.
+        socketConfig.socketIOModule().start(); // SocketIO will automatically gracefully shutdown due to PreDestroy
+                                               // annotation.
     }
 }
