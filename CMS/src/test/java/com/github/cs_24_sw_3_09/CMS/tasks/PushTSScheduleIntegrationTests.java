@@ -62,31 +62,27 @@ public class PushTSScheduleIntegrationTests {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private DisplayDeviceService displayDeviceService;
+    private DisplayDeviceRepository displayDeviceRepository;
 
     @Autowired
-    public PushTSScheduleIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper,
+    public PushTSScheduleIntegrationTests(DisplayDeviceRepository displayDeviceRepository, MockMvc mockMvc,
+            ObjectMapper objectMapper,
             DisplayDeviceService displayDeviceService) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.displayDeviceService = displayDeviceService;
+        this.displayDeviceRepository = displayDeviceRepository;
     }
 
     @Test
     public void testThatOnlyGetTheDisplayDevicesThatIsConnected() throws Exception {
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        // displayDeviceEntity.setId(1);
         displayDeviceService.save(displayDeviceEntity);
         displayDeviceEntity.setConnectedState(true);
-        // displayDeviceEntity.setId(2);
         displayDeviceService.save(displayDeviceEntity);
 
         Iterable<DisplayDeviceEntity> ddDB = displayDeviceRepository.findConnectedDisplayDevices();
-        // List<DisplayDeviceEntity> connectedDevices =
-        // StreamSupport.stream(ddDB.spliterator(), false).toList();
-        // System.out.println(
-        // "-----------------------------------------------------------------------------------------------\n"
-        // + connectedDevices);
-        // assertEquals(1, connectedDevices.size(), "There is not one connected screen
-        // in the DB");
+        List<DisplayDeviceEntity> connectedDevices = StreamSupport.stream(ddDB.spliterator(), false).toList();
+        assertEquals(1, connectedDevices.size(), "There are not one connected screen in the DB");
     }
 }
