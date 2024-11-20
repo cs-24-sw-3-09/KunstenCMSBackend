@@ -1,13 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,6 +46,14 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
+    public List<TagEntity> getVisualMediaTags(Long id) {
+        Optional<VisualMediaEntity> vm = visualMediaRepository.findById(Math.toIntExact(id));
+
+        return vm.map(visualMediaEntity -> new ArrayList<>(visualMediaEntity.getTags()))
+                .orElseThrow(() -> new RuntimeException("Visual media not found"));
+    }
+
+    @Override
     public boolean isExists(Long id) {
         return visualMediaRepository.existsById(Math.toIntExact(id));
     }
@@ -60,7 +70,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             Optional.ofNullable(visualMediaEntity.getLastDateModified()).ifPresent(existingVisualMedia::setLastDateModified);
             Optional.ofNullable(visualMediaEntity.getTags()).ifPresent(existingVisualMedia::setTags);
             return visualMediaRepository.save(existingVisualMedia);
-        }).orElseThrow(() -> new RuntimeException("Author does not exist"));
+        }).orElseThrow(() -> new RuntimeException("Visual Media Not Found"));
     }
 
     @Override
