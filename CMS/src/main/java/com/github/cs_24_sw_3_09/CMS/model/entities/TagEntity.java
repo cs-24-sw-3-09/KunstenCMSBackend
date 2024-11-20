@@ -23,6 +23,7 @@ public class TagEntity {
     private Integer id;
     private String text;
     @ManyToMany(mappedBy = "tags")
+    @ToString.Exclude
     private Set<VisualMediaEntity> visualMedias = new HashSet<VisualMediaEntity>();
 
 }

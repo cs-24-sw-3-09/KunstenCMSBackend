@@ -5,6 +5,8 @@ import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class TagServiceImpl implements TagService {
 
@@ -17,5 +19,15 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagEntity save(TagEntity tag) {
         return tagRepository.save(tag);
+    }
+
+    @Override
+    public boolean isExists(Long id) {
+        return tagRepository.existsById(id);
+    }
+
+    @Override
+    public Optional<TagEntity> findOne(Long tagId) {
+        return tagRepository.findById(tagId);
     }
 }

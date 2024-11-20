@@ -22,7 +22,7 @@ public class VisualMediaEntity extends ContentEntity {
     private String fileType;
     private String description;
     private String lastDateModified;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "visual_media_tag",
             joinColumns = {@JoinColumn(name = "visual_media_id")},
@@ -30,4 +30,9 @@ public class VisualMediaEntity extends ContentEntity {
     )
     private Set<TagEntity> tags = new HashSet<TagEntity>();
 
+
+    public VisualMediaEntity addTag(TagEntity tag) {
+        tags.add(tag);
+        return this;
+    }
 }
