@@ -97,7 +97,7 @@
             <artifactId>spring-dotenv</artifactId>
             <version>4.0.0</version>
          </dependency>
-         </dependency>
+         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>

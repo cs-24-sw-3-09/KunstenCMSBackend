@@ -13,7 +13,7 @@ public class TestDataUtil {
     public static DisplayDeviceDto createDisplayDeviceDto() {
 
         return DisplayDeviceDto.builder()
-                .displayOrientation("Horizontal")
+                .displayOrientation("horizontal")
                 .connectedState(false)
                 .location("Esbjerg")
                 .model("Samsung")
@@ -25,7 +25,7 @@ public class TestDataUtil {
     public static DisplayDeviceEntity createDisplayDeviceEntity() {
 
         return DisplayDeviceEntity.builder()
-                .displayOrientation("Horizontal")
+                .displayOrientation("horizontal")
                 .connectedState(false)
                 .location("Esbjerg")
                 .model("Samsung")
@@ -35,8 +35,8 @@ public class TestDataUtil {
     }
 
     public static TagDto createTagDto() {
-        return new TagDto.Builder()
-                .setText("Test Tag")
+        return TagDto.builder()
+                .text("Test Tag")
                 .build();
     }
 
@@ -83,6 +83,5 @@ public class TestDataUtil {
                 .setAdmin(true)
                 .build();
     }
-
 
 }
