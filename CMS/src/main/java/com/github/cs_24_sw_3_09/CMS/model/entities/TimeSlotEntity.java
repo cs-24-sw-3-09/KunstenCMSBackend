@@ -41,9 +41,9 @@ public class TimeSlotEntity {
     @ColumnDefault("0")
     private int weekdaysChosen; 
     //@NotNull
-    //@ManyToOne(cascade = CascadeType.ALL)
-    /*@JoinColumn(name = "time_slot_content")
-    private ContentEntity displayContent;*/
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "time_slot_content")
+    private ContentEntity displayContent;
     
 
     @ManyToMany(cascade = CascadeType.ALL)

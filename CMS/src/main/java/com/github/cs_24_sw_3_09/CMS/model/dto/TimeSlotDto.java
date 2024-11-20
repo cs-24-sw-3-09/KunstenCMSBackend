@@ -30,7 +30,6 @@ public class TimeSlotDto {
     @Min(0)
     @Max(127)
     private int weekdaysChosen;
-    //private ContentEntity displayContent;
+    private ContentEntity displayContent;
     private Set<DisplayDeviceEntity> displayDevices;
-
 }
