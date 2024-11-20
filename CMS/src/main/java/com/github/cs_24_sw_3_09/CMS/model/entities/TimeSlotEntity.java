@@ -11,12 +11,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Data
@@ -45,8 +40,11 @@ public class TimeSlotEntity {
     @NotNull
     @ColumnDefault("0")
     private int weekdaysChosen; 
-    @NotNull
-    private Integer contentId;
+    //@NotNull
+    //@ManyToOne(cascade = CascadeType.ALL)
+    /*@JoinColumn(name = "time_slot_content")
+    private ContentEntity displayContent;*/
+    
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

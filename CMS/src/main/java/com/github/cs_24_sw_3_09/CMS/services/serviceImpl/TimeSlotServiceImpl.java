@@ -61,7 +61,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             Optional.ofNullable(timeSlotEntity.getStartTime()).ifPresent(existingTimeSlot::setStartTime);
             Optional.ofNullable(timeSlotEntity.getEndTime()).ifPresent(existingTimeSlot::setEndTime);
             Optional.ofNullable(timeSlotEntity.getWeekdaysChosen()).ifPresent(existingTimeSlot::setWeekdaysChosen);
-            Optional.ofNullable(timeSlotEntity.getContentId()).ifPresent(existingTimeSlot::setContentId);
+            //Optional.ofNullable(timeSlotEntity.getDisplayContent()).ifPresent(existingTimeSlot::setDisplayContent);
 
             return timeSlotRepository.save(existingTimeSlot);
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));

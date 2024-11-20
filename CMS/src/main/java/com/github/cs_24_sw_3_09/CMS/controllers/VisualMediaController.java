@@ -4,6 +4,7 @@ import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
@@ -52,8 +53,17 @@ public class VisualMediaController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping(path = "/{id}/tags")
+    public ResponseEntity<List<TagEntity>> getVisualMediaTags(@PathVariable("id") Long id) {
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
+    }
+
     @PutMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> fullUpdateDisplayDevice(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -65,14 +75,14 @@ public class VisualMediaController {
     }
 
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> partialUpdateDisplayDevice(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> partialUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
-        VisualMediaEntity updatedDisplayDeviceEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
-        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedDisplayDeviceEntity), HttpStatus.OK);
+        VisualMediaEntity updatedVisualMediaEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
@@ -82,7 +92,7 @@ public class VisualMediaController {
         }
 
         visualMediaService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
