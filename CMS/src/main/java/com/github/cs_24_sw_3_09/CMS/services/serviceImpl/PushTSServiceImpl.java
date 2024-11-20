@@ -9,11 +9,16 @@ public class PushTSServiceImpl implements PushTSService {
     @Override
     TimeSlotDto timeSlotPrioritisationForDisplayDevice(List<TimeSlotDto> timeSlotDtoList,
             DisplayDeviceDto displayDeviceDto) {
-                return new TimeSlotDto();
+        return new TimeSlotDto();
     }
 
     @Override
-    void sendTimeSlotToDisplayDevice(TimeSlotDto timeSlotDto, DisplayDeviceDto displayDeviceDto){
-        
+    void sendTimeSlotToDisplayDevice(TimeSlotDto timeSlotDto, DisplayDeviceDto displayDeviceDto) {
+
+    }
+
+    @Override
+    void updateDisplayDevicesToNewTimeSlots() {
+
     }
 }
