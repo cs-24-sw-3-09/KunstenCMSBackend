@@ -119,7 +119,7 @@ public class TimeSlotDto {
     
 
     // Builder class
-    /*public static class Builder {
+    public static class Builder {
         private Integer id;
         private String name;
         private Date startDate;
@@ -128,6 +128,7 @@ public class TimeSlotDto {
         private Time endTime;
         private int weekdaysChosen;
         private Integer contentId;
+        private Set<DisplayDeviceEntity> displayDevices;
 
         public Builder setId(Integer id) {
             this.id = id;
@@ -169,10 +170,15 @@ public class TimeSlotDto {
             return this;
         }
 
-        public TimeSlotDto build() {
-            return new TimeSlotDto(id, name, startDate, endDate, startTime, endTime, weekdaysChosen, contentId);
+        public Builder setDisplayDevices(Set<DisplayDeviceEntity> displayDevices){
+            this.displayDevices = displayDevices;
+            return this;
         }
-    }*/
+
+        public TimeSlotDto build() {
+            return new TimeSlotDto(id, name, startDate, endDate, startTime, endTime, weekdaysChosen, contentId, displayDevices);
+        }
+    }
 
     @Override
     public String toString() {
@@ -185,6 +191,7 @@ public class TimeSlotDto {
                 ", endTime=" + endTime +
                 ", weekdaysChosen=" + weekdaysChosen +
                 ", contentId=" + contentId +
+                ", displaydevices= " + displayDevices +
                 '}';
     }
 

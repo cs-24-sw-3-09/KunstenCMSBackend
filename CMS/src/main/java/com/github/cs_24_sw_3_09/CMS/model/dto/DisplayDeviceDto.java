@@ -175,8 +175,8 @@ public class DisplayDeviceDto {
             return this;
         }
 
-        public Builder setTimeSlots(Set<TimeSlotEntity> timeslots){
-            this.timeSlots = timeslots;
+        public Builder setTimeSlots(Set<TimeSlotEntity> timeSlots){
+            this.timeSlots = timeSlots;
             return this;
         }
 
