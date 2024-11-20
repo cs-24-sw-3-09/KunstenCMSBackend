@@ -40,10 +40,9 @@ public class TagControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/tags")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(createdTagJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
+                        .content(createdTagJson))
+                .andExpect(
+                        MockMvcResultMatchers.status().isCreated());
     }
 
 }
