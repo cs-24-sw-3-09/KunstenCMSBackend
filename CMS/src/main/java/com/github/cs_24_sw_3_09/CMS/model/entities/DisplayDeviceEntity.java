@@ -34,10 +34,12 @@ public class DisplayDeviceEntity {
     private String resolution;
     @ColumnDefault("false")
     private Boolean connectedState;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
-    @ManyToMany(mappedBy = "displayDevices")
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "time_slot_display_device", joinColumns = {
+            @JoinColumn(name = "display_device_id") }, inverseJoinColumns = { @JoinColumn(name = "time_slot_id") })
     private Set<TimeSlotEntity> timeSlots;
 
 }

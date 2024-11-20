@@ -16,18 +16,14 @@ import java.util.Set;
 @Builder
 public class VisualMediaEntity extends ContentEntity {
 
-
     private String name;
     private String location;
     private String fileType;
     private String description;
     private String lastDateModified;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "visual_media_tag",
-            joinColumns = {@JoinColumn(name = "visual_media_id")},
-            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
-    )
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "visual_media_tag", joinColumns = {
+            @JoinColumn(name = "visual_media_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
     private Set<TagEntity> tags = new HashSet<TagEntity>();
 
 }

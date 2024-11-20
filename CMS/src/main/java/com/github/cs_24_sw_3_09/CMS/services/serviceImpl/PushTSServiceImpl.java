@@ -1,14 +1,20 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 
+import jakarta.transaction.Transactional;
+
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +28,6 @@ public class PushTSServiceImpl implements PushTSService {
             Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.displayDeviceMapper = displayDeviceMapper;
-
     }
 
     @Override
@@ -41,15 +46,9 @@ public class PushTSServiceImpl implements PushTSService {
 
     @Override
     public void updateDisplayDevicesToNewTimeSlots() {
-        System.out.println("he");
-        // Gets all relevant DD and TS
-        Iterable<DisplayDeviceEntity> displayDeviceEntities = displayDeviceRepository.findConnectedDisplayDevices();
-        // TODO Get all of the relevant TS
-
-        for (DisplayDeviceEntity displayDeviceEntity : displayDeviceEntities) {
-            // Process each entity
-            System.out.println("Processing: " + displayDeviceEntity);
-        }
+        // Fetch the list of connected display devices
+        // List<DisplayDeviceEntity> devices =
+        // System.out.println(displayDeviceRepository.findConnectedDisplayDevices());
 
     }
 }

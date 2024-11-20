@@ -1,6 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +21,7 @@ public class TagEntity {
     @SequenceGenerator(name = "tag_id_seq", sequenceName = "tag_id_seq", allocationSize = 1)
     private Integer id;
     private String text;
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.EAGER)
     private Set<VisualMediaEntity> visualMedias = new HashSet<VisualMediaEntity>();
 
 }
