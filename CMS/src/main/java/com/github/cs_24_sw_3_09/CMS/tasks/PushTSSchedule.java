@@ -8,11 +8,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @Service
 @EnableAsync
-public class FunctionComponent {
+public class PushTSSchedule {
 
     @Async("asyncTaskExecutor")
     @Scheduled(fixedRate = 3 * 1000) // Runs every 3 minutes
-    public void getDataFromDB() {
+    public void pushTSSchedule() {
         System.out.println("Hej");
         // Your code to get data from the DB
     }
