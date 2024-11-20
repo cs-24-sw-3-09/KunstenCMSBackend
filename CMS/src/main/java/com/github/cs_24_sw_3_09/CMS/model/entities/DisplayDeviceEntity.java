@@ -1,10 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.*;
 import lombok.*;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -16,7 +18,6 @@ import jakarta.validation.constraints.NotNull;
 @AllArgsConstructor
 @Builder
 public class DisplayDeviceEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "display_device_id_seq")
     @SequenceGenerator(name = "display_device_id_seq", sequenceName = "display_device_id_seq", allocationSize = 1)
@@ -36,5 +37,7 @@ public class DisplayDeviceEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
+    @ManyToMany(mappedBy = "displayDevices")
+    private Set<TimeSlotEntity> timeSlots;
 
 }
