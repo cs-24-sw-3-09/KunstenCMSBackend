@@ -198,15 +198,15 @@ public class UserEntity {
             return this;
         }
 
-        public UserDto build() {
-            return new UserDto(id, firstName, lastName, password, email, pauseNotificationStart, pauseNotificationEnd,
+        public UserEntity build() {
+            return new UserEntity(id, firstName, lastName, email, password, pauseNotificationStart, pauseNotificationEnd,
                     notificationState, mediaPlanner, admin);
         }
     }
 
     @Override
     public String toString() {
-        return "UserDto{" +
+        return "UserEntity{" +
                 "id=" + id +
                 ", first_name='" + firstName + '\'' +
                 ", last_name='" + lastName + '\'' +

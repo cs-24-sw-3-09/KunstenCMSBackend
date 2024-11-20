@@ -189,7 +189,7 @@ public class UserDto {
         }
 
         public UserDto build() {
-            return new UserDto(id, firstName, lastName, password, email, pauseNotificationStart, pauseNotificationEnd,
+            return new UserDto(id, firstName, lastName, email, password, pauseNotificationStart, pauseNotificationEnd,
                     notificationState, mediaPlanner, admin);
         }
     }

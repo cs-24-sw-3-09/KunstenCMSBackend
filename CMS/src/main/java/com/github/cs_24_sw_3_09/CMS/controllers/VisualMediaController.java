@@ -53,7 +53,7 @@ public class VisualMediaController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> fullUpdateDisplayDevice(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -65,7 +65,7 @@ public class VisualMediaController {
     }
 
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> partialUpdateDisplayDevice(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> partialUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
