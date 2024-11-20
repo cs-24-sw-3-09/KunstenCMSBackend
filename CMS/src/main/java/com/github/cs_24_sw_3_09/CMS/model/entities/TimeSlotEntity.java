@@ -35,7 +35,13 @@ public class TimeSlotEntity {
     private int weekdaysChosen; 
     @NotNull
     private Integer contentId;
-     @ManyToMany(mappedBy = "timeSlots")
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "time_slot_display_device",
+        joinColumns = {@JoinColumn(name = "time_slot_id")},
+        inverseJoinColumns = {@JoinColumn(name = "display_device_id")}
+    )
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
 

@@ -30,12 +30,8 @@ public class DisplayDeviceEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "falback_id")
     private VisualMediaEntity fallbackVisualMedia;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "display_device_time_slot",
-            joinColumns = {@JoinColumn(name = "display_device_id")},
-            inverseJoinColumns = {@JoinColumn(name = "time_slot_id")}
-    )
+
+    @ManyToMany(mappedBy = "displayDevices", cascade = CascadeType.ALL)
     private Set<TimeSlotEntity> timeSlots = new HashSet<TimeSlotEntity>();
 
     // No-argument constructor

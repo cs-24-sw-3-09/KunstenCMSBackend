@@ -28,7 +28,7 @@ public class DisplayDeviceDto {
     private String resolution;
     private Boolean connectedState;
     private VisualMediaEntity fallbackVisualMedia;
-    private Set<TimeSlotEntity> timeSlots = new HashSet<>();
+    private Set<TimeSlotEntity> timeSlots;
 
     // No-argument constructor
     public DisplayDeviceDto() {
