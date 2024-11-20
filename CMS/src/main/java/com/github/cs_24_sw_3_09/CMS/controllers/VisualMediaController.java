@@ -85,6 +85,7 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
+
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<VisualMediaDto> deleteVisualMedia(@PathVariable("id") Long id) {
         if (!visualMediaService.isExists(id)) {
