@@ -3,13 +3,9 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +59,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             Optional.ofNullable(displayDeviceEntity.getLocation()).ifPresent(existingDisplayDevice::setLocation);
             Optional.ofNullable(displayDeviceEntity.getModel()).ifPresent(existingDisplayDevice::setModel);
             Optional.ofNullable(displayDeviceEntity.getResolution()).ifPresent(existingDisplayDevice::setResolution);
-            Optional.ofNullable(displayDeviceEntity.getFallbackVisualMedia()).ifPresent(existingDisplayDevice::setFallbackVisualMedia);
+            Optional.ofNullable(displayDeviceEntity.getFallbackContent()).ifPresent(existingDisplayDevice::setFallbackContent);
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }
