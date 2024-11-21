@@ -5,7 +5,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "visual_media_inclusion")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor

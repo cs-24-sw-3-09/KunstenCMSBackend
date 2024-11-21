@@ -14,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "display_devices")
-// @Data
 @Getter
 @Setter
 @NoArgsConstructor

@@ -9,9 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 import lombok.*;
 
-
 @Entity
-@Data
 @Getter
 @Setter
 @Builder

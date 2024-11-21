@@ -8,7 +8,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tags")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
