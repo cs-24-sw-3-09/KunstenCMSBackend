@@ -20,7 +20,7 @@ public class PushTSSchedule {
     }
 
     @Async("asyncTaskExecutor")
-    @Scheduled(fixedRate = 3 * 1000) // Runs every 3 minutes
+    @Scheduled(fixedRate = 10 * 1000) // Runs every 3 minutes
     public void pushTSSchedule() {
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }

@@ -54,9 +54,4 @@ public class TimeSlotEntity {
     @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
-    // @Override
-    // public String toString() {
-    //     return this.name;
-    // }
-
-}
+} 
