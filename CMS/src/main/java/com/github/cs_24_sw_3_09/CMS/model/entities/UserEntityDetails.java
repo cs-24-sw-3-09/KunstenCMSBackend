@@ -18,6 +18,7 @@ public class UserEntityDetails implements UserDetails {
         this.email = userEntity.getEmail();
         this.password = userEntity.getPassword();
         this.authorities = new ArrayList<>();
+        // If user has certain roles, grant them the authority roles.
         if (userEntity.isAdmin()) this.authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         if (userEntity.isMediaPlanner()) this.authorities.add(new SimpleGrantedAuthority("ROLE_PLANNER"));
     }
@@ -53,7 +54,5 @@ public class UserEntityDetails implements UserDetails {
     }
 
     @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    public boolean isEnabled() { return true; }
 }

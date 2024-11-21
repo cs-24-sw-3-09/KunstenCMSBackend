@@ -43,6 +43,7 @@ public class DisplayDeviceController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<DisplayDeviceDto> getDisplayDevices(Pageable pageable) {
         Page<DisplayDeviceEntity> displayDeviceEntities = displayDeviceService.findAll(pageable);
         return displayDeviceEntities.map(displayDeviceMapper::mapTo);

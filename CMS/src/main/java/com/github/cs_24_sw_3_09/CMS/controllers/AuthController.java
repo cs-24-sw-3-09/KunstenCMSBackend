@@ -29,21 +29,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public String authenticateAndGetToken(@RequestBody AuthRequestDto authRequest) {
+        // Authenticate with provided email and password from AuthRequestDto
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
         );
+        //If valid email and password return jwt token for provided email (unique for our user).
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(authRequest.getEmail());
         } else {
             throw new UsernameNotFoundException("Invalid request!");
         }
     }
-
-    /*@PostMapping("/register")
-    public String registerUser(@RequestBody AuthRequestDto authRequest) {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder.encode(authRequest.getPassword());
-    }*/
 
 
 }
