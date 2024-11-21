@@ -16,4 +16,6 @@ public interface TagService {
     Optional<TagEntity> findOne(Long tagId);
 
     Page<TagEntity> findAll(Pageable pageable);
+
+    void delete(Long id);
 }

@@ -6,10 +6,7 @@ import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -39,4 +36,8 @@ public class TagServiceImpl implements TagService {
     public Page<TagEntity> findAll(Pageable pageable) {
         return tagRepository.findAll(pageable);
     }
+
+    @Override
+    public void delete(Long id) { tagRepository.deleteById(id); }
+
 }
