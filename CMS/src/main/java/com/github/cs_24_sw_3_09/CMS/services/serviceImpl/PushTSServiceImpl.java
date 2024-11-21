@@ -52,23 +52,18 @@ public class PushTSServiceImpl implements PushTSService {
         LocalTime currentTime = LocalTime.now();
         DayOfWeek currentDay = currentDate.getDayOfWeek();
 
-        System.out.println("++++++");
-
         // Check if current date and time fall within the TimeSlotEntity's range for all
         // timeSlots
         for (TimeSlotEntity timeSlot : timeSlotList) {
             if (isTimeSlotActive(timeSlot, currentDate, currentTime, currentDay)) {
                 currentTimeSlots.add(timeSlot);
-                System.out.println("Timeslot " + timeSlot.getName() + " is in range");
             }
         }
 
         // Figure out what timeslot is the one to be prioistraied
         TimeSlotEntity prio = null;
         for (TimeSlotEntity timeSlot : currentTimeSlots) {
-            System.out.println(calculateDaysCovered(timeSlot));
             if (prio == null || calculateDaysCovered(timeSlot) <= calculateDaysCovered(prio)) {
-                System.out.println();
                 prio = timeSlot;
             }
         }
@@ -110,7 +105,6 @@ public class PushTSServiceImpl implements PushTSService {
 
     @Override
     public void updateDisplayDevicesToNewTimeSlots() {
-        System.out.println("hej");
         // Fetch the list of connected display devices
         List<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findConnectedDisplayDevices();
 
@@ -119,7 +113,13 @@ public class PushTSServiceImpl implements PushTSService {
 
             TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(timeSlots,
                     displayDeviceMapper.mapTo(dd));
-            sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
+            if (timeSlotToBeDisplayed == null) {
+                System.out.println("PRIO for " + dd.getId() + ": null");
+                // TODO: Gør så den kan sende at et DD skal stoppe med at vise noget
+            } else {
+                System.out.println("PRIO for ddId " + dd.getId() + ": " + timeSlotToBeDisplayed.getName());
+                sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
+            }
         }
     }
 }
