@@ -17,4 +17,7 @@ public interface TagService {
     Page<TagEntity> findAll(Pageable pageable);
 
     void delete(Long id);
+
+    TagEntity partialUpdate(Long id, TagEntity tagEntity);
+
 }

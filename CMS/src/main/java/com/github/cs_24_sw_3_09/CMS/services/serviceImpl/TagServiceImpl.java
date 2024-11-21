@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import org.springframework.data.domain.Page;
@@ -40,4 +41,12 @@ public class TagServiceImpl implements TagService {
     @Override
     public void delete(Long id) { tagRepository.deleteById(id); }
 
+    @Override
+    public TagEntity partialUpdate(Long id, TagEntity tagEntity) {
+        tagEntity.setId(Math.toIntExact(id));
+        return tagRepository.findById(id).map(existingTagEntity -> {
+            Optional.ofNullable(tagEntity.getText()).ifPresent(existingTagEntity::setText);
+            return tagRepository.save(existingTagEntity);
+        }).orElseThrow(() -> new RuntimeException("Tag does not exist"));
+    }
 }

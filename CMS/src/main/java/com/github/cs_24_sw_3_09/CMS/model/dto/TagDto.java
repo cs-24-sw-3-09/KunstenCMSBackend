@@ -11,10 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class TagDto {
-
     private Integer id;
     private String text;
     private Set<VisualMediaEntity> visualMedias;
-
-
 }

@@ -11,6 +11,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,4 +69,14 @@ public class TagController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<TagDto> patchTag(@PathVariable("id") Long id,
+                                           @Valid @RequestBody TagDto tagDto) {
+        if (!tagService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        TagEntity tagEntity = tagMapper.mapFrom(tagDto);
+        TagEntity updatedUserEntity = tagService.partialUpdate(id, tagEntity);
+        return new ResponseEntity<>(tagMapper.mapTo(updatedUserEntity), HttpStatus.OK);
+    }
 }
