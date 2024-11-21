@@ -2,9 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.junit.jupiter.api.Test;
@@ -164,9 +162,9 @@ public class VisualMediaControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.name").value(visualMediaEntity.getName())
+                MockMvcResultMatchers.jsonPath("$.name").value(visualMediaDto.getName())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.location").value(visualMediaEntity.getLocation())
+                MockMvcResultMatchers.jsonPath("$.location").value(visualMediaDto.getLocation())
         );
     }
 
