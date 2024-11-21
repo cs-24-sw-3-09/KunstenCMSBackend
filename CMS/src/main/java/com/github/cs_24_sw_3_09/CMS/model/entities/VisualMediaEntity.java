@@ -1,6 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,14 +24,15 @@ public class VisualMediaEntity extends ContentEntity {
     private String fileType;
     private String description;
     private String lastDateModified;
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "visual_media_tag",
             joinColumns = {@JoinColumn(name = "visual_media_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
-    @JsonIgnoreProperties(value = {"visualMedias"})
-    private Set<TagEntity> tags = new HashSet<TagEntity>();
+    @JsonIgnoreProperties("text")
+    @JsonIgnore
+    private Set<TagEntity> tags;
 
 
     public void addTag(TagEntity tag) {
