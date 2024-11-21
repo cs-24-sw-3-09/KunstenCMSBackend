@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "visual_medias")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,6 +28,7 @@ public class VisualMediaEntity extends ContentEntity {
             joinColumns = {@JoinColumn(name = "visual_media_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
+    @JsonIgnoreProperties(value = {"visualMedias"})
     private Set<TagEntity> tags = new HashSet<TagEntity>();
 
 
