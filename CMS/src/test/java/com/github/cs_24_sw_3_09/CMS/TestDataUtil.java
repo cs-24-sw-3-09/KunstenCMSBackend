@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
@@ -110,9 +111,29 @@ public class TestDataUtil {
                 .startTime(java.sql.Time.valueOf("10:20:30"))                               
                 .endTime(java.sql.Time.valueOf("11:21:31"))                                
                 .weekdaysChosen(3)                                          
-                .displayContent(new SlideshowEntity())                     
-                .displayDevices(new  HashSet<DisplayDeviceEntity>())                            
+                .displayContent(assignedSlideshow())                     
+                .displayDevices(assignDisplayDevice())                            
                 .build();
     }
     
+    public static SlideshowEntity assignedSlideshow(){
+        return SlideshowEntity.builder()
+                .name("test1")
+                .build();
+    }
+
+    public static HashSet<DisplayDeviceEntity> assignDisplayDevice(){
+        HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
+
+        DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
+                                .displayOrientation("horizontal")
+                                .connectedState(false)
+                                .location("Aalborg")
+                                .model("Samsung")
+                                .name("Skærm Esbjerg1")
+                                .resolution("1920x1080")
+                                .build();
+        displayDevices.add(dd);
+        return displayDevices;
+    }
 }

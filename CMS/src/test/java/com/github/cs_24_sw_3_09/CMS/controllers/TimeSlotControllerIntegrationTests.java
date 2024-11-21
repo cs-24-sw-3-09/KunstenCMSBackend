@@ -53,9 +53,9 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isOk());
     }
-    //TODO: tilføj test om nested objekter bliver returneret, GET.
+    
     @Test 
-    public void testThatGetTimeSlotsSuccessfullyReturnsListOfUsers() throws Exception{
+    public void testThatGetTimeSlotsSuccessfullyReturnsListOfTimeSlots() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotService.save(testTimeSlotEntity);
 
@@ -72,7 +72,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
-    public void testThatGetTimeSlotReturnsStatus200WhenUserExists() throws Exception {
+    public void testThatGetTimeSlotReturnsStatus200WhenTimeSlotsExists() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotService.save(testTimeSlotEntity);
 
@@ -86,6 +86,25 @@ public class TimeSlotControllerIntegrationTests {
                 MockMvcResultMatchers.jsonPath("startDate").value(testTimeSlotEntity.getStartDate().toString())
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("startTime").value(testTimeSlotEntity.getStartTime().toString())
+        );
+    }
+
+
+    @Test
+    public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception{
+        TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
+        timeSlotService.save(testTimeSlotEntity);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/time_slots/1")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("displayContent").isNotEmpty()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("displayContent.name").value("test1")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("displayDevices").isNotEmpty()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("displayDevices[0].name").value("Skærm Esbjerg1")
         );
     }
 
@@ -147,7 +166,6 @@ public class TimeSlotControllerIntegrationTests {
                 MockMvcResultMatchers.status().isOk());
     }
 
-    //TODO: tilføj test for at tjekke om vi kan ændre id til eks. DD og displayContent
     @Test
     public void testThatPatchUpdateTimeSlotReturnsStatus200() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();

@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "display_devices")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,16 +36,13 @@ public class DisplayDeviceEntity {
     private String resolution;
     @ColumnDefault("false")
     private Boolean connectedState;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
-    //@ManyToMany(mappedBy = "displayDevices")
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "time_slot_display_device",
-        joinColumns = {@JoinColumn(name = "display_device_id")},
-        inverseJoinColumns = {@JoinColumn(name = "time_slot_id")}
-    )
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "time_slot_display_device", joinColumns = {
+            @JoinColumn(name = "display_device_id") }, inverseJoinColumns = { @JoinColumn(name = "time_slot_id") })
+    @JsonIgnore
     private Set<TimeSlotEntity> timeSlots;
 
 }

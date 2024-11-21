@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import lombok.*;
 
-@Data
 @Getter
 @Setter
 @NoArgsConstructor

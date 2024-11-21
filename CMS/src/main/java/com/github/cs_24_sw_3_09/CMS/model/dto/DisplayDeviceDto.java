@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
@@ -14,8 +15,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,7 +34,7 @@ public class DisplayDeviceDto {
     @Pattern(regexp = "^\\d+x\\d+$", message = "Resolution must be in the format 'widthxheight' (e.g., 1920x1080)")
     private String resolution;
     private Boolean connectedState;
-    private VisualMediaEntity fallbackVisualMedia;
+    private ContentEntity fallbackContent;
     private Set<TimeSlotEntity> timeSlots;
 
 }
