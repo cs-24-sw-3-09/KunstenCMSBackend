@@ -104,9 +104,8 @@ public class PushTSServiceImpl implements PushTSService {
     }
 
     @Override
-    public void sendTimeSlotToDisplayDevice(TimeSlotDto timeSlotDto,
-            DisplayDeviceDto displayDeviceDto) {
-        socketIOModule.sendContent(displayDeviceDto.getId(), timeSlotDto.getDisplayContent());
+    public void sendTimeSlotToDisplayDevice(TimeSlotEntity timeSlotEntity, DisplayDeviceEntity displayDeviceEntity) {
+        socketIOModule.sendContent(displayDeviceEntity.getId(), timeSlotEntity.getDisplayContent());
     }
 
     @Override
@@ -120,7 +119,7 @@ public class PushTSServiceImpl implements PushTSService {
 
             TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(timeSlots,
                     displayDeviceMapper.mapTo(dd));
-
+            sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
         }
     }
 }
