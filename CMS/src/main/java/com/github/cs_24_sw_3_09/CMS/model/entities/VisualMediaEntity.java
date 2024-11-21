@@ -23,7 +23,7 @@ public class VisualMediaEntity extends ContentEntity {
     private String fileType;
     private String description;
     private String lastDateModified;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "visual_media_tag",
             joinColumns = {@JoinColumn(name = "visual_media_id")},
@@ -31,6 +31,7 @@ public class VisualMediaEntity extends ContentEntity {
     )
     @JsonIgnoreProperties("text")
     @JsonIgnore
+
     private Set<TagEntity> tags;
 
 

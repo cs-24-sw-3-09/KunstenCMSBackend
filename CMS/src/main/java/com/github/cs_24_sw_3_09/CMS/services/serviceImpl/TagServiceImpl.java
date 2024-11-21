@@ -39,7 +39,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void delete(Long id) { tagRepository.deleteById(id); }
+    public void delete(Long id) {
+        tagRepository.deleteAssociations(id);
+        tagRepository.deleteById(id);
+    }
 
     @Override
     public TagEntity partialUpdate(Long id, TagEntity tagEntity) {

@@ -89,34 +89,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaRepository.save(foundVisualMedia);
 
         return foundVisualMedia;
-
-
-
-        /*
-        return visualMediaRepository.findById(Math.toIntExact(id)).map(existingVisualMedia -> {
-
-
-
-
-            System.out.println(tagService.findOne(tagId).isEmpty());
-            if (tagService.findOne(tagId).isEmpty()) {
-
-                throw new RuntimeException("Tag not found");
-            }
-
-            Set<TagEntity> tags = existingVisualMedia.getTags();
-
-            TagEntity tag = tagService.findOne(tagId).get();
-            tags.add(tag);
-            existingVisualMedia.setTags(tags);
-
-
-            System.out.println(tags);
-            System.out.println(existingVisualMedia);
-            System.out.println(foundTag);
-            return visualMediaRepository.save(existingVisualMedia);
-        }).orElseThrow(() -> new RuntimeException("Visual Media Not Found"));
-    */
     }
 
     @Override
