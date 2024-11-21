@@ -23,7 +23,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
     @Override
     public Optional<DisplayDeviceEntity> findOne(Long id) {
-        return displayDeviceRepository.findById(Math.toIntExact(id));
+        return displayDeviceRepository.findById(Math.toIntExact(id));   
     }
 
     @Override
