@@ -18,7 +18,6 @@ import java.util.Set;
 @Builder
 public class VisualMediaEntity extends ContentEntity {
 
-
     private String name;
     private String location;
     private String fileType;

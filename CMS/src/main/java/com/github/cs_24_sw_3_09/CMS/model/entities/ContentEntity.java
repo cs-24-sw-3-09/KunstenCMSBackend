@@ -12,7 +12,7 @@ import lombok.*;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = VisualMediaEntity.class, name = "visualMedia"),
-        @JsonSubTypes.Type(value = SlideshowEntity.class, name = "slideshow")
+        @JsonSubTypes.Type(value = SlideshowEntity.class, name = "slideshow"),
 })
 public abstract class ContentEntity {
     @Id

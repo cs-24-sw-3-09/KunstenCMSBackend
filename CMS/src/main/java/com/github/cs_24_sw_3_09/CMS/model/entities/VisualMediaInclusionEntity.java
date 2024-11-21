@@ -5,7 +5,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "visual_media_inclusion")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,7 +18,7 @@ public class VisualMediaInclusionEntity {
     protected Integer id;
     private Integer slideDuration;
     private Integer slideshowPosition;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "visual_media_id")
     private VisualMediaEntity visualMedia;
 

@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 public interface TagService {
-
     TagEntity save(TagEntity tag);
 
     boolean isExists(Long id);

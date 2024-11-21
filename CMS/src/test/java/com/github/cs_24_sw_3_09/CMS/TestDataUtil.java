@@ -61,26 +61,26 @@ public class TestDataUtil {
     }
 
     public static UserDto createUserDto() {
-        return new UserDto.Builder()
-                .setFirstName("FirstTestName")
-                .setLastName("LastTestName")
-                .setEmail("test@test.com")
-                .setPassword("testtest1234")
-                .setNotificationState(true)
-                .setMediaPlanner(true)
-                .setAdmin(true)
+        return UserDto.builder()
+                .firstName("FirstTestName")
+                .lastName("LastTestName")
+                .email("test@test.com")
+                .password("testtest1234")
+                .notificationState(true)
+                .mediaPlanner(true)
+                .admin(true)
                 .build();
     }
 
     public static UserEntity createUserEntity() {
-        return new UserEntity.Builder()
-                .setFirstName("FirstTestName")
-                .setLastName("LastTestName")
-                .setEmail("test@test.com")
-                .setPassword("testtest123")
-                .setNotificationState(true)
-                .setMediaPlanner(true)
-                .setAdmin(true)
+        return UserEntity.builder()
+                .firstName("FirstTestName")
+                .lastName("LastTestName")
+                .email("test@test.com")
+                .password("testtest123")
+                .notificationState(true)
+                .mediaPlanner(true)
+                .admin(true)
                 .build();
     }
 
