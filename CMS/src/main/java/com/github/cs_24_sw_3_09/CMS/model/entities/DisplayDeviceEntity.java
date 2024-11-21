@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +14,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "display_devices")
-@Data
+// @Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,6 +43,7 @@ public class DisplayDeviceEntity {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "display_device_id") }, inverseJoinColumns = { @JoinColumn(name = "time_slot_id") })
+    @JsonIgnore
     private Set<TimeSlotEntity> timeSlots;
 
 }
