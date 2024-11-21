@@ -1,10 +1,13 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.time.LocalDateTime;
+
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 
@@ -81,6 +84,26 @@ public class TestDataUtil {
                 .notificationState(true)
                 .mediaPlanner(true)
                 .admin(true)
+                .build();
+    }
+
+    public static TimeSlotEntity createTimeSlotEntityWithCurrentTime() {
+        // Get the current date and time
+        LocalDateTime now = LocalDateTime.now();
+
+        // Adjust time ±2 hours
+        LocalDateTime startDateTime = now.minusHours(2); // Current time - 2 hours
+        LocalDateTime endDateTime = now.plusHours(2); // Current time + 2 hours
+
+        return TimeSlotEntity.builder()
+                .name("Test2 TimeSlot")
+                .startDate(Date.valueOf(startDateTime.toLocalDate())) // Convert to java.sql.Date
+                .endDate(Date.valueOf(endDateTime.toLocalDate())) // Convert to java.sql.Date
+                .startTime(Time.valueOf(startDateTime.toLocalTime())) // Convert to java.sql.Time
+                .endTime(Time.valueOf(endDateTime.toLocalTime())) // Convert to java.sql.Time
+                .weekdaysChosen(3)
+                .displayContent(assignedSlideshow())
+                .displayDevices(assignDisplayDevice())
                 .build();
     }
 
