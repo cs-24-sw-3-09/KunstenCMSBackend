@@ -25,8 +25,8 @@ public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEnt
         // Iterable<DisplayDeviceEntity> findConnectedDisplayDevices();
 
         // @EntityGraph(attributePaths = { "timeSlots" })
-        // @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
-        // List<DisplayDeviceEntity> findConnectedDisplayDevices();
-        @Query("SELECT d FROM DisplayDeviceEntity d LEFT JOIN FETCH d.timeSlots WHERE d.connectedState = true")
+        @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
         List<DisplayDeviceEntity> findConnectedDisplayDevices();
+        //@Query("SELECT d FROM DisplayDeviceEntity d LEFT JOIN FETCH d.timeSlots WHERE d.connectedState = true")
+        //List<DisplayDeviceEntity> findConnectedDisplayDevices();
 }

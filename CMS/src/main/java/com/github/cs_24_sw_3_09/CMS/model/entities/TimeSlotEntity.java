@@ -21,6 +21,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Table(name = "time_slots")
 public class TimeSlotEntity {
 
@@ -51,5 +53,10 @@ public class TimeSlotEntity {
             @JoinColumn(name = "time_slot_id") }, inverseJoinColumns = { @JoinColumn(name = "display_device_id") })
     @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
+
+    // @Override
+    // public String toString() {
+    //     return this.name;
+    // }
 
 }

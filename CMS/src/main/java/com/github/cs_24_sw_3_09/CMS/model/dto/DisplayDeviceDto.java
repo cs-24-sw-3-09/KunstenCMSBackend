@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
@@ -20,6 +21,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
+@EqualsAndHashCode
 public class DisplayDeviceDto {
 
     protected Integer id;
@@ -35,6 +38,6 @@ public class DisplayDeviceDto {
     private String resolution;
     private Boolean connectedState;
     private ContentEntity fallbackContent;
-    private Set<TimeSlotEntity> timeSlots;
+    private List<TimeSlotEntity> timeSlots;
 
 }
