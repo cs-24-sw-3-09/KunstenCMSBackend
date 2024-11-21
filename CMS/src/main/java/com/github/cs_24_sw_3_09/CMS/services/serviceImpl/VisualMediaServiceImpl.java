@@ -84,13 +84,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         TagEntity foundTag = tagRepository.findById(tagId).get();
 
-        VisualMediaEntity updatedVisualMedia = foundVisualMedia.addTag(foundTag);
-        updatedVisualMedia.setId(Math.toIntExact(id));
-        visualMediaRepository.save(updatedVisualMedia);
+        foundVisualMedia.addTag(foundTag);
+        foundVisualMedia.setId(Math.toIntExact(id));
+        visualMediaRepository.save(foundVisualMedia);
 
-        System.out.println(updatedVisualMedia);
-
-        return new VisualMediaEntity();
+        return foundVisualMedia;
 
 
 
