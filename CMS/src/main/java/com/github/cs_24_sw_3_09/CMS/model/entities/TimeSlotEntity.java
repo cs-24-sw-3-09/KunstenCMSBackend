@@ -40,13 +40,13 @@ public class TimeSlotEntity {
     @NotNull
     @ColumnDefault("0")
     private int weekdaysChosen; 
-    //@NotNull
+    @NotNull
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "time_slot_content")
     private ContentEntity displayContent;
     
-
-    @ManyToMany(cascade = CascadeType.ALL)
+    @NotNull
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
         name = "time_slot_display_device",
         joinColumns = {@JoinColumn(name = "time_slot_id")},

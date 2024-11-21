@@ -37,7 +37,13 @@ public class DisplayDeviceEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
-    @ManyToMany(mappedBy = "displayDevices")
+    //@ManyToMany(mappedBy = "displayDevices")
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "time_slot_display_device",
+        joinColumns = {@JoinColumn(name = "display_device_id")},
+        inverseJoinColumns = {@JoinColumn(name = "time_slot_id")}
+    )
     private Set<TimeSlotEntity> timeSlots;
 
 }
