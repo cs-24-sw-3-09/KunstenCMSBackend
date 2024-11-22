@@ -57,7 +57,6 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             Optional.ofNullable(displayDeviceEntity.getDisplayOrientation()).ifPresent(existingDisplayDevice::setDisplayOrientation);
             Optional.ofNullable(displayDeviceEntity.getConnectedState()).ifPresent(existingDisplayDevice::setConnectedState);
             Optional.ofNullable(displayDeviceEntity.getLocation()).ifPresent(existingDisplayDevice::setLocation);
-            Optional.ofNullable(displayDeviceEntity.getModel()).ifPresent(existingDisplayDevice::setModel);
             Optional.ofNullable(displayDeviceEntity.getResolution()).ifPresent(existingDisplayDevice::setResolution);
             Optional.ofNullable(displayDeviceEntity.getFallbackContent()).ifPresent(existingDisplayDevice::setFallbackContent);
             return displayDeviceRepository.save(existingDisplayDevice);

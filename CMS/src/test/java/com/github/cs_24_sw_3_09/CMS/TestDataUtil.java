@@ -22,7 +22,6 @@ public class TestDataUtil {
                 .displayOrientation("horizontal")
                 .connectedState(false)
                 .location("Aalborg")
-                .model("Samsung")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
                 .build();
@@ -34,7 +33,6 @@ public class TestDataUtil {
                 .displayOrientation("horizontal")
                 .connectedState(false)
                 .location("Esbjerg")
-                .model("Samsung")
                 .name("Skærm Esbjerg")
                 .resolution("1920x1080")
                 .build();
@@ -129,7 +127,6 @@ public class TestDataUtil {
                                 .displayOrientation("horizontal")
                                 .connectedState(false)
                                 .location("Aalborg")
-                                .model("Samsung")
                                 .name("Skærm Esbjerg1")
                                 .resolution("1920x1080")
                                 .build();
