@@ -25,4 +25,5 @@ public class VisualMediaEntity extends ContentEntity {
             @JoinColumn(name = "visual_media_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
     private Set<TagEntity> tags = new HashSet<TagEntity>();
 
+
 }
