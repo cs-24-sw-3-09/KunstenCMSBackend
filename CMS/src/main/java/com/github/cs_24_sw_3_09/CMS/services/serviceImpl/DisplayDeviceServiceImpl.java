@@ -1,13 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,14 +18,16 @@ import java.util.stream.StreamSupport;
 @Service
 public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
+    private final TimeSlotService timeSlotService;
     private DisplayDeviceRepository displayDeviceRepository;
     private VisualMediaRepository visualMediaRepository;
     private SlideshowRepository slideshowRepository;
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository) {
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository, TimeSlotService timeSlotService) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
+        this.timeSlotService = timeSlotService;
     }
 
     @Override
@@ -96,5 +96,16 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
 
+    }
+
+    @Override
+    public DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId) {
+        return displayDeviceRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+            TimeSlotEntity foundTimeslot = timeSlotService.findOne(timeslotId)
+                    .orElseThrow(() -> new RuntimeException("Timeslot does not exist"));
+            existingDisplayDevice.addTimeSlot(foundTimeslot);
+
+            return displayDeviceRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
     }
 }

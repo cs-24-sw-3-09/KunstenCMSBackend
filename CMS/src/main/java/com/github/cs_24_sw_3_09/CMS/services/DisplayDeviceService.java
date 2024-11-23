@@ -23,4 +23,6 @@ public interface DisplayDeviceService {
     void delete(Long id);
 
     DisplayDeviceEntity setFallbackContent(Long id, Long fallbackId, String type);
+
+    DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId);
 }

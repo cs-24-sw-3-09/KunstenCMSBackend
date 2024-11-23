@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
 import jakarta.persistence.EntityManager;
@@ -29,6 +30,7 @@ public class DisplayDeviceController {
     private final DisplayDeviceService displayDeviceService;
     private final VisualMediaService visualMediaService;
     private final SlideshowService slideshowService;
+    private final TimeSlotService timeSlotService;
     private Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
     private ContentUtils contentUtils;
 
@@ -36,13 +38,13 @@ public class DisplayDeviceController {
     public DisplayDeviceController(DisplayDeviceService displayDeviceService,
                                    Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
                                    VisualMediaService visualMediaService, SlideshowService slideshowService,
-                                   ContentUtils contentUtils) {
+                                   ContentUtils contentUtils, TimeSlotService timeSlotService) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceMapper = displayDeviceMapper;
         this.visualMediaService = visualMediaService;
         this.contentUtils = contentUtils;
         this.slideshowService = slideshowService;
-
+        this.timeSlotService = timeSlotService;
     }
 
     @PostMapping
@@ -106,7 +108,7 @@ public class DisplayDeviceController {
     }
 
     @PatchMapping(path = "/{id}/fallbackContent")
-    public ResponseEntity<DisplayDeviceDto> patchFallbackContent(
+    public ResponseEntity<DisplayDeviceDto> setFallbackContent(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
 
@@ -132,6 +134,36 @@ public class DisplayDeviceController {
         // Update the display device and return the response
         DisplayDeviceEntity updatedDisplayDeviceEntity =
                 displayDeviceService.setFallbackContent(id, fallbackId, type);
+
+        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
+    }
+
+    @PatchMapping(path = "/{id}/time_slots")
+    public ResponseEntity<DisplayDeviceDto> addTimeSlot(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("timeSlotId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //check if is a number
+        Long timeslotId;
+        try {
+            timeslotId = Long.valueOf(requestBody.get("timeSlotId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Get content type and validate existence of dd and content
+        if (!displayDeviceService.isExists(id) || !timeSlotService.isExists(timeslotId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Update the display device and return the response
+        DisplayDeviceEntity updatedDisplayDeviceEntity =
+                displayDeviceService.addTimeSlot(id, timeslotId);
 
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
