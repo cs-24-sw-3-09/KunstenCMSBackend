@@ -22,4 +22,6 @@ public interface SlideshowService {
     SlideshowEntity partialUpdate(Long id, SlideshowEntity slideshowEntity);
 
     void delete(Long id);
+
+    SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId);
 }

@@ -1,8 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,10 +18,12 @@ import java.util.stream.StreamSupport;
 @Service
 public class SlideshowServiceImpl implements SlideshowService {
 
+    private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowRepository slideshowRepository;
 
-    public SlideshowServiceImpl(SlideshowRepository slideshowRepository) {
+    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService) {
         this.slideshowRepository = slideshowRepository;
+        this.visualMediaInclusionService = visualMediaInclusionService;
     }
 
 
@@ -64,5 +69,16 @@ public class SlideshowServiceImpl implements SlideshowService {
     @Override
     public void delete(Long id) {
         slideshowRepository.deleteById(Math.toIntExact(id));
+    }
+
+    @Override
+    public SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId) {
+        return slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionService.findOne(visualMediaInclusionId)
+                    .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));
+            existingDisplayDevice.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
+
+            return slideshowRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
 }
