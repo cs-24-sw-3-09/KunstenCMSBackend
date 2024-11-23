@@ -1,7 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +21,13 @@ import java.util.stream.StreamSupport;
 public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
     private DisplayDeviceRepository displayDeviceRepository;
+    private VisualMediaRepository visualMediaRepository;
+    private SlideshowRepository slideshowRepository;
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository) {
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository) {
         this.displayDeviceRepository = displayDeviceRepository;
+        this.visualMediaRepository = visualMediaRepository;
+        this.slideshowRepository = slideshowRepository;
     }
 
     @Override
@@ -68,5 +77,24 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     public void delete(Long id) {
 
         displayDeviceRepository.deleteById(Math.toIntExact(id));
+    }
+
+    @Override
+    public DisplayDeviceEntity setFallbackContent(Long id, Long fallbackId, String type) {
+        return displayDeviceRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+
+            if (type.equals("VisualMediaEntity")) {
+                VisualMediaEntity foundFallback = visualMediaRepository.findById(Math.toIntExact(fallbackId))
+                        .orElseThrow(() -> new RuntimeException("Visual Media does not exist"));
+                existingDisplayDevice.setFallbackContent(foundFallback);
+            } else if (type.equals("SlideshowEntity")) {
+                SlideshowEntity foundFallback = slideshowRepository.findById(Math.toIntExact(fallbackId))
+                        .orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
+                existingDisplayDevice.setFallbackContent(foundFallback);
+            }
+
+            return displayDeviceRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
+
     }
 }
