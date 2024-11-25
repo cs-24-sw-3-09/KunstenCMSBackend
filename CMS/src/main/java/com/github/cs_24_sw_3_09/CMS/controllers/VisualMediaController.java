@@ -81,6 +81,7 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
 
+    @PutMapping(path = "/{id}"}
     public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id,
             @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
