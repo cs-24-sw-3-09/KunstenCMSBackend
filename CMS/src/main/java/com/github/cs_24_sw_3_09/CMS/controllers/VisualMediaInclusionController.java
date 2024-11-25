@@ -89,7 +89,7 @@ public class VisualMediaInclusionController {
         }
 
         visualMediaInclusionService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(path = "/{id}/visual_media")
