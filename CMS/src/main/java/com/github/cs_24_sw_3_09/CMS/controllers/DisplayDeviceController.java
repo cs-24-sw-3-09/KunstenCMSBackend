@@ -2,7 +2,6 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 
@@ -10,7 +9,6 @@ import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
-import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +36,9 @@ public class DisplayDeviceController {
 
     @Autowired
     public DisplayDeviceController(DisplayDeviceService displayDeviceService,
-                                   Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
-                                   VisualMediaService visualMediaService, SlideshowService slideshowService,
-                                   ContentUtils contentUtils, TimeSlotService timeSlotService) {
+            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
+            VisualMediaService visualMediaService, SlideshowService slideshowService,
+            ContentUtils contentUtils, TimeSlotService timeSlotService) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceMapper = displayDeviceMapper;
         this.visualMediaService = visualMediaService;
@@ -78,7 +76,7 @@ public class DisplayDeviceController {
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<DisplayDeviceDto> fullUpdateDisplayDevice(@PathVariable("id") Long id,
-                                                                    @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
+            @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -91,7 +89,7 @@ public class DisplayDeviceController {
 
     @PatchMapping(path = "/{id}")
     public ResponseEntity<DisplayDeviceDto> partialUpdateDisplayDevice(@PathVariable("id") Long id,
-                                                                       @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
+            @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -120,7 +118,7 @@ public class DisplayDeviceController {
             return ResponseEntity.badRequest().build();
         }
 
-        //check if is a number
+        // check if is a number
         Long fallbackId;
         try {
             fallbackId = Long.valueOf(requestBody.get("fallbackId").toString());
@@ -130,13 +128,13 @@ public class DisplayDeviceController {
 
         // Get content type and validate existence of dd and content
         String type = contentUtils.getContentTypeById(Math.toIntExact(fallbackId));
-        if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId) || !displayDeviceService.isExists(id)) {
+        if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId)
+                || !displayDeviceService.isExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         // Update the display device and return the response
-        DisplayDeviceEntity updatedDisplayDeviceEntity =
-                displayDeviceService.setFallbackContent(id, fallbackId, type);
+        DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.setFallbackContent(id, fallbackId, type);
 
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
@@ -151,7 +149,7 @@ public class DisplayDeviceController {
             return ResponseEntity.badRequest().build();
         }
 
-        //check if is a number
+        // check if is a number
         Long timeslotId;
         try {
             timeslotId = Long.valueOf(requestBody.get("timeSlotId").toString());
@@ -165,8 +163,7 @@ public class DisplayDeviceController {
         }
 
         // Update the display device and return the response
-        DisplayDeviceEntity updatedDisplayDeviceEntity =
-                displayDeviceService.addTimeSlot(id, timeslotId);
+        DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.addTimeSlot(id, timeslotId);
 
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }

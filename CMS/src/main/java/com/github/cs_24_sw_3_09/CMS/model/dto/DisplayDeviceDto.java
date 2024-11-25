@@ -1,17 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.model.dto;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
+
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;

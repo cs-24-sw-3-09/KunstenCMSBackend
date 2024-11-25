@@ -1,9 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.mappers.impl;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

@@ -1,11 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 
 public interface TagService {
     TagEntity save(TagEntity tag);
