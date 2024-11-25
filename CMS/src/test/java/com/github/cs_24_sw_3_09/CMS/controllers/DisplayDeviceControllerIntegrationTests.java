@@ -22,9 +22,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 public class DisplayDeviceControllerIntegrationTests {
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
-    private DisplayDeviceService displayDeviceService;
+	private MockMvc mockMvc;
+	private ObjectMapper objectMapper;
+	private DisplayDeviceService displayDeviceService;
 
 	@Autowired
 	public DisplayDeviceControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper,
@@ -34,19 +34,18 @@ public class DisplayDeviceControllerIntegrationTests {
 		this.displayDeviceService = displayDeviceService;
 	}
 
-    @Test
-    public void testThatCreateDisplayDeviceSuccessfullyReturnsHttp201Created() throws Exception {
-        DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
-        String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceDto);
-     
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/display_devices")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(displayDeviceJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
-    }
+	@Test
+	public void testThatCreateDisplayDeviceSuccessfullyReturnsHttp201Created() throws Exception {
+		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
+		String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceDto);
+
+		mockMvc.perform(
+				MockMvcRequestBuilders.post("/api/display_devices")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(displayDeviceJson))
+				.andExpect(
+						MockMvcResultMatchers.status().isCreated());
+	}
 
 	@Test
 	public void testThatCreateDisplayDeviceSuccessfullyReturnsSavedDisplayDevice() throws Exception {
@@ -102,13 +101,12 @@ public class DisplayDeviceControllerIntegrationTests {
 						MockMvcResultMatchers.status().isOk());
 	}
 
-    @Test
-    public void testThatGetDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/display_devices/99")
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound());
-    }
+	@Test
+	public void testThatGetDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
+		mockMvc.perform(
+				MockMvcRequestBuilders.get("/api/display_devices/99")).andExpect(
+						MockMvcResultMatchers.status().isNotFound());
+	}
 
 	@Test
 	public void testThatGetDisplayDeviceReturnsDisplayDeviceWhenDisplayDeviceExists() throws Exception {
@@ -178,18 +176,17 @@ public class DisplayDeviceControllerIntegrationTests {
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/" + savedDisplayDeviceEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(displayDeviceDtoJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk()
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$.name").value(displayDeviceDto.getName())
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$.location").value(displayDeviceDto.getLocation())
-                );
-    }
+		mockMvc.perform(
+				MockMvcRequestBuilders.patch("/api/display_devices/" + savedDisplayDeviceEntity.getId())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(displayDeviceDtoJson))
+				.andExpect(
+						MockMvcResultMatchers.status().isOk())
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.name").value(displayDeviceDto.getName()))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.location").value(displayDeviceDto.getLocation()));
+	}
 
 	@Test
 	public void testThatPatchUpdateDisplayDeviceReturnsStatus404() throws Exception {
@@ -203,5 +200,4 @@ public class DisplayDeviceControllerIntegrationTests {
 				.andExpect(
 						MockMvcResultMatchers.status().isNotFound());
 	}
-
 }
