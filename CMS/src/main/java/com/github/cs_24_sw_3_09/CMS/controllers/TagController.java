@@ -63,7 +63,7 @@ public class TagController {
 
     @PatchMapping(path = "/{id}")
     public ResponseEntity<TagDto> patchTag(@PathVariable("id") Long id,
-                                           @Valid @RequestBody TagDto tagDto) {
+            @Valid @RequestBody TagDto tagDto) {
         if (!tagService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -3,7 +3,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
-import org.hibernate.validator.internal.util.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

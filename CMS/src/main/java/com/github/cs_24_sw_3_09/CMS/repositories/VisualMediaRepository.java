@@ -10,11 +10,11 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 
 @Repository
 public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity, Integer>,
-        PagingAndSortingRepository<VisualMediaEntity, Integer> {
+                PagingAndSortingRepository<VisualMediaEntity, Integer> {
 
     @Transactional
     @Modifying

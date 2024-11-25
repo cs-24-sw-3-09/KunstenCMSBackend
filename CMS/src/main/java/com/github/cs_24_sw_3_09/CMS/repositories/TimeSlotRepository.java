@@ -5,6 +5,9 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +25,7 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
     @Transactional
     @Query(value = "SELECT COUNT(*) FROM time_slot_display_device WHERE time_slot_id = :ts_id", nativeQuery = true)
     int countAssociations(@Param("ts_id") Long ts_id);
+
+    @Query("SELECT ts FROM TimeSlotEntity ts WHERE ts.displayDevices IS EMPTY")
+    List<TimeSlotEntity> findTimeSlotsWithNoDisplayDevices();
 }
