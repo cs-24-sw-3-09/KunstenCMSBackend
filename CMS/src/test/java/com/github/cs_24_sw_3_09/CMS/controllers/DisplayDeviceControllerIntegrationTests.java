@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 public class DisplayDeviceControllerIntegrationTests {
-	// Mock is a powerful way of testing controllers.
 	private MockMvc mockMvc;
 	private ObjectMapper objectMapper;
 	private DisplayDeviceService displayDeviceService;
@@ -38,8 +36,8 @@ public class DisplayDeviceControllerIntegrationTests {
 
 	@Test
 	public void testThatCreateDisplayDeviceSuccessfullyReturnsHttp201Created() throws Exception {
-		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceEntity);
+		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
+		String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceDto);
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.post("/api/display_devices")
@@ -105,11 +103,8 @@ public class DisplayDeviceControllerIntegrationTests {
 
 	@Test
 	public void testThatGetDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
-		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceEntity);
-
 		mockMvc.perform(
-				MockMvcRequestBuilders.get("/api/display_devices/100000")).andExpect(
+				MockMvcRequestBuilders.get("/api/display_devices/99")).andExpect(
 						MockMvcResultMatchers.status().isNotFound());
 	}
 
@@ -188,9 +183,9 @@ public class DisplayDeviceControllerIntegrationTests {
 				.andExpect(
 						MockMvcResultMatchers.status().isOk())
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.name").value(displayDeviceEntity.getName()))
+						MockMvcResultMatchers.jsonPath("$.name").value(displayDeviceDto.getName()))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.location").value(displayDeviceEntity.getLocation()));
+						MockMvcResultMatchers.jsonPath("$.location").value(displayDeviceDto.getLocation()));
 	}
 
 	@Test
@@ -205,5 +200,4 @@ public class DisplayDeviceControllerIntegrationTests {
 				.andExpect(
 						MockMvcResultMatchers.status().isNotFound());
 	}
-
 }

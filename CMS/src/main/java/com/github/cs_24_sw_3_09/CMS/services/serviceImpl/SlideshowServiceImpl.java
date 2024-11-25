@@ -5,6 +5,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,16 +23,19 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowRepository slideshowRepository;
+    private PushTSService pushTSService;
 
-    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService) {
+    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService) {
         this.slideshowRepository = slideshowRepository;
+        this.pushTSService = pushTSService;
         this.visualMediaInclusionService = visualMediaInclusionService;
     }
 
-
     @Override
     public SlideshowEntity save(SlideshowEntity slideshowEntity) {
-        return slideshowRepository.save(slideshowEntity);
+        SlideshowEntity toReturn = slideshowRepository.save(slideshowEntity);
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        return toReturn;
     }
 
     @Override
@@ -58,12 +62,16 @@ public class SlideshowServiceImpl implements SlideshowService {
     public SlideshowEntity partialUpdate(Long id, SlideshowEntity slideshowEntity)
             throws RuntimeException {
         return slideshowRepository.findById(Math.toIntExact(id)).map(existingSlideshow -> {
-            // if display device from request has name, we set it to the existing display device. (same with other atts)
+            // if display device from request has name, we set it to the existing display
+            // device. (same with other atts)
             Optional.ofNullable(slideshowEntity.getName()).ifPresent(existingSlideshow::setName);
             Optional.ofNullable(slideshowEntity.getIsArchived()).ifPresent(existingSlideshow::setIsArchived);
-            Optional.ofNullable(slideshowEntity.getVisualMediaInclusionCollection()).ifPresent(existingSlideshow::setVisualMediaInclusionCollection);
+            Optional.ofNullable(slideshowEntity.getVisualMediaInclusionCollection())
+                    .ifPresent(existingSlideshow::setVisualMediaInclusionCollection);
 
-            return slideshowRepository.save(existingSlideshow);
+            SlideshowEntity toReturn = slideshowRepository.save(existingSlideshow);
+            pushTSService.updateDisplayDevicesToNewTimeSlots();
+            return toReturn;
 
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
@@ -76,6 +84,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         slideshow.getVisualMediaInclusionCollection().clear();
         slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
     @Override

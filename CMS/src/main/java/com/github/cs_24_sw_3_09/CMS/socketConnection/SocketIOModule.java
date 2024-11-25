@@ -1,10 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
+import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
+import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
+
 import jakarta.annotation.PreDestroy;
 
 public class SocketIOModule {
@@ -34,6 +39,11 @@ public class SocketIOModule {
         return (client -> {
             System.out.println("Device disconnected: " + client.getRemoteAddress());
         });
+    }
+
+    public void sendContent(int screenId, ContentEntity contentEntity) {
+        BroadcastOperations roomOperations = server.getRoomOperations(String.valueOf(screenId));
+        roomOperations.sendEvent("content", contentEntity);
     }
 
     public void start() {

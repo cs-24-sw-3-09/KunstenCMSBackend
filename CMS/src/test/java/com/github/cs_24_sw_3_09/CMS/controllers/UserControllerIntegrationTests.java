@@ -2,12 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
-import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureMockMvc
 public class UserControllerIntegrationTests {
 
-    //Mock is a powerful way of testing controllers.
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private UserService userService;
@@ -41,16 +36,15 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void testThatCreateUserSuccessfullyReturnsHttp201Created() throws Exception {
-        UserEntity userEntity = TestDataUtil.createUserEntity();
-        String userJson = objectMapper.writeValueAsString(userEntity);
+        // Have to be hardcoded as a Json string, due to the password only being write and not read
+        String userJson = "{\"firstName\": \"FirstTestName\", \"lastName\":\"LastTestName\", \"email\":\"test@test.com\", \"password\":\"testtest1234\"}";
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson)
         ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
+                MockMvcResultMatchers.status().isCreated());
     }
 
     @Test
@@ -145,7 +139,7 @@ public class UserControllerIntegrationTests {
         UserEntity userEntity = TestDataUtil.createUserEntity();
         UserEntity savedUserEntity = userService.save(userEntity);
 
-        // Have to be hardcoded as a Json string, do to the password only being write and not read
+        // Have to be hardcoded as a Json string, due to the password only being write and not read
         String userDtoJson = "{\"firstName\": \"FirstTestName\", \"lastName\":\"LastTestName\", \"email\":\"test@test.com\", \"password\":\"testtest1234\"}";
 
         mockMvc.perform(
@@ -173,9 +167,9 @@ public class UserControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.firstName").value(userEntity.getFirstName())
+                MockMvcResultMatchers.jsonPath("$.firstName").value(userDto.getFirstName())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.email").value(userEntity.getEmail())
+                MockMvcResultMatchers.jsonPath("$.email").value(userDto.getEmail())
         );
     }
 

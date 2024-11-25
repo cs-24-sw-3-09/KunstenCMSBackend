@@ -17,6 +17,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
+@EqualsAndHashCode
 public class TimeSlotDto {
 
     protected Integer id;
