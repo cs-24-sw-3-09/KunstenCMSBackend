@@ -116,7 +116,8 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "{vmId}/tag/{tagId}")
+    //Todo: Change path name
+    @DeleteMapping(path = "{vmId}/tags/{tagId}")
     public ResponseEntity<VisualMediaDto> deleteTagRelation(@PathVariable("vmId") Long visualMediaId, @PathVariable("tagId") Long tagId) {
         if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

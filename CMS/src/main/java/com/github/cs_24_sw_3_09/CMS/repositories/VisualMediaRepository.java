@@ -18,7 +18,6 @@ public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity,
 
     @Transactional
     @Modifying
-    //TODO: Check this
-    @Query(value = "DELETE FROM visual_media_tag WHERE tag_id = :tagId and vm_id = :vmId", nativeQuery = true)
+    @Query(value = "DELETE FROM visual_media_tag WHERE tag_id = :tagId and visual_media_id = :vmId", nativeQuery = true)
     void deleteAssociation(@Param("vmId")Long vmId, @Param("tagId") Long tagId);
 }
