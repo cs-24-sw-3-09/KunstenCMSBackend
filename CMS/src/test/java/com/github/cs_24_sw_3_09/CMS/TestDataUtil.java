@@ -15,6 +15,8 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 public class TestDataUtil {
 
@@ -165,4 +167,12 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static MockMultipartFile createVisualMediaFile() {
+        return new MockMultipartFile(
+                "file",
+                "test-image.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "Fake JPEG file content".getBytes()
+        );
+    }
 }
