@@ -20,4 +20,7 @@ public class SlideshowEntity extends ContentEntity {
     @JoinColumn(name = "visual_media_inclusion_id")
     private Set<VisualMediaInclusionEntity> visualMediaInclusionCollection;
 
+    public void addVisualMediaInclusion(VisualMediaInclusionEntity visualMediaInclusionEntity) {
+        this.visualMediaInclusionCollection.add(visualMediaInclusionEntity);
+    }
 }

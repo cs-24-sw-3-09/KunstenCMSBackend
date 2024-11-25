@@ -22,4 +22,6 @@ public interface VisualMediaInclusionService {
     VisualMediaInclusionEntity partialUpdate(Long id, VisualMediaInclusionEntity visualMediaInclusionEntity);
 
     void delete(Long id);
+
+    VisualMediaInclusionEntity setVisualMedia(Long id, Long visualMediaId);
 }

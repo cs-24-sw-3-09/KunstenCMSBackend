@@ -1,8 +1,14 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,16 +21,21 @@ import java.util.stream.StreamSupport;
 @Service
 public class SlideshowServiceImpl implements SlideshowService {
 
+    private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowRepository slideshowRepository;
+    private PushTSService pushTSService;
 
-    public SlideshowServiceImpl(SlideshowRepository slideshowRepository) {
+    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService) {
         this.slideshowRepository = slideshowRepository;
+        this.pushTSService = pushTSService;
+        this.visualMediaInclusionService = visualMediaInclusionService;
     }
-
 
     @Override
     public SlideshowEntity save(SlideshowEntity slideshowEntity) {
-        return slideshowRepository.save(slideshowEntity);
+        SlideshowEntity toReturn = slideshowRepository.save(slideshowEntity);
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        return toReturn;
     }
 
     @Override
@@ -51,18 +62,39 @@ public class SlideshowServiceImpl implements SlideshowService {
     public SlideshowEntity partialUpdate(Long id, SlideshowEntity slideshowEntity)
             throws RuntimeException {
         return slideshowRepository.findById(Math.toIntExact(id)).map(existingSlideshow -> {
-            // if display device from request has name, we set it to the existing display device. (same with other atts)
+            // if display device from request has name, we set it to the existing display
+            // device. (same with other atts)
             Optional.ofNullable(slideshowEntity.getName()).ifPresent(existingSlideshow::setName);
             Optional.ofNullable(slideshowEntity.getIsArchived()).ifPresent(existingSlideshow::setIsArchived);
-            Optional.ofNullable(slideshowEntity.getVisualMediaInclusionCollection()).ifPresent(existingSlideshow::setVisualMediaInclusionCollection);
+            Optional.ofNullable(slideshowEntity.getVisualMediaInclusionCollection())
+                    .ifPresent(existingSlideshow::setVisualMediaInclusionCollection);
 
-            return slideshowRepository.save(existingSlideshow);
+            SlideshowEntity toReturn = slideshowRepository.save(existingSlideshow);
+            pushTSService.updateDisplayDevicesToNewTimeSlots();
+            return toReturn;
 
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
 
     @Override
     public void delete(Long id) {
+        SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
+
+        slideshow.getVisualMediaInclusionCollection().clear();
+        slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }
+
+    @Override
+    public SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId) {
+        return slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionService.findOne(visualMediaInclusionId)
+                    .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));
+            existingDisplayDevice.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
+
+            return slideshowRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
 }

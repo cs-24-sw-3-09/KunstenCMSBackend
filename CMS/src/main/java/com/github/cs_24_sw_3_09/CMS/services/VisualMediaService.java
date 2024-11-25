@@ -26,4 +26,6 @@ public interface VisualMediaService {
     VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity);
 
     void delete(Long id);
+
+    VisualMediaEntity addTag(Long id, Long tagId);
 }

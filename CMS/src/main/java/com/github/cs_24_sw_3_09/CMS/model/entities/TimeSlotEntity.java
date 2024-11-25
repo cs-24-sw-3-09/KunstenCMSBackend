@@ -21,6 +21,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Table(name = "time_slots")
 public class TimeSlotEntity {
 
@@ -46,10 +48,10 @@ public class TimeSlotEntity {
     @JoinColumn(name = "time_slot_content")
     private ContentEntity displayContent;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
-            @JoinColumn(name = "time_slot_id") }, inverseJoinColumns = { @JoinColumn(name = "display_device_id") })
+            @JoinColumn(name = "time_slot_id")}, inverseJoinColumns = {@JoinColumn(name = "display_device_id")})
     @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
-}
+} 
