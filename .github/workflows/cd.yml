@@ -28,8 +28,10 @@ jobs:
       id-token: write
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
     steps:
+      - name: downcase REPO
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Log in to the Container registry
