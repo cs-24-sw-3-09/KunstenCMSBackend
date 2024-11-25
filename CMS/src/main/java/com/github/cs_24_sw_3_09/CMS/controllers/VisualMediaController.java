@@ -43,7 +43,6 @@ public class VisualMediaController {
         VisualMediaDto visualMediaDto = VisualMediaDto.builder()
                 .name(file.getOriginalFilename())
                 .fileType(file.getContentType())
-                .lastDateModified(String.valueOf(LocalDateTime.now()))
                 .build();
 
         fileStorageService.saveFile(file);
@@ -108,7 +107,7 @@ public class VisualMediaController {
 
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
         VisualMediaEntity updatedVisualMediaEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
-        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
+        return new ResponseEntity<>(visualMediaMapper.  mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
