@@ -115,8 +115,7 @@ public class VisualMediaController {
 
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia), HttpStatus.OK);
     }
-
-    //Todo: Change path name
+    
     @DeleteMapping(path = "{visual_media_Id}/tags")
     public ResponseEntity<VisualMediaDto> deleteTagRelation(@PathVariable("visual_media_Id") Long visualMediaId,
                                                             @RequestBody Map<String, Object> requestBody) {

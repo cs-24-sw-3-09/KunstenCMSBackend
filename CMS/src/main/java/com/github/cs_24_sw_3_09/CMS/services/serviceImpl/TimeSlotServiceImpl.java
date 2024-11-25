@@ -120,20 +120,4 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             timeSlotRepository.deleteAssociation(tsId, ddId);
         }
     }
-
-    @Override
-    public void deleteRelation(Long tsId, Long ddId) {
-        Optional<TimeSlotEntity> timeSlotEntity = timeSlotRepository.findById(Math.toIntExact(tsId));
-        if (timeSlotEntity.isEmpty()) { return; }
-        System.out.println(timeSlotEntity.get().getDisplayDevices().size());
-
-        if (timeSlotEntity.get().getDisplayDevices().size() == 1) {
-            //System.out.println("here "+ tsId);
-            //System.out.println(timeSlotEntity.get().toString());
-            
-            delete(tsId);
-        } else {
-            timeSlotRepository.deleteAssociation(tsId, ddId);
-        }
-    }
 }
