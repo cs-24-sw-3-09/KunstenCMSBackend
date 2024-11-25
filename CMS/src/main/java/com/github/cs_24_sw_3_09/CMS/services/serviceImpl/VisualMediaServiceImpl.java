@@ -118,4 +118,9 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     public void deleteRelation(Long visualMediaId, Long tagId) {
         visualMediaRepository.deleteAssociation(visualMediaId, tagId);
     }
+
+    @Override
+    public void deleteRelation(Long visualMediaId, Long tagId) {
+        visualMediaRepository.deleteAssociation(visualMediaId, tagId);
+    }
 }
