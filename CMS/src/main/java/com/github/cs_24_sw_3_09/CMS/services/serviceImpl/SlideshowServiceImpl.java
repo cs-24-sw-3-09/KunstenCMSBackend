@@ -1,22 +1,22 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class SlideshowServiceImpl implements SlideshowService {
@@ -25,7 +25,8 @@ public class SlideshowServiceImpl implements SlideshowService {
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
 
-    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService) {
+    public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
+            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.visualMediaInclusionService = visualMediaInclusionService;
@@ -90,7 +91,8 @@ public class SlideshowServiceImpl implements SlideshowService {
     @Override
     public SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId) {
         return slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
-            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionService.findOne(visualMediaInclusionId)
+            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionService
+                    .findOne(visualMediaInclusionId)
                     .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));
             existingDisplayDevice.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
 
