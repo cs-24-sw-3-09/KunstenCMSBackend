@@ -8,11 +8,13 @@ import com.github.cs_24_sw_3_09.CMS.services.CleanUpDataBaseService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
 @Component
+@Profile("!test")
 public class CleanUpDataBase {
 
     private final CleanUpDataBaseService cleanUpDateBaseService;
