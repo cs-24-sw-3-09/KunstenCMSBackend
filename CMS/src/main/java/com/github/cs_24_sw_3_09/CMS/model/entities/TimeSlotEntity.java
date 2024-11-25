@@ -7,9 +7,7 @@ import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

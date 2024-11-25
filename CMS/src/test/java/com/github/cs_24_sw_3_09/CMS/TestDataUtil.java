@@ -1,7 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -13,7 +12,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;

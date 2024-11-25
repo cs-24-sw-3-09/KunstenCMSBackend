@@ -1,6 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

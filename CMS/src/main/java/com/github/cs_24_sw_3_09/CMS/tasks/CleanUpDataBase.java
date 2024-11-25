@@ -2,11 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.tasks;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.services.CleanUpDataBaseService;
-import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
-import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;

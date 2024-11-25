@@ -1,11 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

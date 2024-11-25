@@ -1,9 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/visual_medias")

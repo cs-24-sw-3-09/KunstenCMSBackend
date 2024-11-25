@@ -2,7 +2,6 @@ package com.github.cs_24_sw_3_09.CMS;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 

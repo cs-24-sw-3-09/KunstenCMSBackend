@@ -1,9 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import org.springframework.data.domain.Page;
