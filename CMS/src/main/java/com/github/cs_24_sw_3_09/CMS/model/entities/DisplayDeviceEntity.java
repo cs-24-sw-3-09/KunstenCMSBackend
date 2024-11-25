@@ -32,8 +32,6 @@ public class DisplayDeviceEntity {
     @NotNull
     private String location;
     @NotNull
-    private String model;
-    @NotNull
     private String displayOrientation;
     @NotNull
     private String resolution;
