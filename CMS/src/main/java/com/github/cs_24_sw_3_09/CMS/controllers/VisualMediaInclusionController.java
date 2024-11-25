@@ -26,8 +26,8 @@ public class VisualMediaInclusionController {
 
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final VisualMediaService visualMediaService;
-    private Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper;
-    private VisualMediaInclusionService visualMediaInclusionService;
+    private final Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper;
+    private final VisualMediaInclusionService visualMediaInclusionService;
 
     public VisualMediaInclusionController(Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper, VisualMediaInclusionService visualMediaInclusionService, VisualMediaInclusionRepository visualMediaInclusionRepository, VisualMediaService visualMediaService) {
         this.visualMediaInclusionMapper = visualMediaInclusionMapper;

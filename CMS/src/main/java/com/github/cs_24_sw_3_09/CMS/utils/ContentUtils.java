@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContentUtils {
 
-    private EntityManager entityManager;
-    private VisualMediaService visualMediaService;
-    private SlideshowService slideshowService;
+    private final EntityManager entityManager;
+    private final VisualMediaService visualMediaService;
+    private final SlideshowService slideshowService;
 
     @Autowired
     public ContentUtils(EntityManager entityManager, VisualMediaService visualMediaService, SlideshowService slideshowService) {

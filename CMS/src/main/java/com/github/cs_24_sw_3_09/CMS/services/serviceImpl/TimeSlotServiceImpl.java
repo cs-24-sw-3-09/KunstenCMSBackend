@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,5 +71,21 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     @Override
     public void delete(Long id) {
         timeSlotRepository.deleteById(Math.toIntExact(id));
+    }
+
+    @Override
+    public void deleteRelation(Long tsId, Long ddId) {
+        Optional<TimeSlotEntity> timeSlotEntity = timeSlotRepository.findById(Math.toIntExact(tsId));
+        if (timeSlotEntity.isEmpty()) { return; }
+        System.out.println(timeSlotEntity.get().getDisplayDevices().size());
+
+        if (timeSlotEntity.get().getDisplayDevices().size() == 1) {
+            //System.out.println("here "+ tsId);
+            //System.out.println(timeSlotEntity.get().toString());
+            
+            delete(tsId);
+        } else {
+            timeSlotRepository.deleteAssociation(tsId, ddId);
+        }
     }
 }

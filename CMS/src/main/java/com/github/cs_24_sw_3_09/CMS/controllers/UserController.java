@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private Mapper<UserEntity, UserDto> userMapper;
+    private final Mapper<UserEntity, UserDto> userMapper;
 
     @Autowired
     public UserController(UserService userService,
