@@ -4,7 +4,10 @@ import com.github.cs_24_sw_3_09.CMS.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +22,11 @@ import java.util.function.Function;
 public class JwtServiceImpl implements JwtService {
 
     // Get jwt secret from environment variables
-    @Value("${JWT.SECRET}")
-    private String jwtSecret;
+    @Autowired
+    private Environment environment;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = environment.getProperty("JWT.SECRET").getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
