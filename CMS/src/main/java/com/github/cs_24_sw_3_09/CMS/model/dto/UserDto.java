@@ -29,9 +29,9 @@ public class UserDto {
     @Size(min = 8, message = "a password must be at least 8 characters long")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into somehing valid
+    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date pauseNotificationStart;
-    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into somehing valid
+    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date pauseNotificationEnd;
     private boolean notificationState;
     private boolean mediaPlanner;

@@ -29,9 +29,9 @@ public class TimeSlotDto {
     protected Integer id;
     @Size(min = 1, max = 50, message = "a time slot name must be between 1 and 50 characters")
     private String name;
-    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into somehing valid
+    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date startDate;
-    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into somehing valid
+    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date endDate;
     @DateTimeFormat(pattern = "HH:mm") // For time in hours, minutes, seconds
     private Time startTime;
