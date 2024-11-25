@@ -2,6 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.repositories;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -17,4 +19,7 @@ public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEnt
 
         @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
         List<DisplayDeviceEntity> findConnectedDisplayDevices();
+
+        // @Query("SELECT ts FROM TimeSlotEntity")
+        // List<TimeSlotEntity> findTimeSlotsWithNoDisplayDevices();
 }

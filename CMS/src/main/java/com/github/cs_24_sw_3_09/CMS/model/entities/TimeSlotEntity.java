@@ -25,7 +25,6 @@ import lombok.*;
 @EqualsAndHashCode
 @Table(name = "time_slots")
 public class TimeSlotEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "time_slot_id_seq")
     @SequenceGenerator(name = "time_slot_id_seq", sequenceName = "time_slot_id_seq", allocationSize = 1)
@@ -54,4 +53,4 @@ public class TimeSlotEntity {
     @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
-} 
+}
