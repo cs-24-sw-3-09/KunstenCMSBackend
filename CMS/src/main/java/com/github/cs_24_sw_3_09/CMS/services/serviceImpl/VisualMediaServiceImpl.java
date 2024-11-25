@@ -1,8 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +24,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
 
     private VisualMediaRepository visualMediaRepository;
+    private SlideshowRepository slideshowRepository;
 
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository) {
         this.visualMediaRepository = visualMediaRepository;
@@ -51,6 +56,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         return vm.map(visualMediaEntity -> new ArrayList<>(visualMediaEntity.getTags()))
                 .orElseThrow(() -> new RuntimeException("Visual media not found"));
+    }
+
+    @Override
+    public List<SlideshowEntity> getRiskCheck(Long id){        
+        return slideshowRepository.findSlideshowsViaVisualMedia();     
     }
 
     @Override

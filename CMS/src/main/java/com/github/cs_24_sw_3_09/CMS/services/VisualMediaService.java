@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import org.springframework.data.domain.Page;
@@ -21,9 +22,13 @@ public interface VisualMediaService {
 
     List<TagEntity> getVisualMediaTags(Long id);
 
+    List<SlideshowEntity>getRiskCheck(Long id);
+
     boolean isExists(Long id);
 
     VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity);
 
     void delete(Long id);
+
+    
 }
