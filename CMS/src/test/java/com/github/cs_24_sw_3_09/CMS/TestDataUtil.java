@@ -17,6 +17,8 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 public class TestDataUtil {
 
@@ -128,12 +130,12 @@ public class TestDataUtil {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
 
         DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
-                                .displayOrientation("horizontal")
-                                .connectedState(false)
-                                .location("Aalborg")
-                                .name("Skærm Esbjerg1")
-                                .resolution("1920x1080")
-                                .build();
+                .displayOrientation("horizontal")
+                .connectedState(false)
+                .location("Aalborg")
+                .name("Skærm Esbjerg1")
+                .resolution("1920x1080")
+                .build();
         displayDevices.add(dd);
         return displayDevices;
     }
@@ -155,4 +157,12 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static MockMultipartFile createVisualMediaFile() {
+        return new MockMultipartFile(
+                "file",
+                "test-image.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "Fake JPEG file content".getBytes()
+        );
+    }
 }
