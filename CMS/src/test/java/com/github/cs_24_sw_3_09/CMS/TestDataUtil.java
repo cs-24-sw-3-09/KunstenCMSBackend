@@ -2,6 +2,9 @@ package com.github.cs_24_sw_3_09.CMS;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDateTime;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
@@ -10,6 +13,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
@@ -88,39 +92,39 @@ public class TestDataUtil {
                 .build();
     }
 
-    public static TimeSlotDto createTimeSlotDto(){
+    public static TimeSlotDto createTimeSlotDto() {
         return TimeSlotDto.builder()
-                .name("Test1 TimeSlot")                                      
-                .startDate(java.sql.Date.valueOf("2024-11-20"))                                      
-                .endDate(java.sql.Date.valueOf("2024-11-20"))  
-                .startTime(java.sql.Time.valueOf("10:20:30"))                               
-                .endTime(java.sql.Time.valueOf("11:21:31"))                                
-                .weekdaysChosen(3)                                          
-                .displayContent(new SlideshowEntity())                     
-                .displayDevices(new  HashSet<DisplayDeviceEntity>())                            
+                .name("Test1 TimeSlot")
+                .startDate(java.sql.Date.valueOf("2024-11-20"))
+                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startTime(java.sql.Time.valueOf("10:20:30"))
+                .endTime(java.sql.Time.valueOf("11:21:31"))
+                .weekdaysChosen(3)
+                .displayContent(new SlideshowEntity())
+                .displayDevices(new HashSet<DisplayDeviceEntity>())
                 .build();
     }
 
-    public static TimeSlotEntity createTimeSlotEntity(){
+    public static TimeSlotEntity createTimeSlotEntity() {
         return TimeSlotEntity.builder()
-                .name("Test2 TimeSlot")                                      
-                .startDate(java.sql.Date.valueOf("2024-11-20"))                                      
-                .endDate(java.sql.Date.valueOf("2024-11-20"))  
-                .startTime(java.sql.Time.valueOf("10:20:30"))                               
-                .endTime(java.sql.Time.valueOf("11:21:31"))                                
-                .weekdaysChosen(3)                                          
-                .displayContent(assignedSlideshow())                     
-                .displayDevices(assignDisplayDevice())                            
+                .name("Test2 TimeSlot")
+                .startDate(java.sql.Date.valueOf("2024-11-20"))
+                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startTime(java.sql.Time.valueOf("10:20:30"))
+                .endTime(java.sql.Time.valueOf("11:21:31"))
+                .weekdaysChosen(3)
+                .displayContent(assignedSlideshow())
+                .displayDevices(assignDisplayDevice())
                 .build();
     }
-    
-    public static SlideshowEntity assignedSlideshow(){
+
+    public static SlideshowEntity assignedSlideshow() {
         return SlideshowEntity.builder()
                 .name("test1")
                 .build();
     }
 
-    public static HashSet<DisplayDeviceEntity> assignDisplayDevice(){
+    public static HashSet<DisplayDeviceEntity> assignDisplayDevice() {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
 
         DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
@@ -133,4 +137,22 @@ public class TestDataUtil {
         displayDevices.add(dd);
         return displayDevices;
     }
+
+    public static TimeSlotEntity createTimeSlotEntityWithCurrentTime() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDateTime = now.minusHours(2);
+        LocalDateTime endDateTime = now.plusHours(2);
+
+        return TimeSlotEntity.builder()
+                .name("Test2 TimeSlot")
+                .startDate(Date.valueOf(startDateTime.toLocalDate()))
+                .endDate(Date.valueOf(endDateTime.toLocalDate()))
+                .startTime(Time.valueOf(startDateTime.toLocalTime()))
+                .endTime(Time.valueOf(endDateTime.toLocalTime()))
+                .weekdaysChosen(3)
+                .displayContent(assignedSlideshow())
+                .displayDevices(assignDisplayDevice())
+                .build();
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -19,6 +20,8 @@ import jakarta.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
+@EqualsAndHashCode
 public class DisplayDeviceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "display_device_id_seq")
@@ -41,6 +44,6 @@ public class DisplayDeviceEntity {
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "display_device_id") }, inverseJoinColumns = { @JoinColumn(name = "time_slot_id") })
     @JsonIgnore
-    private Set<TimeSlotEntity> timeSlots;
+    private List<TimeSlotEntity> timeSlots;
 
 }

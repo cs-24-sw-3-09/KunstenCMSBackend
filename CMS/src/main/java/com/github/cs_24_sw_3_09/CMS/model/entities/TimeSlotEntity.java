@@ -21,6 +21,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Table(name = "time_slots")
 public class TimeSlotEntity {
 
@@ -52,4 +54,4 @@ public class TimeSlotEntity {
     @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
-}
+} 
