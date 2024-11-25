@@ -27,7 +27,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final TagRepository tagRepository;
     private PushTSService pushTSService;
 
-    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, TagRepository tagRepository, PushTSService) {
+    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, TagRepository tagRepository, PushTSService pushTSService) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagService = tagService;
         this.tagRepository = tagRepository;
