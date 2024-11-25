@@ -50,7 +50,7 @@ public class TestDataUtil {
         return VisualMediaDto.builder()
                 .description("dkaoidkao test descpt")
                 .fileType("jpg")
-                .lastDateModified("30/10/2003")
+                // .lastDateModified("30/10/2003")
                 .location("/djao/dhau1")
                 .name("Billede navn1")
                 .build();
@@ -60,7 +60,7 @@ public class TestDataUtil {
         return VisualMediaEntity.builder()
                 .description("dkaoidkao test descpt")
                 .fileType("jpg")
-                .lastDateModified("30/10/2003")
+                // .lastDateModified("30/10/2003")
                 .location("/djao/dhau")
                 .name("Billede navn")
                 .build();
