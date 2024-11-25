@@ -1,4 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
+import java.util.Map;
 import java.util.Optional;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
@@ -103,12 +104,26 @@ public class TimeSlotController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //todo: change such that it is part of the body instead
-    @DeleteMapping(path = "/{id}/display_devices/{dd_id}")
-    public ResponseEntity<Object> deleteRelation(@PathVariable("id") Long tsId, @PathVariable("dd_id") Long ddId) {
+    @DeleteMapping(path = "/{id}/display_devices")
+    public ResponseEntity<Object> deleteRelation(@PathVariable("id") Long tsId,
+                                                 @RequestBody Map<String, Object> requestBody) {
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("ddId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //check if is a number
+        Long ddId;
+        try {
+            ddId = Long.valueOf(requestBody.get("ddId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
         if (!timeSlotService.isExists(tsId) || !displayDeviceService.isExists(ddId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         timeSlotService.deleteRelation(tsId, ddId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

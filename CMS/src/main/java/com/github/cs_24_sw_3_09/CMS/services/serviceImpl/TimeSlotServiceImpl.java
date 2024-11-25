@@ -79,25 +79,42 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void delete(Long id) {
-        TimeSlotEntity timeslot = timeSlotRepository.findById(Math.toIntExact(id))
+        timeSlotRepository.deleteById(Math.toIntExact(id));
+        /*TimeSlotEntity timeslot = timeSlotRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Timeslot with id " + id + " not found"));
+
+
         timeslot.setDisplayContent(null);
         timeslot.getDisplayDevices().clear();
-        timeSlotRepository.save(timeslot);
+
+        TimeSlotEntity ts = timeSlotRepository.save(timeslot);
+
+        System.out.println(ts);
         timeSlotRepository.deleteById(Math.toIntExact(id));
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        System.out.println(ts);
+
+        pushTSService.updateDisplayDevicesToNewTimeSlots();*/
     }
+
+    /*public void delete(TimeSlotEntity timeslot) {
+        timeslot.setDisplayContent(null);
+        timeslot.getDisplayDevices().clear();
+
+        TimeSlotEntity ts = timeSlotRepository.save(timeslot);
+
+        timeSlotRepository.deleteById(ts.getId());
+        System.out.println(ts);
+
+
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }*/
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
-        Optional<TimeSlotEntity> timeSlotEntity = timeSlotRepository.findById(Math.toIntExact(tsId));
-        if (timeSlotEntity.isEmpty()) { return; }
-        System.out.println(timeSlotEntity.get().getDisplayDevices().size());
+        //todo: Overvej om der skal gøres brug af den periodiske sletning i stedet
+        int associations = timeSlotRepository.countAssociations(tsId);
 
-        if (timeSlotEntity.get().getDisplayDevices().size() == 1) {
-            //System.out.println("here "+ tsId);
-            //System.out.println(timeSlotEntity.get().toString());
-            
+        if (associations == 1) {
             delete(tsId);
         } else {
             timeSlotRepository.deleteAssociation(tsId, ddId);

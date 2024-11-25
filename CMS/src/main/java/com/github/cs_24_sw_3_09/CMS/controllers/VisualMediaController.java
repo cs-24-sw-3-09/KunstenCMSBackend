@@ -117,8 +117,22 @@ public class VisualMediaController {
     }
 
     //Todo: Change path name
-    @DeleteMapping(path = "{vmId}/tags/{tagId}")
-    public ResponseEntity<VisualMediaDto> deleteTagRelation(@PathVariable("vmId") Long visualMediaId, @PathVariable("tagId") Long tagId) {
+    @DeleteMapping(path = "{visual_media_Id}/tags")
+    public ResponseEntity<VisualMediaDto> deleteTagRelation(@PathVariable("visual_media_Id") Long visualMediaId,
+                                                            @RequestBody Map<String, Object> requestBody) {
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("tagId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //check if is a number
+        Long tagId;
+        try {
+            tagId = Long.valueOf(requestBody.get("tagId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
         if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
