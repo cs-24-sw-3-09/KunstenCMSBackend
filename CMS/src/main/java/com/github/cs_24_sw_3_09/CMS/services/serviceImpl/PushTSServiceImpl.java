@@ -71,7 +71,7 @@ public class PushTSServiceImpl implements PushTSService {
         return prio;
     }
 
-    private long calculateDaysCovered(TimeSlotEntity timeSlot) {
+    public long calculateDaysCovered(TimeSlotEntity timeSlot) {
         LocalDate startDate = timeSlot.getStartDate().toLocalDate();
         LocalDate endDate = timeSlot.getEndDate().toLocalDate();
 
@@ -79,7 +79,7 @@ public class PushTSServiceImpl implements PushTSService {
         return ChronoUnit.DAYS.between(startDate, endDate) + 1; // +1 to include the start date
     }
 
-    private boolean isTimeSlotActive(TimeSlotEntity timeSlot, LocalDate currentDate, LocalTime currentTime,
+    public boolean isTimeSlotActive(TimeSlotEntity timeSlot, LocalDate currentDate, LocalTime currentTime,
             DayOfWeek currentDay) {
         LocalDate startDate = timeSlot.getStartDate().toLocalDate();
         LocalDate endDate = timeSlot.getEndDate().toLocalDate();
@@ -104,10 +104,11 @@ public class PushTSServiceImpl implements PushTSService {
     }
 
     @Override
-    public void updateDisplayDevicesToNewTimeSlots() {
+    public int updateDisplayDevicesToNewTimeSlots() {
         // Fetch the list of connected display devices
         List<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findConnectedDisplayDevices();
-
+        // Counts amount of DD that gets a TS
+        int i = 0;
         for (DisplayDeviceEntity dd : displayDevices) {
             List<TimeSlotEntity> timeSlots = dd.getTimeSlots();
 
@@ -119,7 +120,9 @@ public class PushTSServiceImpl implements PushTSService {
             } else {
                 System.out.println("PRIO for ddId " + dd.getId() + ": " + timeSlotToBeDisplayed.getName());
                 sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
+                i++;
             }
         }
+        return i;
     }
 }

@@ -22,5 +22,5 @@ public interface PushTSService {
 
     // This method is to get all TS and DD and figure out and send the new TS for
     // each DD
-    void updateDisplayDevicesToNewTimeSlots();
+    int updateDisplayDevicesToNewTimeSlots();
 }
