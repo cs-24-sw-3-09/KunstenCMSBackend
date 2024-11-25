@@ -2,6 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import java.sql.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -27,7 +29,9 @@ public class UserDto {
     @Size(min = 8, message = "a password must be at least 8 characters long")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date pauseNotificationStart;
+    @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date pauseNotificationEnd;
     private boolean notificationState;
     private boolean mediaPlanner;
