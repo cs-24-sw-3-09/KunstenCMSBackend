@@ -1,17 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 
 public interface PushTSService {
     // This method is to figure out what TS have the highest prioritisation for a DD

@@ -1,9 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

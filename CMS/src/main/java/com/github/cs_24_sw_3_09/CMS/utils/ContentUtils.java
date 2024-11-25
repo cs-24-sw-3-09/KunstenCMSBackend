@@ -1,13 +1,13 @@
 package com.github.cs_24_sw_3_09.CMS.utils;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
-import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
-import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
-import jakarta.persistence.EntityManager;
-import lombok.experimental.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
+import jakarta.persistence.EntityManager;
 
 @Component
 public class ContentUtils {
@@ -17,7 +17,8 @@ public class ContentUtils {
     private SlideshowService slideshowService;
 
     @Autowired
-    public ContentUtils(EntityManager entityManager, VisualMediaService visualMediaService, SlideshowService slideshowService) {
+    public ContentUtils(EntityManager entityManager, VisualMediaService visualMediaService,
+            SlideshowService slideshowService) {
         this.entityManager = entityManager;
         this.visualMediaService = visualMediaService;
         this.slideshowService = slideshowService;

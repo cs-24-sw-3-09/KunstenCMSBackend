@@ -1,7 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Set;
