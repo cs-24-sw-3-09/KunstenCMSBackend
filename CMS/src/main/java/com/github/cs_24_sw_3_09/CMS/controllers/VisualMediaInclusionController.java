@@ -1,16 +1,22 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -18,16 +24,18 @@ import java.util.Optional;
 public class VisualMediaInclusionController {
 
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
+    private final VisualMediaService visualMediaService;
     private Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper;
     private VisualMediaInclusionService visualMediaInclusionService;
 
     public VisualMediaInclusionController(
             Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper,
             VisualMediaInclusionService visualMediaInclusionService,
-            VisualMediaInclusionRepository visualMediaInclusionRepository) {
+            VisualMediaInclusionRepository visualMediaInclusionRepository, VisualMediaService visualMediaService) {
         this.visualMediaInclusionMapper = visualMediaInclusionMapper;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
+        this.visualMediaService = visualMediaService;
     }
 
     @GetMapping
@@ -95,6 +103,36 @@ public class VisualMediaInclusionController {
 
         visualMediaInclusionService.delete(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping(path = "/{id}/visual_media")
+    public ResponseEntity<VisualMediaInclusionDto> setVisualMedia(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("visualMediaId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // check if is a number
+        Long visualMediaId;
+        try {
+            visualMediaId = Long.valueOf(requestBody.get("visualMediaId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Get content type and validate existence of dd and content
+        if (!visualMediaInclusionService.isExists(id) || !visualMediaService.isExists(visualMediaId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Update the display device and return the response
+        VisualMediaInclusionEntity updatedVisualMediaInclusionEntity = visualMediaInclusionService.setVisualMedia(id,
+                visualMediaId);
+
+        return ResponseEntity.ok(visualMediaInclusionMapper.mapTo(updatedVisualMediaInclusionEntity));
     }
 
 }

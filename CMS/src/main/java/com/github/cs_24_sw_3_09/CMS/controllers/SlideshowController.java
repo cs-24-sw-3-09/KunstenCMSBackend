@@ -1,29 +1,35 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.impl.SlideshowMapperImpl;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/slideshows")
 public class SlideshowController {
 
+    private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowMapperImpl slideshowMapper;
     private SlideshowService slideshowService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService,
-            SlideshowRepository slideshowRepository) {
+            VisualMediaInclusionService visualMediaInclusionService) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
+        this.visualMediaInclusionService = visualMediaInclusionService;
     }
 
     @GetMapping(path = "/{id}")
@@ -83,5 +89,34 @@ public class SlideshowController {
         SlideshowEntity updatedSlideshow = slideshowService.partialUpdate(id, slideshowEntity);
 
         return new ResponseEntity<>(slideshowMapper.mapTo(updatedSlideshow), HttpStatus.OK);
+    }
+
+    @PatchMapping(path = "/{id}/visual_media_inclusions")
+    public ResponseEntity<SlideshowDto> addVisualMediaInclusion(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("visualMediaInclusionId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // check if is a number
+        Long visualMediaInclusionId;
+        try {
+            visualMediaInclusionId = Long.valueOf(requestBody.get("visualMediaInclusionId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Get content type and validate existence of dd and content
+        if (!slideshowService.isExists(id) || !visualMediaInclusionService.isExists(visualMediaInclusionId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Update the display device and return the response
+        SlideshowEntity updatedSlideshowEntity = slideshowService.addVisualMediaInclusion(id, visualMediaInclusionId);
+
+        return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity));
     }
 }

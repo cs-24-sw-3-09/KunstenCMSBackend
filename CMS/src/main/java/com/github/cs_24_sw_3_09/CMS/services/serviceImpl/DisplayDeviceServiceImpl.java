@@ -1,10 +1,13 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
+import jakarta.persistence.EntityNotFoundException;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,12 +20,19 @@ import java.util.stream.StreamSupport;
 @Service
 public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
+    private final TimeSlotService timeSlotService;
     private DisplayDeviceRepository displayDeviceRepository;
+    private VisualMediaRepository visualMediaRepository;
+    private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, PushTSService pushTSService) {
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
+                                   PushTSService pushTSService) {
         this.displayDeviceRepository = displayDeviceRepository;
+        this.visualMediaRepository = visualMediaRepository;
+        this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
+        this.timeSlotService = timeSlotService;
     }
 
     @Override
@@ -78,6 +88,42 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
     @Override
     public void delete(Long id) {
-        displayDeviceRepository.deleteById(Math.toIntExact(id));
+
+        DisplayDeviceEntity displayDevice = displayDeviceRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("DisplayDeviceEntity with id " + id + " not found"));
+
+        displayDevice.getTimeSlots().clear();
+        displayDevice.setFallbackContent(null);
+        displayDeviceRepository.save(displayDevice);
+    }
+
+    @Override
+    public DisplayDeviceEntity setFallbackContent(Long id, Long fallbackId, String type) {
+        return displayDeviceRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+
+            if (type.equals("VisualMediaEntity")) {
+                VisualMediaEntity foundFallback = visualMediaRepository.findById(Math.toIntExact(fallbackId))
+                        .orElseThrow(() -> new RuntimeException("Visual Media does not exist"));
+                existingDisplayDevice.setFallbackContent(foundFallback);
+            } else if (type.equals("SlideshowEntity")) {
+                SlideshowEntity foundFallback = slideshowRepository.findById(Math.toIntExact(fallbackId))
+                        .orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
+                existingDisplayDevice.setFallbackContent(foundFallback);
+            }
+
+            return displayDeviceRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
+
+    }
+
+    @Override
+    public DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId) {
+        return displayDeviceRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+            TimeSlotEntity foundTimeslot = timeSlotService.findOne(timeslotId)
+                    .orElseThrow(() -> new RuntimeException("Timeslot does not exist"));
+            existingDisplayDevice.addTimeSlot(foundTimeslot);
+
+            return displayDeviceRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
     }
 }

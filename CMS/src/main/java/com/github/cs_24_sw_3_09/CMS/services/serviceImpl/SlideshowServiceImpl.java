@@ -1,9 +1,14 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,12 +21,14 @@ import java.util.stream.StreamSupport;
 @Service
 public class SlideshowServiceImpl implements SlideshowService {
 
+    private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
 
-    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, PushTSService pushTSService) {
+    public SlideshowServiceImpl(SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
+        this.visualMediaInclusionService = visualMediaInclusionService;
     }
 
     @Override
@@ -71,7 +78,23 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public void delete(Long id) {
+        SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
+
+        slideshow.getVisualMediaInclusionCollection().clear();
+        slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }
+
+    @Override
+    public SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId) {
+        return slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionService.findOne(visualMediaInclusionId)
+                    .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));
+            existingDisplayDevice.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
+
+            return slideshowRepository.save(existingDisplayDevice);
+        }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
 }

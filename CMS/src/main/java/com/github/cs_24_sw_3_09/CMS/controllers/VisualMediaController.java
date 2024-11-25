@@ -1,6 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -21,7 +24,8 @@ public class VisualMediaController {
     private Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper;
     private VisualMediaService visualMediaService;
 
-    public VisualMediaController(Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper, VisualMediaService visualMediaService) {
+    public VisualMediaController(Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
+            VisualMediaService visualMediaService) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
     }
@@ -55,12 +59,12 @@ public class VisualMediaController {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id,
+            @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -72,7 +76,8 @@ public class VisualMediaController {
     }
 
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> partialUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> partialUpdateVisualMedia(@PathVariable("id") Long id,
+            @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -92,5 +97,22 @@ public class VisualMediaController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PatchMapping(path = "/{id}/tags")
+    public ResponseEntity<VisualMediaDto> addTag(@PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+        Long tagId = ((Integer) requestBody.get("tagId")).longValue();
+
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        VisualMediaEntity updatedVisualMedia = visualMediaService.addTag(id, tagId);
+
+        // If tag was not found, updatedVisualMedia will be null.
+        if (updatedVisualMedia == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia), HttpStatus.OK);
+    }
 
 }

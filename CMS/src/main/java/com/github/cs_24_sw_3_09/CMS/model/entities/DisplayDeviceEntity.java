@@ -37,10 +37,13 @@ public class DisplayDeviceEntity {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
-            @JoinColumn(name = "display_device_id") }, inverseJoinColumns = { @JoinColumn(name = "time_slot_id") })
+            @JoinColumn(name = "display_device_id")}, inverseJoinColumns = {@JoinColumn(name = "time_slot_id")})
     @JsonIgnore
     private List<TimeSlotEntity> timeSlots;
 
+    public void addTimeSlot(TimeSlotEntity timeSlot) {
+        this.timeSlots.add(timeSlot);
+    }
 }
