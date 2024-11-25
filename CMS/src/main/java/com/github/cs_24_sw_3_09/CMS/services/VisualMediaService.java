@@ -28,4 +28,6 @@ public interface VisualMediaService {
     void delete(Long id);
 
     VisualMediaEntity addTag(Long id, Long tagId);
+
+    void deleteRelation(Long visualMediaId, Long tagId);
 }

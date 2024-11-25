@@ -79,7 +79,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public VisualMediaEntity addTag(Long id, Long tagId) {
-
+        //TODO: Add Error Handling
         VisualMediaEntity foundVisualMedia = visualMediaRepository.findById(Math.toIntExact(id)).get();
 
         TagEntity foundTag = tagRepository.findById(tagId).get();
@@ -94,5 +94,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public void delete(Long id) {
         visualMediaRepository.deleteById(Math.toIntExact(id));
+    }
+
+    @Override
+    public void deleteRelation(Long visualMediaId, Long tagId) {
+        visualMediaRepository.deleteAssociation(visualMediaId, tagId);
     }
 }
