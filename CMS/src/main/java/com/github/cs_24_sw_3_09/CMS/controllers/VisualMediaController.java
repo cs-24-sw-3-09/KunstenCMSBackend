@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,14 +30,31 @@ public class VisualMediaController {
 
     private Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper;
     private VisualMediaService visualMediaService;
+    private FileStorageService fileStorageService;
 
-    public VisualMediaController(Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper, VisualMediaService visualMediaService) {
+    public VisualMediaController(Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper, VisualMediaService visualMediaService, FileStorageService fileStorageService) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
+        this.fileStorageService = fileStorageService;
     }
 
     @PostMapping
-    public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestBody VisualMediaDto visualMediaDto, @RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestParam("file") MultipartFile file) throws IOException {
+
+        if (file.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        VisualMediaDto visualMediaDto = VisualMediaDto.builder()
+                .name(file.getOriginalFilename())
+                .fileType(file.getContentType())
+                .location("/visual_media/" + file.getOriginalFilename())
+                .lastDateModified(String.valueOf(LocalDateTime.now()))
+                .build();
+
+        System.out.println(file.getOriginalFilename());
+        fileStorageService.saveFile(file);
+
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
         VisualMediaDto savedVisualMediaDto = visualMediaMapper.mapTo(savedVisualMediaEntity);
