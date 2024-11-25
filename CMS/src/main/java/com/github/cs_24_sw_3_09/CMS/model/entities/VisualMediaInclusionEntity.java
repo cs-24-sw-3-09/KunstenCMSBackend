@@ -18,7 +18,7 @@ public class VisualMediaInclusionEntity {
     protected Integer id;
     private Integer slideDuration;
     private Integer slideshowPosition;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "visual_media_id")
     private VisualMediaEntity visualMedia;
 

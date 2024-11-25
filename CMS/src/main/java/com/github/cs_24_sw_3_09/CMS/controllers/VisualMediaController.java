@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -58,7 +60,6 @@ public class VisualMediaController {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
 
@@ -85,6 +86,7 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
+
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<VisualMediaDto> deleteVisualMedia(@PathVariable("id") Long id) {
         if (!visualMediaService.isExists(id)) {
@@ -93,6 +95,22 @@ public class VisualMediaController {
 
         visualMediaService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping(path = "/{id}/tags")
+    public ResponseEntity<VisualMediaDto> addTag(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestBody) {
+        Long tagId = ((Integer) requestBody.get("tagId")).longValue();
+
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        VisualMediaEntity updatedVisualMedia = visualMediaService.addTag(id, tagId);
+
+        //If tag was not found, updatedVisualMedia will be null.
+        if (updatedVisualMedia == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia), HttpStatus.OK);
     }
 
 

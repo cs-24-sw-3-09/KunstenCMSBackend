@@ -1,30 +1,38 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
 public class VisualMediaServiceImpl implements VisualMediaService {
 
-    private VisualMediaRepository visualMediaRepository;
+    private final VisualMediaRepository visualMediaRepository;
+    private final TagServiceImpl tagService;
+    private final TagRepository tagRepository;
     private PushTSService pushTSService;
 
-    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, PushTSService pushTSService) {
+    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, TagRepository tagRepository, PushTSService pushTSService) {
         this.visualMediaRepository = visualMediaRepository;
+        this.tagService = tagService;
+        this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
+      
     }
 
     @Override
@@ -83,7 +91,25 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
+    public VisualMediaEntity addTag(Long id, Long tagId) {
+
+        VisualMediaEntity foundVisualMedia = visualMediaRepository.findById(Math.toIntExact(id)).get();
+
+        TagEntity foundTag = tagRepository.findById(tagId).get();
+
+        foundVisualMedia.addTag(foundTag);
+        foundVisualMedia.setId(Math.toIntExact(id));
+        visualMediaRepository.save(foundVisualMedia);
+
+        return foundVisualMedia;
+    }
+
+    @Override
     public void delete(Long id) {
+        VisualMediaEntity timeslot = visualMediaRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
+        timeslot.getTags().clear();
+        visualMediaRepository.save(timeslot);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
