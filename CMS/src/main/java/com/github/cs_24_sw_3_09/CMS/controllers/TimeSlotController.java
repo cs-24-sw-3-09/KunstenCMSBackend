@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 import java.util.Optional;
 
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,13 +29,18 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/time_slots")
 public class TimeSlotController {
     private final TimeSlotService timeSlotService;
-    private Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
+    private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
+    private final DisplayDeviceService displayDeviceService;
 
     @Autowired
-    public TimeSlotController(TimeSlotService timeSlotService,
-            Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper) {
+    public TimeSlotController(
+            TimeSlotService timeSlotService,
+            Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
+            DisplayDeviceService displayDeviceService
+    ) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
+        this.displayDeviceService = displayDeviceService;
     }
 
     @PostMapping
@@ -89,12 +95,22 @@ public class TimeSlotController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity deleteTimeSlot(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteTimeSlot(@PathVariable("id") Long id) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         timeSlotService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    //todo: change such that it is part of the body instead
+    @DeleteMapping(path = "/{id}/display_devices/{dd_id}")
+    public ResponseEntity<Object> deleteRelation(@PathVariable("id") Long tsId, @PathVariable("dd_id") Long ddId) {
+        if (!timeSlotService.isExists(tsId) || !displayDeviceService.isExists(ddId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        timeSlotService.deleteRelation(tsId, ddId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

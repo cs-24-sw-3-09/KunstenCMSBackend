@@ -24,8 +24,8 @@ import java.util.Optional;
 public class SlideshowController {
 
     private final VisualMediaInclusionService visualMediaInclusionService;
-    private SlideshowMapperImpl slideshowMapper;
-    private SlideshowService slideshowService;
+    private final SlideshowMapperImpl slideshowMapper;
+    private final SlideshowService slideshowService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService, SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService) {
         this.slideshowMapper = slideshowMapper;
