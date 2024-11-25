@@ -15,18 +15,6 @@ import org.springframework.stereotype.Repository;
 public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEntity, Integer>,
                 PagingAndSortingRepository<DisplayDeviceEntity, Integer> {
 
-        // @EntityGraph(attributePaths = { "timeSlots" })
-        // @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
-        // List<DisplayDeviceEntity> findConnectedDisplayDevices();
-        // @Query("SELECT d FROM DisplayDeviceEntity d JOIN FETCH d.timeSlots WHERE
-        // d.connectedState = true")
-        // List<DisplayDeviceEntity> findConnectedDisplayDevices();
-        // @Query("SELECT a from DisplayDeviceEntity a where a.connectedState = true")
-        // Iterable<DisplayDeviceEntity> findConnectedDisplayDevices();
-
-        // @EntityGraph(attributePaths = { "timeSlots" })
         @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
         List<DisplayDeviceEntity> findConnectedDisplayDevices();
-        //@Query("SELECT d FROM DisplayDeviceEntity d LEFT JOIN FETCH d.timeSlots WHERE d.connectedState = true")
-        //List<DisplayDeviceEntity> findConnectedDisplayDevices();
 }
