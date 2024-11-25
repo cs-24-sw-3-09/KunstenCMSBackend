@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
@@ -104,6 +105,11 @@ public class PushTSServiceImpl implements PushTSService {
     }
 
     @Override
+    public void sendTimeSlotToDisplayDevice(ContentEntity contentEntity, DisplayDeviceEntity displayDeviceEntity) {
+        socketIOModule.sendContent(displayDeviceEntity.getId(), contentEntity);
+    }
+
+    @Override
     public int updateDisplayDevicesToNewTimeSlots() {
         // Fetch the list of connected display devices
         List<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findConnectedDisplayDevices();
@@ -116,7 +122,7 @@ public class PushTSServiceImpl implements PushTSService {
                     displayDeviceMapper.mapTo(dd));
             if (timeSlotToBeDisplayed == null) {
                 System.out.println("PRIO for " + dd.getId() + ": null");
-                // TODO: Gør så den kan sende at et DD skal stoppe med at vise noget
+                sendTimeSlotToDisplayDevice(dd.getFallbackContent(), dd);
             } else {
                 System.out.println("PRIO for ddId " + dd.getId() + ": " + timeSlotToBeDisplayed.getName());
                 sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
