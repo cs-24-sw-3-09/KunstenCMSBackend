@@ -1,20 +1,20 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
-import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
-import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
-import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
-import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
+import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionService {
@@ -23,12 +23,12 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     private final VisualMediaService visualMediaService;
     private PushTSService pushTSService;
 
-  
-    public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository, VisualMediaService visualMediaService, PushTSService pushTSService) {
+    public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository,
+            VisualMediaService visualMediaService, PushTSService pushTSService) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.visualMediaService = visualMediaService;
         this.pushTSService = pushTSService;
-      
+
     }
 
     @Override

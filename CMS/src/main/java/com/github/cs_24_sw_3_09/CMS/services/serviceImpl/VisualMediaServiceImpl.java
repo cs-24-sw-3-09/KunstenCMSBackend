@@ -1,19 +1,26 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +28,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class VisualMediaServiceImpl implements VisualMediaService {
 
     private final VisualMediaRepository visualMediaRepository;
-    private final TagServiceImpl tagService;
     private final TagRepository tagRepository;
     private PushTSService pushTSService;
 
-    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, TagRepository tagRepository, PushTSService pushTSService) {
+    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository,
+            TagRepository tagRepository, PushTSService pushTSService) {
         this.visualMediaRepository = visualMediaRepository;
-        this.tagService = tagService;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
 

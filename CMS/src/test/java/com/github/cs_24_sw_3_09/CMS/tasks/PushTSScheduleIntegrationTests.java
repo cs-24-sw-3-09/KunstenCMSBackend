@@ -1,11 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.tasks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
@@ -15,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -28,63 +24,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
-import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
-import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.PushTSServiceImpl;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-/*@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@ExtendWith(SpringExtension.class)
-public class PushTSScheduleIntegrationTests {
-
-    private DisplayDeviceRepository displayDeviceRepository;
-    private DisplayDeviceService displayDeviceService;
-
-    @Autowired
-    public PushTSScheduleIntegrationTests(DisplayDeviceRepository displayDeviceRepository,
-            DisplayDeviceService displayDeviceService) {
-        this.displayDeviceRepository = displayDeviceRepository;
-        this.displayDeviceService = displayDeviceService;
-    }*/
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 public class PushTSScheduleIntegrationTests {
     // Mock is a powerful way of testing controllers.
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
     private DisplayDeviceService displayDeviceService;
-    private TimeSlotService timeSlotService;
     private DisplayDeviceRepository displayDeviceRepository;
     private PushTSService pushTSService;
 
     @Autowired
-    public PushTSScheduleIntegrationTests(DisplayDeviceRepository displayDeviceRepository, MockMvc mockMvc,
-            ObjectMapper objectMapper,
-            DisplayDeviceService displayDeviceService, TimeSlotService timeSlotService, PushTSService pushTSService) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
+    public PushTSScheduleIntegrationTests(DisplayDeviceRepository displayDeviceRepository,
+            DisplayDeviceService displayDeviceService, PushTSService pushTSService) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceRepository = displayDeviceRepository;
-        this.timeSlotService = timeSlotService;
         this.pushTSService = pushTSService;
     }
 

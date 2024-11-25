@@ -1,7 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -13,7 +12,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
@@ -117,6 +115,18 @@ public class TestDataUtil {
                 .weekdaysChosen(3)
                 .displayContent(assignedSlideshow())
                 .displayDevices(assignDisplayDevice())
+                .build();
+    }
+
+    public static TimeSlotEntity createTimeSlotEntityWithOutDisplayDevice() {
+        return TimeSlotEntity.builder()
+                .name("Test2 TimeSlot")
+                .startDate(java.sql.Date.valueOf("2024-11-20"))
+                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startTime(java.sql.Time.valueOf("10:20:30"))
+                .endTime(java.sql.Time.valueOf("11:21:31"))
+                .weekdaysChosen(3)
+                .displayContent(assignedSlideshow())
                 .build();
     }
 
