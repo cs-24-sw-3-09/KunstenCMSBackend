@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,13 +17,13 @@ import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
 @Service
 public class TimeSlotServiceImpl implements TimeSlotService {
-    
+
     private TimeSlotRepository timeSlotRepository;
 
     public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository) {
         this.timeSlotRepository = timeSlotRepository;
     }
-    
+
     @Override
     public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
         return timeSlotRepository.save(timeSlotEntity);
@@ -54,7 +56,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         timeSlotEntity.setId(Math.toIntExact(id));
         return timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
             // if time slot from request has name, we set it to the existing time slot. (same with other atts)
-            
+
             Optional.ofNullable(timeSlotEntity.getName()).ifPresent(existingTimeSlot::setName);
             Optional.ofNullable(timeSlotEntity.getStartDate()).ifPresent(existingTimeSlot::setStartDate);
             Optional.ofNullable(timeSlotEntity.getEndDate()).ifPresent(existingTimeSlot::setEndDate);
@@ -69,6 +71,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void delete(Long id) {
+        TimeSlotEntity timeslot = timeSlotRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Timeslot with id " + id + " not found"));
+        timeslot.setDisplayContent(null);
+        timeslot.getDisplayDevices().clear();
+        timeSlotRepository.save(timeslot);
         timeSlotRepository.deleteById(Math.toIntExact(id));
     }
 }

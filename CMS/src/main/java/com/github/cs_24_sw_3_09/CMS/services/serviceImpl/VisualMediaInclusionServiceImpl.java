@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,10 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     @Override
     public void delete(Long id) {
+        VisualMediaInclusionEntity visualMediaInclusion = visualMediaInclusionRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Visual Media Inclusion with id " + id + " not found"));
+        visualMediaInclusion.setVisualMedia(null);
+        visualMediaInclusionRepository.save(visualMediaInclusion);
         visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
     }
 

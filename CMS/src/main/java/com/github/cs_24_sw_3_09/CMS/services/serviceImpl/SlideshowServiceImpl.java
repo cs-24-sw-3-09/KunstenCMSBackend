@@ -1,11 +1,13 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -68,6 +70,11 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public void delete(Long id) {
+        SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
+
+        slideshow.getVisualMediaInclusionCollection().clear();
+        slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
     }
 

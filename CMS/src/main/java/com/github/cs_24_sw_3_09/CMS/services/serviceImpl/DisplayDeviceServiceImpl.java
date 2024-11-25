@@ -6,6 +6,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,12 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     @Override
     public void delete(Long id) {
 
+        DisplayDeviceEntity displayDevice = displayDeviceRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("DisplayDeviceEntity with id " + id + " not found"));
+
+        displayDevice.getTimeSlots().clear();
+        displayDevice.setFallbackContent(null);
+        displayDeviceRepository.save(displayDevice);
         displayDeviceRepository.deleteById(Math.toIntExact(id));
     }
 

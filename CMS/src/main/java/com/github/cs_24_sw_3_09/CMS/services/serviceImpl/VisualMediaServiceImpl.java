@@ -1,10 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -93,6 +95,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public void delete(Long id) {
+        VisualMediaEntity timeslot = visualMediaRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
+        timeslot.getTags().clear();
+        visualMediaRepository.save(timeslot);
         visualMediaRepository.deleteById(Math.toIntExact(id));
     }
 }

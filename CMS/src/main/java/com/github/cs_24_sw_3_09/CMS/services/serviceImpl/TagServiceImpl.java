@@ -1,21 +1,28 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
+    private final VisualMediaRepository visualMediaRepository;
 
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, VisualMediaRepository visualMediaRepository) {
         this.tagRepository = tagRepository;
+        this.visualMediaRepository = visualMediaRepository;
     }
 
     @Override
@@ -40,8 +47,16 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void delete(Long id) {
-        tagRepository.deleteAssociations(id);
-        tagRepository.deleteById(id);
+        TagEntity tag = tagRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tag with id " + id + " not found"));
+
+        // Remove the TagEntity from each associated VisualMediaEntity
+        for (VisualMediaEntity media : tag.getVisualMedias()) {
+            media.getTags().remove(tag); // Update from the owning side
+        }
+
+        visualMediaRepository.saveAll(tag.getVisualMedias());
+        tagRepository.delete(tag);
     }
 
     @Override
