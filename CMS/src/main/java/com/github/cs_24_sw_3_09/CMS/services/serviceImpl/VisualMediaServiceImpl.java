@@ -32,7 +32,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         this.tagService = tagService;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
-      
+
     }
 
     @Override
@@ -112,11 +112,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaRepository.save(timeslot);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-    }
-
-    @Override
-    public void deleteRelation(Long visualMediaId, Long tagId) {
-        visualMediaRepository.deleteAssociation(visualMediaId, tagId);
     }
 
     @Override
