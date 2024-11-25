@@ -2,18 +2,18 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
-import com.github.cs_24_sw_3_09.CMS.services.CleanUpDateBaseService;
+import com.github.cs_24_sw_3_09.CMS.services.CleanUpDataBaseService;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 @Service
-public class CleanUpDateBaseServiceImpl implements CleanUpDateBaseService {
+public class CleanUpDataBaseServiceImpl implements CleanUpDataBaseService {
 
     private TimeSlotRepository timeSlotRepository;
 
-    public CleanUpDateBaseServiceImpl(TimeSlotRepository timeSlotRepository) {
+    public CleanUpDataBaseServiceImpl(TimeSlotRepository timeSlotRepository) {
         this.timeSlotRepository = timeSlotRepository;
     }
 

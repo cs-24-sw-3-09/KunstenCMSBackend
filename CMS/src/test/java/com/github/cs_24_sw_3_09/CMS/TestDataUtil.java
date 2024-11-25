@@ -118,6 +118,18 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static TimeSlotEntity createTimeSlotEntityWithOutDisplayDevice() {
+        return TimeSlotEntity.builder()
+                .name("Test2 TimeSlot")
+                .startDate(java.sql.Date.valueOf("2024-11-20"))
+                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startTime(java.sql.Time.valueOf("10:20:30"))
+                .endTime(java.sql.Time.valueOf("11:21:31"))
+                .weekdaysChosen(3)
+                .displayContent(assignedSlideshow())
+                .build();
+    }
+
     public static SlideshowEntity assignedSlideshow() {
         return SlideshowEntity.builder()
                 .name("test1")
@@ -128,12 +140,12 @@ public class TestDataUtil {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
 
         DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
-                                .displayOrientation("horizontal")
-                                .connectedState(false)
-                                .location("Aalborg")
-                                .name("Skærm Esbjerg1")
-                                .resolution("1920x1080")
-                                .build();
+                .displayOrientation("horizontal")
+                .connectedState(false)
+                .location("Aalborg")
+                .name("Skærm Esbjerg1")
+                .resolution("1920x1080")
+                .build();
         displayDevices.add(dd);
         return displayDevices;
     }

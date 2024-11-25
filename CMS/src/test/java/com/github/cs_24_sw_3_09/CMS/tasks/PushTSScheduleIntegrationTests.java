@@ -49,20 +49,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-/*@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@ExtendWith(SpringExtension.class)
-public class PushTSScheduleIntegrationTests {
-
-    private DisplayDeviceRepository displayDeviceRepository;
-    private DisplayDeviceService displayDeviceService;
-
-    @Autowired
-    public PushTSScheduleIntegrationTests(DisplayDeviceRepository displayDeviceRepository,
-            DisplayDeviceService displayDeviceService) {
-        this.displayDeviceRepository = displayDeviceRepository;
-        this.displayDeviceService = displayDeviceService;
-    }*/
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
