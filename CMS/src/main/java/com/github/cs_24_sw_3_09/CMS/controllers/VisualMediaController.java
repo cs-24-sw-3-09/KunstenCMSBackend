@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +34,7 @@ public class VisualMediaController {
     }
 
     @PostMapping
-    public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestBody VisualMediaDto visualMediaDto, @RequestParam("file") MultipartFile file) throws IOException {
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
         VisualMediaDto savedVisualMediaDto = visualMediaMapper.mapTo(savedVisualMediaEntity);
@@ -64,7 +66,7 @@ public class VisualMediaController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id, @RequestBody VisualMediaDto visualMediaDto) throws IOException {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
