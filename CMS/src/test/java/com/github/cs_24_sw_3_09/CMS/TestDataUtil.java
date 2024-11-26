@@ -17,6 +17,8 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 public class TestDataUtil {
 
