@@ -1,6 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.tasks;
 
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,10 +17,9 @@ public class EnsureAdminExistTask {
         this.userService = userService;
     }
 
-    @EventListener(ApplicationStartedEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void ensureAdminExist() {
         if(userService.existsByAdmin()) {
-            System.out.println("Admin already in db.s");
             return;
         }
         // Create admin user
@@ -28,6 +27,10 @@ public class EnsureAdminExistTask {
         .email("admin@kunsten.dk")
         .password(new BCryptPasswordEncoder().encode("admin123"))
         .admin(true)
+        .mediaPlanner(false)
+        .firstName("Admin")
+        .lastName("Admin")
+        .notificationState(false)
         .build();
         userService.save(adminEntity);
         System.out.println("Admin user created");

@@ -48,6 +48,7 @@ public class DisplayDeviceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<DisplayDeviceDto> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
 
         // Done to decouple the persistence layer from the presentation and service
@@ -58,7 +59,6 @@ public class DisplayDeviceController {
     }
 
     @GetMapping
-    //@PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<DisplayDeviceDto> getDisplayDevices(Pageable pageable) {
         Page<DisplayDeviceEntity> displayDeviceEntities = displayDeviceService.findAll(pageable);
         return displayDeviceEntities.map(displayDeviceMapper::mapTo);
@@ -75,6 +75,7 @@ public class DisplayDeviceController {
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<DisplayDeviceDto> fullUpdateDisplayDevice(@PathVariable("id") Long id,
             @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
@@ -88,6 +89,7 @@ public class DisplayDeviceController {
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<DisplayDeviceDto> partialUpdateDisplayDevice(@PathVariable("id") Long id,
             @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
@@ -100,6 +102,7 @@ public class DisplayDeviceController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteDisplayDevice(@PathVariable("id") Long id) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -109,6 +112,7 @@ public class DisplayDeviceController {
     }
 
     @PatchMapping(path = "/{id}/fallbackContent")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<DisplayDeviceDto> setFallbackContent(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
@@ -140,6 +144,7 @@ public class DisplayDeviceController {
     }
 
     @PatchMapping(path = "/{id}/time_slots")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<DisplayDeviceDto> addTimeSlot(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
