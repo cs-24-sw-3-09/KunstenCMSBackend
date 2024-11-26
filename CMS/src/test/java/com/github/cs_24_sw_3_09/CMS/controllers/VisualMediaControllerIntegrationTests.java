@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,184 +23,167 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class VisualMediaControllerIntegrationTests {
 
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
-    private VisualMediaService visualMediaService;
+        private MockMvc mockMvc;
+        private ObjectMapper objectMapper;
+        private VisualMediaService visualMediaService;
 
-    @Autowired
-    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService) {
-        this.mockMvc = mockMvc;
-        this.visualMediaService = visualMediaService;
-        this.objectMapper = objectMapper;
-    }
+        @Autowired
+        public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper,
+                        VisualMediaService visualMediaService) {
+                this.mockMvc = mockMvc;
+                this.visualMediaService = visualMediaService;
+                this.objectMapper = objectMapper;
+        }
 
-    @Test
-    public void testThatCreateVisualMediaReturnsHttpStatus201Created() throws Exception {
+        @Test
+        public void testThatCreateVisualMediaReturnsHttpStatus201Created() throws Exception {
 
+                MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
-        MockMultipartFile file = TestDataUtil.createVisualMediaFile();
+                mockMvc.perform(
+                                MockMvcRequestBuilders.multipart("/api/visual_medias") // Use multipart request
+                                                .file(file) // Attach the file
+                ).andExpect(MockMvcResultMatchers.status().isCreated());
+        }
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.multipart("/api/visual_medias") // Use multipart request
-                        .file(file)                                   // Attach the file
-        ).andExpect(MockMvcResultMatchers.status().isCreated());
-    }
+        @Test
+        public void testThatCreateVisualMediaReturnsCreatedVisualMedia() throws Exception {
+                MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
+                mockMvc.perform(
+                                MockMvcRequestBuilders.multipart("/api/visual_medias")
+                                                .file(file))
+                                .andExpect(MockMvcResultMatchers.status().isCreated())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.fileType")
+                                                .value(MediaType.IMAGE_JPEG_VALUE))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/visual_media/1"));
+        }
 
-    @Test
-    public void testThatCreateVisualMediaReturnsCreatedVisualMedia() throws Exception {
-        MockMultipartFile file = TestDataUtil.createVisualMediaFile();
+        @Test
+        public void testThatFindAllVisualMediaReturnsHttpStatus200() throws Exception {
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get("/api/visual_medias")).andExpect(
+                                                MockMvcResultMatchers.status().isOk());
+        }
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/visual_medias")
-                                .file(file)
-                ).andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fileType").value(MediaType.IMAGE_JPEG_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/visual_media/1"));
-    }
+        @Test
+        public void testThatFindAllVisualMediaReturnsVisualMedia() throws Exception {
+                VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
+                visualMediaService.save(testVisualMediaEntity);
 
-    @Test
-    public void testThatFindAllVisualMediaReturnsHttpStatus200() throws Exception {
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias")
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk()
-        );
-    }
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get("/api/visual_medias")).andExpect(
+                                                MockMvcResultMatchers.jsonPath("content.[0].id").isNumber())
+                                .andExpect(
+                                                MockMvcResultMatchers
+                                                                .jsonPath("content.[0].name").value(
+                                                                                testVisualMediaEntity.getName()))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("content.[0].location")
+                                                                .value(testVisualMediaEntity.getLocation()));
+        }
 
-    @Test
-    public void testThatFindAllVisualMediaReturnsVisualMedia() throws Exception {
-        VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
-        visualMediaService.save(testVisualMediaEntity);
+        @Test
+        public void testThatFindAllVisualMediaReturnsHttpStatus200WhenVisualMediaExists() throws Exception {
+                VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
+                visualMediaService.save(testVisualMediaEntity);
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias")
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("content.[0].name").value(testVisualMediaEntity.getName())
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("content.[0].location").value(testVisualMediaEntity.getLocation())
-        );
-    }
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get("/api/visual_medias/" + testVisualMediaEntity.getId()))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isOk());
+        }
 
-    @Test
-    public void testThatFindAllVisualMediaReturnsHttpStatus200WhenVisualMediaExists() throws Exception {
-        VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
-        visualMediaService.save(testVisualMediaEntity);
+        @Test
+        public void testThatFindAllVisualMediaReturnsHttpStatus404WhenNoVisualMediaExists() throws Exception {
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get("/api/visual_medias/1")).andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+        }
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias/" + testVisualMediaEntity.getId())
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk()
-        );
-    }
+        @Test
+        public void testThatFullUpdateVisualMediaReturnsStatus200WhenVisualMediaExists() throws Exception {
+                VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+                VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
 
-    @Test
-    public void testThatFindAllVisualMediaReturnsHttpStatus404WhenNoVisualMediaExists() throws Exception {
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias/1")
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound()
-        );
-    }
+                VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
+                String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
 
+                mockMvc.perform(
+                                MockMvcRequestBuilders.put("/api/visual_medias/" + savedVisualMediaEntity.getId())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(visualMediaDtoJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isOk());
+        }
 
-    @Test
-    public void testThatFullUpdateVisualMediaReturnsStatus200WhenVisualMediaExists() throws Exception {
-        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
-        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+        @Test
+        public void testThatFullUpdateVisualMediaReturnsStatus404WhenNoVisualMediaExists() throws Exception {
+                VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
+                String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
 
-        VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
-        String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
+                mockMvc.perform(
+                                MockMvcRequestBuilders.put("/api/visual_medias/99")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(visualMediaDtoJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+        }
 
+        @Test
+        public void testThatPatchUpdateVisualMediaReturnsStatus200() throws Exception {
+                VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+                VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/visual_medias/" + savedVisualMediaEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(visualMediaDtoJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk()
-        );
-    }
+                VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
+                String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
 
-    @Test
-    public void testThatFullUpdateVisualMediaReturnsStatus404WhenNoVisualMediaExists() throws Exception {
-        VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
-        String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(visualMediaDtoJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isOk())
+                                .andExpect(
+                                                MockMvcResultMatchers
+                                                                .jsonPath("$.name").value(visualMediaDto.getName()))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.location")
+                                                                .value(visualMediaDto.getLocation()));
+        }
 
+        @Test
+        public void testThatPatchUpdateVisualMediaReturnsStatus404() throws Exception {
+                VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
+                String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/visual_medias/99")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(visualMediaDtoJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound()
-        );
-    }
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/api/visual_medias/99")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(visualMediaDtoJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+        }
 
-    @Test
-    public void testThatPatchUpdateVisualMediaReturnsStatus200() throws Exception {
-        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
-        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+        @Test
+        public void testThatDeleteVisualMediaReturnsStatus200() throws Exception {
+                VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+                VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
 
-        VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
-        String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/api/visual_medias/" + savedVisualMediaEntity.getId()))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNoContent());
+        }
 
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(visualMediaDtoJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isOk()
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.name").value(visualMediaDto.getName())
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.location").value(visualMediaDto.getLocation())
-        );
-    }
-
-    @Test
-    public void testThatPatchUpdateVisualMediaReturnsStatus404() throws Exception {
-        VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
-        String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
-
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/visual_medias/99")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(visualMediaDtoJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound()
-        );
-    }
-
-
-    @Test
-    public void testThatDeleteVisualMediaReturnsStatus200() throws Exception {
-        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
-        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/visual_medias/" + savedVisualMediaEntity.getId())
-        ).andExpect(
-                MockMvcResultMatchers.status().isNoContent()
-        );
-    }
-
-
-    @Test
-    public void testThatDeleteVisualMediaReturnsStatus404() throws Exception {
-        mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/visual_medias/99")
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound()
-        );
-    }
+        @Test
+        public void testThatDeleteVisualMediaReturnsStatus404() throws Exception {
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/api/visual_medias/99")).andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+        }
 }
-
-
