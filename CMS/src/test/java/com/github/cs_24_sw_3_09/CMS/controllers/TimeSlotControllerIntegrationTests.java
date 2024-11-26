@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
@@ -37,6 +38,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatCreateTimeSlotSuccessfullyReturnsHttp201Created() throws Exception {
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto(); 
         String timeSlotJson = objectMapper.writeValueAsString(timeSlotDto);
@@ -49,6 +51,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTimeSlotsSuccessfullyReturnsHttp200() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots")
@@ -57,6 +60,7 @@ public class TimeSlotControllerIntegrationTests {
     }
     
     @Test 
+    @WithMockUser
     public void testThatGetTimeSlotsSuccessfullyReturnsListOfTimeSlots() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotService.save(testTimeSlotEntity);
@@ -74,6 +78,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTimeSlotReturnsStatus200WhenTimeSlotsExists() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotService.save(testTimeSlotEntity);
@@ -93,6 +98,7 @@ public class TimeSlotControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser
     public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity);
@@ -113,6 +119,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTimeSlotReturnsStatus404WhenNoTimeSlotExists() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/100000")
@@ -121,6 +128,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteTimeSlotReturnsStatus200() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
@@ -133,6 +141,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteTimeSlotReturnsStatus404() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/time_slots/99")
@@ -142,6 +151,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateTimeSlotReturnsStatus404WhenNoTimeSlotExists() throws Exception {
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeDtoJson = objectMapper.writeValueAsString(timeSlotDto);
@@ -155,6 +165,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateTimeSlotReturnsStatus200WhenTimeSlotExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
@@ -171,6 +182,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateTimeSlotReturnsStatus200() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
@@ -192,6 +204,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateTimeSlotReturnsStatus404() throws Exception {
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
