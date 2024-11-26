@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +37,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatCreateVisualMediaReturnsHttpStatus201Created() throws Exception {
 
 
@@ -49,6 +51,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatCreateVisualMediaReturnsCreatedVisualMedia() throws Exception {
         MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
@@ -62,6 +65,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatFindAllVisualMediaReturnsHttpStatus200() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/visual_medias")
@@ -71,6 +75,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatFindAllVisualMediaReturnsVisualMedia() throws Exception {
         VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(testVisualMediaEntity);
@@ -87,6 +92,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatFindAllVisualMediaReturnsHttpStatus200WhenVisualMediaExists() throws Exception {
         VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(testVisualMediaEntity);
@@ -99,6 +105,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatFindAllVisualMediaReturnsHttpStatus404WhenNoVisualMediaExists() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/visual_medias/1")
@@ -109,6 +116,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateVisualMediaReturnsStatus200WhenVisualMediaExists() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
@@ -127,6 +135,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateVisualMediaReturnsStatus404WhenNoVisualMediaExists() throws Exception {
         VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
         String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
@@ -142,6 +151,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateVisualMediaReturnsStatus200() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
@@ -164,6 +174,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateVisualMediaReturnsStatus404() throws Exception {
         VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
         String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
@@ -180,6 +191,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteVisualMediaReturnsStatus200() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
@@ -193,6 +205,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteVisualMediaReturnsStatus404() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/visual_medias/99")
