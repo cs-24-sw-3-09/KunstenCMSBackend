@@ -5,6 +5,9 @@ import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,4 +203,39 @@ public class DisplayDeviceControllerIntegrationTests {
 				.andExpect(
 						MockMvcResultMatchers.status().isNotFound());
 	}
+
+	@Test
+	public void testThatDisplayDevicesGetsConnectedOnSocketWhenNotConnected() throws Exception {
+		DisplayDeviceEntity dd = TestDataUtil.createDisplayDeviceEntity();
+		dd.setConnectedState(false);
+		displayDeviceService.save(dd);
+
+		// id 1 should be the one just added
+		boolean queryResult = displayDeviceService.connectScreen(1);
+		assertEquals(true, queryResult, "The query failed");
+		queryResult = displayDeviceService.disconnectScreen(1);
+		assertEquals(true, queryResult, "The query failed");
+	}
+
+	@Test
+	public void testThatDisplayDevicesGetsConnectedOnSocketWhenConnected() throws Exception {
+		DisplayDeviceEntity dd = TestDataUtil.createDisplayDeviceEntity();
+		dd.setConnectedState(true);
+		displayDeviceService.save(dd);
+
+		// id 1 should be the one just added
+		boolean queryResult = displayDeviceService.connectScreen(1);
+		assertEquals(false, queryResult, "The query failed");
+		queryResult = displayDeviceService.disconnectScreen(1);
+		assertEquals(true, queryResult, "The query failed");
+
+		DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity();
+		dd2.setConnectedState(false);
+		displayDeviceService.save(dd2);
+
+		// id 2 should be the one just added
+		queryResult = displayDeviceService.disconnectScreen(2);
+		assertEquals(false, queryResult, "The query failed");
+	}
+
 }
