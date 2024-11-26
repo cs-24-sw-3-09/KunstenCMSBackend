@@ -7,8 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
     UserEntity save(UserEntity user);
 
     List<UserEntity> findAll();

@@ -5,13 +5,18 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
+import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,18 +28,43 @@ public class VisualMediaController {
     private final Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper;
     private final VisualMediaService visualMediaService;
     private final TagService tagService;
+    private FileStorageService fileStorageService;
 
-    public VisualMediaController(Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper, VisualMediaService visualMediaService, TagService tagService) {
+    public VisualMediaController(
+            Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
+                                 VisualMediaService visualMediaService,
+                                 TagService tagService,
+                                 FileStorageService fileStorageService) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
         this.tagService = tagService;
+        this.fileStorageService = fileStorageService;
     }
 
     @PostMapping
-    public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestBody VisualMediaDto visualMediaDto) {
+    public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        VisualMediaDto visualMediaDto = VisualMediaDto.builder()
+                .name(file.getOriginalFilename())
+                .fileType(file.getContentType())
+                .build();
+
+        fileStorageService.saveFile(file);
+
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
-        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
-        VisualMediaDto savedVisualMediaDto = visualMediaMapper.mapTo(savedVisualMediaEntity);
+        VisualMediaEntity savedEntity = visualMediaService.save(visualMediaEntity);
+
+        //Update the location field using the ID
+        String location = "/visual_media/" + savedEntity.getId();
+        savedEntity.setLocation(location);
+
+        //Save the updated entity
+        savedEntity = visualMediaService.save(savedEntity);
+
+        VisualMediaDto savedVisualMediaDto = visualMediaMapper.mapTo(savedEntity);
         return new ResponseEntity<>(savedVisualMediaDto, HttpStatus.CREATED);
     }
 
@@ -64,7 +94,7 @@ public class VisualMediaController {
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id,
-            @RequestBody VisualMediaDto visualMediaDto) {
+                                                                @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -77,14 +107,14 @@ public class VisualMediaController {
 
     @PatchMapping(path = "/{id}")
     public ResponseEntity<VisualMediaDto> partialUpdateVisualMedia(@PathVariable("id") Long id,
-            @RequestBody VisualMediaDto visualMediaDto) {
+                                                                   @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
         VisualMediaEntity updatedVisualMediaEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
-        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
+        return new ResponseEntity<>(visualMediaMapper.  mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
@@ -99,7 +129,7 @@ public class VisualMediaController {
 
     @PatchMapping(path = "/{id}/tags")
     public ResponseEntity<VisualMediaDto> addTag(@PathVariable("id") Long id,
-            @RequestBody Map<String, Object> requestBody) {
+                                                 @RequestBody Map<String, Object> requestBody) {
         Long tagId = ((Integer) requestBody.get("tagId")).longValue();
 
         if (!visualMediaService.isExists(id)) {
