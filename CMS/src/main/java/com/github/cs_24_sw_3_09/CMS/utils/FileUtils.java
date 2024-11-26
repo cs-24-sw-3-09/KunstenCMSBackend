@@ -53,6 +53,8 @@ public class FileUtils {
                 return ".webp";
             case "image/bmp":
                 return ".bmp";
+            case "video/mp4":
+                return ".mp4";
             default:
                 return ".unknown"; // Default for unrecognized MIME types
         }
