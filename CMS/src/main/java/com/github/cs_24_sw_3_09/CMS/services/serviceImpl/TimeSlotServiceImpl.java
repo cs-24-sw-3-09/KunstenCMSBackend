@@ -77,34 +77,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     @Override
     public void delete(Long id) {
         timeSlotRepository.deleteById(Math.toIntExact(id));
-        /*TimeSlotEntity timeslot = timeSlotRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Timeslot with id " + id + " not found"));
-
-
-        timeslot.setDisplayContent(null);
-        timeslot.getDisplayDevices().clear();
-
-        TimeSlotEntity ts = timeSlotRepository.save(timeslot);
-
-        System.out.println(ts);
-        timeSlotRepository.deleteById(Math.toIntExact(id));
-        System.out.println(ts);
-
-        pushTSService.updateDisplayDevicesToNewTimeSlots();*/
     }
-
-    /*public void delete(TimeSlotEntity timeslot) {
-        timeslot.setDisplayContent(null);
-        timeslot.getDisplayDevices().clear();
-
-        TimeSlotEntity ts = timeSlotRepository.save(timeslot);
-
-        timeSlotRepository.deleteById(ts.getId());
-        System.out.println(ts);
-
-
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
-    }*/
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
