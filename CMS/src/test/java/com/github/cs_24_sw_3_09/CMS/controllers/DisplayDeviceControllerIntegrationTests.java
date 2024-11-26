@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +36,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatCreateDisplayDeviceSuccessfullyReturnsHttp201Created() throws Exception {
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceDto);
@@ -48,6 +50,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatCreateDisplayDeviceSuccessfullyReturnsSavedDisplayDevice() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceEntity);
@@ -65,6 +68,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser
 	public void testThatGetDisplayDeviceSuccessfullyReturnsHttp200() throws Exception {
 		// DisplayDeviceEntity displayDeviceEntity =
 		// TestDataUtil.createDisplayDeviceEntity();
@@ -77,6 +81,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser
 	public void testThatGetDisplayDeviceSuccessfullyReturnsListOfDisplayDevices() throws Exception {
 		DisplayDeviceEntity testDisplayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		displayDeviceService.save(testDisplayDeviceEntity);
@@ -92,6 +97,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser
 	public void testThatGetDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		displayDeviceService.save(displayDeviceEntity);
@@ -102,6 +108,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser
 	public void testThatGetDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
 		mockMvc.perform(
 				MockMvcRequestBuilders.get("/api/display_devices/99")).andExpect(
@@ -109,6 +116,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser
 	public void testThatGetDisplayDeviceReturnsDisplayDeviceWhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		displayDeviceService.save(displayDeviceEntity);
@@ -123,6 +131,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatFullUpdateDisplayDeviceReturnsStatus404WhenNoDisplayDeviceExists() throws Exception {
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
@@ -136,6 +145,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatDeleteDisplayDeviceReturnsStatus200() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
@@ -146,6 +156,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatDeleteDisplayDeviceReturnsStatus404() throws Exception {
 		mockMvc.perform(
 				MockMvcRequestBuilders.delete("/api/display_devices/99")).andExpect(
@@ -153,6 +164,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatFullUpdateDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
@@ -169,6 +181,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatPatchUpdateDisplayDeviceReturnsStatus200() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
@@ -189,6 +202,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles="ADMIN")
 	public void testThatPatchUpdateDisplayDeviceReturnsStatus404() throws Exception {
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
