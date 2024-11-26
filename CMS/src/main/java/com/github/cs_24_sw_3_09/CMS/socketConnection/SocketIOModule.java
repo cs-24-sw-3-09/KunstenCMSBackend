@@ -12,7 +12,6 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
-import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.DisplayDeviceServiceImpl;
 
 import jakarta.annotation.PreDestroy;
 
