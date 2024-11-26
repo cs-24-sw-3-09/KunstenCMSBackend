@@ -3,7 +3,6 @@ package com.github.cs_24_sw_3_09.CMS;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -18,6 +17,8 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
@@ -54,7 +55,7 @@ public class TestDataUtil {
         return VisualMediaDto.builder()
                 .description("dkaoidkao test descpt")
                 .fileType("jpg")
-                .lastDateModified("30/10/2003")
+                // .lastDateModified("30/10/2003")
                 .location("/djao/dhau1")
                 .name("Billede navn1")
                 .build();
@@ -64,7 +65,7 @@ public class TestDataUtil {
         return VisualMediaEntity.builder()
                 .description("dkaoidkao test descpt")
                 .fileType("jpg")
-                .lastDateModified("30/10/2003")
+                // .lastDateModified("30/10/2003")
                 .location("/djao/dhau")
                 .name("Billede navn")
                 .build();
@@ -120,6 +121,18 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static TimeSlotEntity createTimeSlotEntityWithOutDisplayDevice() {
+        return TimeSlotEntity.builder()
+                .name("Test2 TimeSlot")
+                .startDate(java.sql.Date.valueOf("2024-11-20"))
+                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startTime(java.sql.Time.valueOf("10:20:30"))
+                .endTime(java.sql.Time.valueOf("11:21:31"))
+                .weekdaysChosen(3)
+                .displayContent(assignedSlideshow())
+                .build();
+    }
+
     public static SlideshowEntity assignedSlideshow() {
         return SlideshowEntity.builder()
                 .name("test1")
@@ -130,12 +143,12 @@ public class TestDataUtil {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
 
         DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
-                                .displayOrientation("horizontal")
-                                .connectedState(false)
-                                .location("Aalborg")
-                                .name("Skærm Esbjerg1")
-                                .resolution("1920x1080")
-                                .build();
+                .displayOrientation("horizontal")
+                .connectedState(false)
+                .location("Aalborg")
+                .name("Skærm Esbjerg1")
+                .resolution("1920x1080")
+                .build();
         displayDevices.add(dd);
         return displayDevices;
     }
@@ -157,6 +170,14 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static MockMultipartFile createVisualMediaFile() {
+        return new MockMultipartFile(
+                "file",
+                "test-image.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "Fake JPEG file content".getBytes()
+        );
+    }
     
     public static VisualMediaInclusionEntity createVisualMediaInclusionEntity(){
         return VisualMediaInclusionEntity.builder()

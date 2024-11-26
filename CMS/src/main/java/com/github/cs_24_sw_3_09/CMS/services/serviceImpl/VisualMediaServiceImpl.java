@@ -1,8 +1,17 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
@@ -11,23 +20,24 @@ import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
-import jakarta.persistence.EntityNotFoundException;
+import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class VisualMediaServiceImpl implements VisualMediaService {
 
     private final VisualMediaRepository visualMediaRepository;
-    private final TagServiceImpl tagService;
     private final TagRepository tagRepository;
     private PushTSService pushTSService;
     private SlideshowRepository slideshowRepository;
@@ -35,7 +45,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, 
                                     TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
         this.visualMediaRepository = visualMediaRepository;
-        this.tagService = tagService;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
@@ -103,7 +112,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public VisualMediaEntity addTag(Long id, Long tagId) {
-
+        //TODO: Add Error Handling
         VisualMediaEntity foundVisualMedia = visualMediaRepository.findById(Math.toIntExact(id)).get();
 
         TagEntity foundTag = tagRepository.findById(tagId).get();
@@ -123,5 +132,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaRepository.save(timeslot);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }
+
+    @Override
+    public void deleteRelation(Long visualMediaId, Long tagId) {
+        visualMediaRepository.deleteAssociation(visualMediaId, tagId);
     }
 }

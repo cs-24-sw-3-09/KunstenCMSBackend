@@ -1,6 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

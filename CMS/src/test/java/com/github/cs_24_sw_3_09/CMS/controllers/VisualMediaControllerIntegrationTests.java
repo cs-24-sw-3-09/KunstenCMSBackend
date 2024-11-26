@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,34 +51,28 @@ public class VisualMediaControllerIntegrationTests {
 
     @Test
     public void testThatCreateVisualMediaReturnsHttpStatus201Created() throws Exception {
-        VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
-        String createdVisualMediaJson = objectMapper.writeValueAsString(visualMediaDto);
+
+
+        MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/visual_medias")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createdVisualMediaJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
+                MockMvcRequestBuilders.multipart("/api/visual_medias") // Use multipart request
+                        .file(file)                                   // Attach the file
+        ).andExpect(MockMvcResultMatchers.status().isCreated());
     }
+
 
     @Test
     public void testThatCreateVisualMediaReturnsCreatedVisualMedia() throws Exception {
-        VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
-        String createdVisualMediaJson = objectMapper.writeValueAsString(visualMediaDto);
+        MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/visual_medias")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createdVisualMediaJson)
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.id").isNumber()
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.name").value(visualMediaDto.getName())
-        ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.location").value(visualMediaDto.getLocation())
-        );
+                        MockMvcRequestBuilders.multipart("/api/visual_medias")
+                                .file(file)
+                ).andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fileType").value(MediaType.IMAGE_JPEG_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/visual_media/1"));
     }
 
     @Test
@@ -232,7 +227,6 @@ public class VisualMediaControllerIntegrationTests {
                 MockMvcResultMatchers.status().isNotFound()
         );
     }
-
 
 
     @Test
