@@ -14,11 +14,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 
 
     @Override
-    public void saveFile(MultipartFile file) throws IOException {
-        System.out.println(file.getOriginalFilename());
-        System.out.println("imgere");
-        FileUtils.createVisualMediaFile(file);
-        System.out.println("done");
+    public void saveVisualMediaFile(MultipartFile file, String newFileName) throws IOException {
+        FileUtils.createVisualMediaFile(file, newFileName);
 
     }
 }
