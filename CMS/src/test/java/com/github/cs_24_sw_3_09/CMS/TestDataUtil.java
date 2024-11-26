@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -156,7 +157,7 @@ public class TestDataUtil {
                 .build();
     }
 
-    //tror det bliver added i forkert rækkefølge overvej om man kan lave det til patch!
+    
     public static VisualMediaInclusionEntity createVisualMediaInclusionEntity(){
         return VisualMediaInclusionEntity.builder()
                 .visualMedia(createVisualMediaEntity())
@@ -166,6 +167,7 @@ public class TestDataUtil {
     public static SlideshowEntity createSlideshowEntity(){
         return SlideshowEntity.builder()
                 .name("testSS")
+                .visualMediaInclusionCollection(Collections.singleton(createVisualMediaInclusionEntity()))
                 .build();
     }
 

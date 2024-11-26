@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SlideshowRepository extends CrudRepository<SlideshowEntity, Integer>,
         PagingAndSortingRepository<SlideshowEntity, Integer>{
+                
+                //Find all slideshows that have a visual media with the given id 
                 @Query(value = "SELECT DISTINCT ss.* " +
                "FROM slideshows ss " +
                "INNER JOIN visual_media_inclusion vmi ON ss.id = vmi.slideshow_id " +
