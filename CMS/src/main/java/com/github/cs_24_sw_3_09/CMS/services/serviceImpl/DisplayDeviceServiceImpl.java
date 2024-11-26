@@ -142,4 +142,10 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     public boolean disconnectScreen(int deviceId) {
         return (displayDeviceRepository.updateConnectedStateById(deviceId, false) == 1) ? true : false;
     }
+
+    @Override
+    @Transactional
+    public void disconnectAllScreens() {
+        displayDeviceRepository.updateConnectedStateForAll(false);
+    }
 }

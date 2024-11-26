@@ -26,4 +26,10 @@ public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEnt
                         "AND dd.connectedState <> :connectedState")
         int updateConnectedStateById(@Param("id") Integer id, @Param("connectedState") Boolean connectedState);
 
+        @Modifying
+        @Query("UPDATE DisplayDeviceEntity dd " +
+                        "SET dd.connectedState = :connectedState " +
+                        "WHERE dd.connectedState <> :connectedState")
+        int updateConnectedStateForAll(@Param("connectedState") Boolean connectedState);
+
 }
