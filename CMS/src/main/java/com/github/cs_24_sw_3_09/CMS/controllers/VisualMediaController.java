@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +43,6 @@ public class VisualMediaController {
                 .fileType(file.getContentType())
                 .build();
 
-        fileStorageService.saveFile(file);
 
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
         VisualMediaEntity savedEntity = visualMediaService.save(visualMediaEntity);
@@ -53,6 +50,8 @@ public class VisualMediaController {
         //Update the location field using the ID
         String location = "/visual_media/" + savedEntity.getId();
         savedEntity.setLocation(location);
+        fileStorageService.saveVisualMediaFile(file, String.valueOf(savedEntity.getId()));
+
 
         //Save the updated entity
         savedEntity = visualMediaService.save(savedEntity);
@@ -107,7 +106,7 @@ public class VisualMediaController {
 
         VisualMediaEntity visualMediaEntity = visualMediaMapper.mapFrom(visualMediaDto);
         VisualMediaEntity updatedVisualMediaEntity = visualMediaService.partialUpdate(id, visualMediaEntity);
-        return new ResponseEntity<>(visualMediaMapper.  mapTo(updatedVisualMediaEntity), HttpStatus.OK);
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")

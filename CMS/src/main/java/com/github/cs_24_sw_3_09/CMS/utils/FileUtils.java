@@ -8,10 +8,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static com.google.common.io.Files.getFileExtension;
+
 @Component
 public class FileUtils {
-    public static File createVisualMediaFile(MultipartFile file) throws IOException {
-        File newFile = createFileFromRoot("files/visual_media", file.getOriginalFilename());
+    public static File createVisualMediaFile(MultipartFile file, String newFileName) throws IOException {
+
+        System.out.println(newFileName);
+        System.out.println(file.getContentType());
+
+        File newFile = createFileFromRoot("files/visual_media", newFileName + mimeToType(file.getContentType()));
         file.transferTo(newFile);
         return newFile;
     }
@@ -28,5 +34,27 @@ public class FileUtils {
         }
         String absPath = String.format("%s/%s/%s", System.getProperty("user.dir"), path, file);
         return new File(absPath);
+    }
+
+
+    public static String mimeToType(String mime) {
+        if (mime == null) {
+            return ".unknown"; // Default for unknown MIME types
+        }
+
+        switch (mime) {
+            case "image/jpeg":
+                return ".jpg";
+            case "image/png":
+                return ".png";
+            case "image/gif":
+                return ".gif";
+            case "image/webp":
+                return ".webp";
+            case "image/bmp":
+                return ".bmp";
+            default:
+                return ".unknown"; // Default for unrecognized MIME types
+        }
     }
 }
