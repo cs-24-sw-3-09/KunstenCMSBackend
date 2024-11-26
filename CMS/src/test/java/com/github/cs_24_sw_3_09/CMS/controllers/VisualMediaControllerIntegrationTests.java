@@ -3,8 +3,13 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
+import java.util.Collections;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +31,14 @@ public class VisualMediaControllerIntegrationTests {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private VisualMediaService visualMediaService;
+    private SlideshowService slideshowService;
 
     @Autowired
-    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService) {
+    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService, SlideshowService slideshowService) {
         this.mockMvc = mockMvc;
         this.visualMediaService = visualMediaService;
         this.objectMapper = objectMapper;
+        this.slideshowService = slideshowService;
     }
 
     @Test
@@ -111,6 +118,23 @@ public class VisualMediaControllerIntegrationTests {
                 MockMvcResultMatchers.status().isNotFound()
         );
     }
+    
+   /* @Test
+    public void testThatVisualMediaPartOfSlideshowsReturnsSlideshows() throws Exception{
+        VisualMediaEntity testVisualMediaEntity = TestDataUtil.createVisualMediaEntity();
+        visualMediaService.save(testVisualMediaEntity);
+
+        SlideshowEntity testSlideshowEntity = TestDataUtil.createSlideshowEntity();
+
+        SlideshowEntity.builder.visualMediaInclusionCollection(Collections.singleton(testVisualMediaEntity)).build();
+        slideshowService.save(testSlideshowEntity);
+        
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/visual_medias/"+testVisualMediaEntity.getId()+"/risk")
+        ).andExpect(//should enter list not one object check TS
+                MockMvcResultMatchers.jsonPath("$.id", null).value(testSlideshowEntity.getId())      
+        );
+    }*/
 
 
     @Test

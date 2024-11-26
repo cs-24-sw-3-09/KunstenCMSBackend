@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface VisualMediaService {
 
@@ -22,7 +23,7 @@ public interface VisualMediaService {
 
     List<TagEntity> getVisualMediaTags(Long id);
 
-    List<SlideshowEntity>getRiskCheck(Long id);
+    Set<SlideshowEntity>findPartOfSlideshows(Long id);
 
     boolean isExists(Long id);
 
@@ -30,5 +31,5 @@ public interface VisualMediaService {
 
     void delete(Long id);
 
-    
+    VisualMediaEntity addTag(Long id, Long tagId);
 }

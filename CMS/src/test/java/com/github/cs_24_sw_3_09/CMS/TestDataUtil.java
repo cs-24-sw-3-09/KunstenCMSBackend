@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.sql.Date;
@@ -14,9 +15,9 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
 
@@ -152,6 +153,19 @@ public class TestDataUtil {
                 .weekdaysChosen(3)
                 .displayContent(assignedSlideshow())
                 .displayDevices(assignDisplayDevice())
+                .build();
+    }
+
+    //tror det bliver added i forkert rækkefølge overvej om man kan lave det til patch!
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity(){
+        return VisualMediaInclusionEntity.builder()
+                .visualMedia(createVisualMediaEntity())
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowEntity(){
+        return SlideshowEntity.builder()
+                .name("testSS")
                 .build();
     }
 

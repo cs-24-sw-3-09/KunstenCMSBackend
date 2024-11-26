@@ -1,5 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +27,9 @@ public class TagEntity {
     @SequenceGenerator(name = "tag_id_seq", sequenceName = "tag_id_seq", allocationSize = 1)
     private Integer id;
     private String text;
-    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnore
-    private Set<VisualMediaEntity> visualMedias = new HashSet<VisualMediaEntity>();
+    private Set<VisualMediaEntity> visualMedias;
 
 }
