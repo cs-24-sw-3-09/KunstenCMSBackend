@@ -19,7 +19,7 @@ import java.util.Optional;
 public class TagController {
 
     private final TagService tagService;
-    private Mapper<TagEntity, TagDto> tagMapper;
+    private final Mapper<TagEntity, TagDto> tagMapper;
 
     @Autowired
     public TagController(TagService tagService, Mapper<TagEntity, TagDto> tagMapper) {

@@ -32,4 +32,5 @@ public interface DisplayDeviceService {
     boolean disconnectScreen(int deviceId);
 
     void disconnectAllScreens();
+
 }

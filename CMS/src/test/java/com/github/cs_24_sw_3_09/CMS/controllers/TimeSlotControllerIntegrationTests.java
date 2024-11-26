@@ -18,6 +18,8 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
+
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
@@ -93,7 +95,9 @@ public class TimeSlotControllerIntegrationTests {
     @Test
     public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        timeSlotService.save(testTimeSlotEntity);
+        TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity);
+        System.out.println(s.getDisplayDevices().toArray()[0]);
+
 
         mockMvc.perform(
             MockMvcRequestBuilders.get("/api/time_slots/1")
