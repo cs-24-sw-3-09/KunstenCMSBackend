@@ -27,7 +27,7 @@ public interface DisplayDeviceService {
 
     DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId);
 
-    boolean connectScreen(Long deviceId);
+    boolean connectScreen(int deviceId);
 
-    boolean disconnectScreen(Long deviceId);
+    boolean disconnectScreen(int deviceId);
 }

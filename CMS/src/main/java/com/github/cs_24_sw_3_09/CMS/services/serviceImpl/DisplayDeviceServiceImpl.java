@@ -7,6 +7,8 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -130,12 +132,14 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public boolean connectScreen(Long deviceId) {
-        return true;
+    @Transactional
+    public boolean connectScreen(int deviceId) {
+        return (displayDeviceRepository.updateConnectedStateById(deviceId, true) == 1) ? true : false;
     }
 
     @Override
-    public boolean disconnectScreen(Long deviceId) {
-        return true;
+    @Transactional
+    public boolean disconnectScreen(int deviceId) {
+        return (displayDeviceRepository.updateConnectedStateById(deviceId, false) == 1) ? true : false;
     }
 }

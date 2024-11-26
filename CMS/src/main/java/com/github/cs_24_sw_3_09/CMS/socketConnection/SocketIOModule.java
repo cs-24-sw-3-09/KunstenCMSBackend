@@ -43,7 +43,7 @@ public class SocketIOModule {
         return (client -> {
             int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
             client.joinRoom(String.valueOf(deviceId));
-            System.out.println("Should be true " + displayDeviceService.connectScreen((long) 4));
+            displayDeviceService.connectScreen(deviceId);
             System.out.println("Device " + deviceId + " connected: " + client.getRemoteAddress());
         });
     }
@@ -51,6 +51,7 @@ public class SocketIOModule {
     private DisconnectListener onDisconnected() {
         return (client -> {
             int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
+            displayDeviceService.disconnectScreen(deviceId);
             System.out.println("Device disconnected: " + client.getRemoteAddress() + " id:" + deviceId);
         });
     }

@@ -4,9 +4,11 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -14,9 +16,14 @@ import org.springframework.stereotype.Repository;
 public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEntity, Integer>,
                 PagingAndSortingRepository<DisplayDeviceEntity, Integer> {
 
-        @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
+        @Query("SELECT dd FROM DisplayDeviceEntity dd WHERE dd.connectedState = true")
         List<DisplayDeviceEntity> findConnectedDisplayDevices();
 
-        // @Query("SELECT ts FROM TimeSlotEntity")
-        // List<TimeSlotEntity> findTimeSlotsWithNoDisplayDevices();
+        @Modifying
+        @Query("UPDATE DisplayDeviceEntity dd " +
+                        "SET dd.connectedState = :connectedState " +
+                        "WHERE dd.id = :id " +
+                        "AND dd.connectedState <> :connectedState")
+        int updateConnectedStateById(@Param("id") Integer id, @Param("connectedState") Boolean connectedState);
+
 }
