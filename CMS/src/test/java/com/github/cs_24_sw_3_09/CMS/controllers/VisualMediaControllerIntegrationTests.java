@@ -3,7 +3,9 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,12 +29,14 @@ public class VisualMediaControllerIntegrationTests {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private VisualMediaService visualMediaService;
+    private TagService tagService;
 
     @Autowired
-    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService) {
+    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService, TagService tagService) {
         this.mockMvc = mockMvc;
         this.visualMediaService = visualMediaService;
         this.objectMapper = objectMapper;
+        this.tagService = tagService;
     }
 
     @Test
@@ -199,6 +203,28 @@ public class VisualMediaControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );
+    }
+
+    @Test
+    public void testThatAddTagToVisualMediaReturnsVisualMediaWithAddedTag() throws Exception {
+        TagEntity tag = TestDataUtil.createTagEntity();
+        TagEntity savedTagEntity = tagService.save(tag);
+
+        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+
+        String requestBodyJson = "{\"tagId\": " + savedTagEntity.getId() + "}";
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBodyJson)
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.tags[0].text").value(savedTagEntity.getText()));
+
+
     }
 }
 

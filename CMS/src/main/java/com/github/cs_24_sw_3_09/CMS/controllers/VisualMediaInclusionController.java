@@ -131,4 +131,5 @@ public class VisualMediaInclusionController {
         return ResponseEntity.ok(visualMediaInclusionMapper.mapTo(updatedVisualMediaInclusionEntity));
     }
 
+
 }

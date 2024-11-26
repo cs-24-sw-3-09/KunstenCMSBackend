@@ -176,4 +176,33 @@ public class TestDataUtil {
                 .slideshowPosition(1)
                 .build();
     }
+
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
+        return VisualMediaInclusionEntity.builder()
+                .visualMedia(new VisualMediaEntity())
+                .id(1)
+                .slideDuration(10)
+                .slideshowPosition(2)
+                .build();
+    }
+
+    public static SlideshowDto createSlideshowDto() {
+        return SlideshowDto.builder()
+                .name("slideshow 1")
+                .isArchived(false)
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowEntity() {
+        return SlideshowEntity.builder()
+                .name("slideshow 1")
+                .isArchived(false)
+                .build();
+    }
+
+    public static TagEntity createTagEntity() {
+        return TagEntity.builder()
+                .text("Cool image")
+                .build();
+    }
 }
