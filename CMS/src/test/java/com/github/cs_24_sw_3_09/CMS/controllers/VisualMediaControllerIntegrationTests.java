@@ -44,14 +44,6 @@ public class VisualMediaControllerIntegrationTests {
 
         @Autowired
         public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper,
-                        VisualMediaService visualMediaService) {
-                this.mockMvc = mockMvc;
-                this.visualMediaService = visualMediaService;
-                this.objectMapper = objectMapper;
-        }
-
-        @Autowired
-        public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper,
                         VisualMediaService visualMediaService, SlideshowService slideshowService) {
                 this.mockMvc = mockMvc;
                 this.visualMediaService = visualMediaService;
