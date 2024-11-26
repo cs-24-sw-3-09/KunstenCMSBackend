@@ -14,8 +14,6 @@ import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
 public class TimeSlotServiceImpl implements TimeSlotService {
 
@@ -78,12 +76,18 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void delete(Long id) {
-        TimeSlotEntity timeslot = timeSlotRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Timeslot with id " + id + " not found"));
-        timeslot.setDisplayContent(null);
-        timeslot.getDisplayDevices().clear();
-        timeSlotRepository.save(timeslot);
         timeSlotRepository.deleteById(Math.toIntExact(id));
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }
+
+    @Override
+    public void deleteRelation(Long tsId, Long ddId) {
+        //todo: Overvej om der skal gøres brug af den periodiske sletning i stedet
+        int associations = timeSlotRepository.countAssociations(tsId);
+
+        if (associations == 1) {
+            delete(tsId);
+        } else {
+            timeSlotRepository.deleteAssociation(tsId, ddId);
+        }
     }
 }

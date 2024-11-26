@@ -2,8 +2,10 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
@@ -17,18 +19,26 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
 
 @RestController
 @RequestMapping("/api/visual_medias")
 public class VisualMediaController {
 
-    private Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper;
-    private VisualMediaService visualMediaService;
+    private final Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper;
+    private final VisualMediaService visualMediaService;
+    private final TagService tagService;
     private FileStorageService fileStorageService;
 
-    public VisualMediaController(Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper, VisualMediaService visualMediaService, FileStorageService fileStorageService) {
+    public VisualMediaController(
+            Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
+                                 VisualMediaService visualMediaService,
+                                 TagService tagService,
+                                 FileStorageService fileStorageService) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
+        this.tagService = tagService;
         this.fileStorageService = fileStorageService;
     }
 
@@ -84,6 +94,14 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/{id}/risk")
+    public ResponseEntity<Set<SlideshowEntity>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id){
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(visualMediaService.findPartOfSlideshows(id), HttpStatus.OK);
+    }
+
     @PutMapping(path = "/{id}")
     public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id,
                                                                 @RequestBody VisualMediaDto visualMediaDto) {
@@ -137,4 +155,26 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia), HttpStatus.OK);
     }
 
+    @DeleteMapping(path = "{visual_media_Id}/tags")
+    public ResponseEntity<VisualMediaDto> deleteTagRelation(@PathVariable("visual_media_Id") Long visualMediaId,
+                                                            @RequestBody Map<String, Object> requestBody) {
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("tagId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //check if is a number
+        Long tagId;
+        try {
+            tagId = Long.valueOf(requestBody.get("tagId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        visualMediaService.deleteRelation(visualMediaId, tagId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

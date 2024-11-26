@@ -26,4 +26,5 @@ public interface DisplayDeviceService {
     DisplayDeviceEntity setFallbackContent(Long id, Long fallbackId, String type);
 
     DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId);
+
 }

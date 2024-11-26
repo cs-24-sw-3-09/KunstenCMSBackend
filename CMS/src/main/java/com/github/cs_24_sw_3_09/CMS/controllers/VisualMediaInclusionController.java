@@ -21,8 +21,8 @@ public class VisualMediaInclusionController {
 
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final VisualMediaService visualMediaService;
-    private Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper;
-    private VisualMediaInclusionService visualMediaInclusionService;
+    private final Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper;
+    private final VisualMediaInclusionService visualMediaInclusionService;
 
     public VisualMediaInclusionController(
             Mapper<VisualMediaInclusionEntity, VisualMediaInclusionDto> visualMediaInclusionMapper,
@@ -98,7 +98,7 @@ public class VisualMediaInclusionController {
         }
 
         visualMediaInclusionService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(path = "/{id}/visual_media")

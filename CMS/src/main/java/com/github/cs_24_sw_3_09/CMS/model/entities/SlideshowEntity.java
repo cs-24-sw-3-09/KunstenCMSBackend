@@ -18,7 +18,7 @@ public class SlideshowEntity extends ContentEntity {
     private String name;
     private Boolean isArchived;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "visual_media_inclusion_id")
+    @JoinColumn(name = "slideshow_id")
     private Set<VisualMediaInclusionEntity> visualMediaInclusionCollection;
 
     public void addVisualMediaInclusion(VisualMediaInclusionEntity visualMediaInclusionEntity) {

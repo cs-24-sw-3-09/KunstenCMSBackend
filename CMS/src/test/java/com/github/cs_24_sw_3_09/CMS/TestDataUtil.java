@@ -1,5 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
@@ -9,6 +11,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.*;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
 
@@ -168,6 +171,7 @@ public class TestDataUtil {
         );
     }
 
+
     public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
         return VisualMediaInclusionDto.builder()
                 .visualMedia(new VisualMediaEntity())
@@ -179,7 +183,7 @@ public class TestDataUtil {
 
     public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
         return VisualMediaInclusionEntity.builder()
-                .visualMedia(new VisualMediaEntity())
+                .visualMedia(createVisualMediaEntity())
                 .id(1)
                 .slideDuration(10)
                 .slideshowPosition(2)
@@ -195,8 +199,9 @@ public class TestDataUtil {
 
     public static SlideshowEntity createSlideshowEntity() {
         return SlideshowEntity.builder()
-                .name("slideshow 1")
+                .name("testSS")
                 .isArchived(false)
+                .visualMediaInclusionCollection(Collections.singleton(createVisualMediaInclusionEntity()))
                 .build();
     }
 
