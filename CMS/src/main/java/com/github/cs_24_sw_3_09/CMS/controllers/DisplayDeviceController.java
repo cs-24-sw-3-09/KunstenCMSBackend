@@ -100,12 +100,12 @@ public class DisplayDeviceController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity deleteDisplayDevice(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteDisplayDevice(@PathVariable("id") Long id) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         displayDeviceService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(path = "/{id}/fallbackContent")
@@ -167,5 +167,7 @@ public class DisplayDeviceController {
 
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
+
+
 
 }

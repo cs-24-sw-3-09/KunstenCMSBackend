@@ -22,4 +22,6 @@ public interface TimeSlotService {
     TimeSlotEntity partialUpdate(Long id, TimeSlotEntity timeSlotEntity);
 
     void delete(Long id);
+
+    void deleteRelation(Long tsId, Long ddId);
 } 
