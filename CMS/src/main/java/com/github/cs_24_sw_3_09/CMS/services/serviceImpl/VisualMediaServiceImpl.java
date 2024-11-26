@@ -10,11 +10,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 import org.springframework.data.domain.Page;
@@ -36,13 +40,14 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final VisualMediaRepository visualMediaRepository;
     private final TagRepository tagRepository;
     private PushTSService pushTSService;
+    private SlideshowRepository slideshowRepository;
 
-    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository,
-            TagRepository tagRepository, PushTSService pushTSService) {
+    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, 
+                                    TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
-
+        this.slideshowRepository = slideshowRepository;
     }
 
     @Override
@@ -73,6 +78,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         return vm.map(visualMediaEntity -> new ArrayList<>(visualMediaEntity.getTags()))
                 .orElseThrow(() -> new RuntimeException("Visual media not found"));
+    }
+
+    @Override
+    public Set<SlideshowEntity> findPartOfSlideshows(Long id){        
+        return slideshowRepository.findSlideshowsByVisualMediaId(id);     
     }
 
     @Override

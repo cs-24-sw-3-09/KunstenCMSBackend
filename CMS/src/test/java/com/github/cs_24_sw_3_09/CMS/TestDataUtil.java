@@ -1,5 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
@@ -17,8 +19,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
 
@@ -177,4 +178,18 @@ public class TestDataUtil {
                 "Fake JPEG file content".getBytes()
         );
     }
+    
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity(){
+        return VisualMediaInclusionEntity.builder()
+                .visualMedia(createVisualMediaEntity())
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowEntity(){
+        return SlideshowEntity.builder()
+                .name("testSS")
+                .visualMediaInclusionCollection(Collections.singleton(createVisualMediaInclusionEntity()))
+                .build();
+    }
+
 }

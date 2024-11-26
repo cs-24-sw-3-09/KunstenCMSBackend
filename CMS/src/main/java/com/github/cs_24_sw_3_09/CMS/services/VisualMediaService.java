@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface VisualMediaService {
 
@@ -22,6 +24,8 @@ public interface VisualMediaService {
     Optional<VisualMediaEntity> findOne(Long id);
 
     List<TagEntity> getVisualMediaTags(Long id);
+
+    Set<SlideshowEntity>findPartOfSlideshows(Long id);
 
     boolean isExists(Long id);
 

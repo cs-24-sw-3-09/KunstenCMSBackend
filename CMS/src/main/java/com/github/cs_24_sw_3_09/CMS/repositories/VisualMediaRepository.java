@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.EntityGraph;
