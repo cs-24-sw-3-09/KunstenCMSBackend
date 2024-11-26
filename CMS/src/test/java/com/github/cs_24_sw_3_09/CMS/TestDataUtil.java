@@ -5,16 +5,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.dto.*;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -174,5 +166,14 @@ public class TestDataUtil {
                 MediaType.IMAGE_JPEG_VALUE,
                 "Fake JPEG file content".getBytes()
         );
+    }
+
+    public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
+        return VisualMediaInclusionDto.builder()
+                .visualMedia(new VisualMediaEntity())
+                .id(1)
+                .slideDuration(5)
+                .slideshowPosition(1)
+                .build();
     }
 }
