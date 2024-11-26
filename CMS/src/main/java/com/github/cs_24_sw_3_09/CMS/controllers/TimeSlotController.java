@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
 import jakarta.validation.Valid;
@@ -28,13 +29,16 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/time_slots")
 public class TimeSlotController {
     private final TimeSlotService timeSlotService;
-    private Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
+    private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
+    private final DisplayDeviceService displayDeviceService; 
 
     @Autowired
     public TimeSlotController(TimeSlotService timeSlotService,
-            Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper) {
+            Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
+            DisplayDeviceService displayDeviceService) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
+        this.displayDeviceService = displayDeviceService;
     }
 
     @PostMapping
@@ -89,12 +93,38 @@ public class TimeSlotController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity deleteTimeSlot(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteTimeSlot(@PathVariable("id") Long id) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         timeSlotService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @DeleteMapping(path = "/{id}/display_devices")
+    public ResponseEntity<Object> deleteRelation(@PathVariable("id") Long tsId,
+                                                 @RequestBody Map<String, Object> requestBody) {
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("ddId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //check if is a number
+        Long ddId;
+        try {
+            ddId = Long.valueOf(requestBody.get("ddId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!timeSlotService.isExists(tsId) || !displayDeviceService.isExists(ddId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        timeSlotService.deleteRelation(tsId, ddId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
 
 }

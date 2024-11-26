@@ -86,4 +86,10 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         timeSlotRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
+
+    @Override
+    public void deleteRelation(Long tsId, Long ddId) {
+        // TODO Auto-generated method stub
+           
+    }
 }
