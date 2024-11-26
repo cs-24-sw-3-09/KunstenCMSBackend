@@ -39,19 +39,11 @@ public class SetAllScreensToDisconnectedIntegreationTests {
     }
 
     @Test
-    public void newname() throws Exception {
+    public void testForTaskForSettingAllDDToNotConnected() throws Exception {
         DisplayDeviceEntity dd = TestDataUtil.createDisplayDeviceEntity();
         dd.setConnectedState(true);
         displayDeviceService.save(dd);
 
-        // mockMvc.perform(
-        // MockMvcRequestBuilders.get("/api/display_devices")).andExpect(
-        // MockMvcResultMatchers.jsonPath("content.[0].id").isNumber())
-        // .andExpect(
-        // MockMvcResultMatchers.jsonPath("content.[0].name").value(testDisplayDeviceEntity.getName()))
-        // .andExpect(
-        // MockMvcResultMatchers.jsonPath("content.[0].location")
-        // .value(testDisplayDeviceEntity.getLocation()));
         displayDeviceService.disconnectAllScreens();
 
         mockMvc.perform(
