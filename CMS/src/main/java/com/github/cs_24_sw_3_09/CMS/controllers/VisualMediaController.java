@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +41,7 @@ public class VisualMediaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> createVisualMedia(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -92,6 +94,7 @@ public class VisualMediaController {
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> fullUpdateVisualMedia(@PathVariable("id") Long id,
                                                                 @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
@@ -105,6 +108,7 @@ public class VisualMediaController {
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> partialUpdateVisualMedia(@PathVariable("id") Long id,
                                                                    @RequestBody VisualMediaDto visualMediaDto) {
         if (!visualMediaService.isExists(id)) {
@@ -117,6 +121,7 @@ public class VisualMediaController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> deleteVisualMedia(@PathVariable("id") Long id) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -127,6 +132,7 @@ public class VisualMediaController {
     }
 
     @PatchMapping(path = "/{id}/tags")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> addTag(@PathVariable("id") Long id,
                                                  @RequestBody Map<String, Object> requestBody) {
         Long tagId = ((Integer) requestBody.get("tagId")).longValue();
@@ -145,6 +151,7 @@ public class VisualMediaController {
     }
 
     @DeleteMapping(path = "{visual_media_Id}/tags")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> deleteTagRelation(@PathVariable("visual_media_Id") Long visualMediaId,
                                                             @RequestBody Map<String, Object> requestBody) {
         // Validate input and extract fallbackId

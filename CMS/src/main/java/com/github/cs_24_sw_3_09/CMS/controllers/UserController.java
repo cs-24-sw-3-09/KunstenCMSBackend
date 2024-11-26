@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,21 +41,30 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto user) {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
+        /*
+        TODO: add så password bliver enkrypteret ved user creation.
+        Evt. bare udkommentar kode nedenstående hvis vi gerne vil gå med det:
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        */
         UserEntity userEntity = userMapper.mapFrom(user);
         UserEntity savedUserEntity = userService.save(userEntity);
         return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.CREATED);
     }
 
     @GetMapping
+    //TODO: WTF? naming?
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Page<UserDto> getDisplayDevices(Pageable pageable) {
         Page<UserEntity> userEntities = userService.findAll(pageable);
         return userEntities.map(userMapper::mapTo);
     }
 
     @GetMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> getUser(@PathVariable("id") Long id) {
         Optional<UserEntity> foundUser = userService.findOne(id);
 
@@ -64,6 +75,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> fullUpdateUser(@PathVariable("id") Long id,
             @Valid @RequestBody UserDto userDto) {
         if (!userService.isExists(id)) {
@@ -77,6 +89,7 @@ public class UserController {
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> partialUpdateUser(@PathVariable("id") Long id,
             @Valid @RequestBody UserDto userDto) {
         if (!userService.isExists(id)) {
@@ -88,7 +101,9 @@ public class UserController {
         return new ResponseEntity<>(userMapper.mapTo(updatedUserEntity), HttpStatus.OK);
     }
 
+    //TODO: skal man kunne slette sig selv?
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity deleteUser(@PathVariable("id") Long id) {
         if (!userService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
