@@ -26,8 +26,10 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
-                                   PushTSService pushTSService) {
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository,
+            VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository,
+            TimeSlotService timeSlotService,
+            PushTSService pushTSService) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
@@ -125,5 +127,15 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
+    }
+
+    @Override
+    public boolean connectScreen(Long deviceId) {
+        return true;
+    }
+
+    @Override
+    public boolean disconnectScreen(Long deviceId) {
+        return true;
     }
 }

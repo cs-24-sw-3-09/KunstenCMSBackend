@@ -1,5 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
 import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
@@ -7,11 +11,15 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.DisplayDeviceServiceImpl;
 
 import jakarta.annotation.PreDestroy;
 
+@Component
 public class SocketIOModule {
     private final SocketIOServer server;
+    private DisplayDeviceService displayDeviceService;
 
     public SocketIOModule(String hostname, int port) {
         Configuration configuration = new Configuration();
@@ -25,17 +33,25 @@ public class SocketIOModule {
         server.addDisconnectListener(onDisconnected());
     }
 
+    @Autowired
+    @Lazy
+    public void setDisplayDeviceService(DisplayDeviceService displayDeviceService) {
+        this.displayDeviceService = displayDeviceService;
+    }
+
     private ConnectListener onConnected() {
         return (client -> {
             int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
             client.joinRoom(String.valueOf(deviceId));
+            System.out.println("Should be true " + displayDeviceService.connectScreen((long) 4));
             System.out.println("Device " + deviceId + " connected: " + client.getRemoteAddress());
         });
     }
 
     private DisconnectListener onDisconnected() {
         return (client -> {
-            System.out.println("Device disconnected: " + client.getRemoteAddress());
+            int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
+            System.out.println("Device disconnected: " + client.getRemoteAddress() + " id:" + deviceId);
         });
     }
 
