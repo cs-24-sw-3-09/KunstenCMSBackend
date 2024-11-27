@@ -89,13 +89,12 @@ public class MailServiceImpl implements EmailService {
             try {
                 email.setRecipient(user.getEmail());
                 String mailResult = sendSimpleMail(email);
-                return mailResult;
             } catch (Exception e) {
                 // TODO: handle exception
             }
         }
         System.out.println(userList.toString());
-        return "Worked";
+        return "Mail Sent Successfully...";
     }//
 
     public static Set<UserEntity> filterUsersOutsidePausePeriod(Set<UserEntity> users) {
