@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,9 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
 import java.util.Set;
+
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -29,8 +32,8 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private PushTSService pushTSService;
     private SlideshowRepository slideshowRepository;
 
-    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, 
-                                    TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
+    public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService,
+                                  TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
@@ -68,8 +71,8 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public Set<SlideshowEntity> findPartOfSlideshows(Long id){        
-        return slideshowRepository.findSlideshowsByVisualMediaId(id);     
+    public Set<SlideshowEntity> findPartOfSlideshows(Long id) {
+        return slideshowRepository.findSlideshowsByVisualMediaId(id);
     }
 
     @Override
@@ -124,5 +127,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public void deleteRelation(Long visualMediaId, Long tagId) {
         visualMediaRepository.deleteAssociation(visualMediaId, tagId);
+    }
+
+    @Override
+    public List<DisplayDeviceEntity> findDisplayDevicesVisualMediaIsPartOf(Long id) {
+        return visualMediaRepository.getDisplayDevicesPartOfVisualMedia(id);
     }
 }

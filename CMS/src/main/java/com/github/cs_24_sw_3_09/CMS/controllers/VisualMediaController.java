@@ -1,7 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -28,19 +31,22 @@ import java.util.Set;
 public class VisualMediaController {
 
     private final Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper;
+    private final Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
     private final VisualMediaService visualMediaService;
     private final TagService tagService;
     private FileStorageService fileStorageService;
 
     public VisualMediaController(
             Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
-                                 VisualMediaService visualMediaService,
-                                 TagService tagService,
-                                 FileStorageService fileStorageService) {
+            VisualMediaService visualMediaService,
+            TagService tagService,
+            FileStorageService fileStorageService,
+            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
         this.tagService = tagService;
         this.fileStorageService = fileStorageService;
+        this.displayDeviceMapper = displayDeviceMapper;
     }
 
     @PostMapping
@@ -97,11 +103,26 @@ public class VisualMediaController {
     }
 
     @GetMapping(path = "/{id}/risk")
-    public ResponseEntity<Set<SlideshowEntity>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id){
+    public ResponseEntity<Set<SlideshowEntity>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(visualMediaService.findPartOfSlideshows(id), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{id}/display_devices")
+    public ResponseEntity<List<DisplayDeviceDto>> getDisplayDevicesVisualMediaIsPartOf(@PathVariable("id") Long id) {
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<DisplayDeviceEntity> foundDisplayDevices = visualMediaService.findDisplayDevicesVisualMediaIsPartOf(id);
+
+        List<DisplayDeviceDto> foundDisplayDeviceDtos = foundDisplayDevices.stream()
+                .map(displayDeviceMapper::mapTo) // Assuming `mapTo` converts an entity to a DTO
+                .toList();
+
+        return new ResponseEntity<>(foundDisplayDeviceDtos, HttpStatus.OK);
     }
 
     @PutMapping(path = "/{id}")
