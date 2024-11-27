@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<UserEntity, Integer>,
         PagingAndSortingRepository<UserEntity, Integer> {
     Optional<UserEntity> findByEmail(String email);
+    boolean existsByAdmin(boolean admin);
 }

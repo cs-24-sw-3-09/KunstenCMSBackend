@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.PushTSServiceImpl;
@@ -67,8 +68,8 @@ public class PushTSScheduleIntegrationTests {
         displayDeviceEntity.setConnectedState(true);
         displayDeviceService.save(displayDeviceEntity);
 
-        assertEquals(1, pushTSService.updateDisplayDevicesToNewTimeSlots(),
-                "There are not one connected screen in the DB");
+        Set<Integer> result = pushTSService.updateDisplayDevicesToNewTimeSlots();
+        assertEquals(1, result.size(), "There are not one connected screen in the DB");
     }
 
     @Test
@@ -80,8 +81,8 @@ public class PushTSScheduleIntegrationTests {
         displayDeviceEntity.setConnectedState(true);
         displayDeviceService.save(displayDeviceEntity);
 
-        assertEquals(0, pushTSService.updateDisplayDevicesToNewTimeSlots(),
-                "There are not one connected screen in the DB");
+        Set<Integer> result = pushTSService.updateDisplayDevicesToNewTimeSlots();
+        assertEquals(0, result.size(), "There are not one connected screen in the DB");
     }
 
     @Test

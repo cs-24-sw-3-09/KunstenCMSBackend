@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class SlideshowServiceImpl implements SlideshowService {
     }
 
     @Override
+    @Transactional
     public SlideshowEntity save(SlideshowEntity slideshowEntity) {
         SlideshowEntity toReturn = slideshowRepository.save(slideshowEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();

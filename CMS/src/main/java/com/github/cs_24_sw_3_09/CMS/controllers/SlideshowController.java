@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -63,6 +64,7 @@ public class SlideshowController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<SlideshowDto> createSlideshow(@RequestBody SlideshowDto slideshowDto) {
         SlideshowEntity slideshowEntity = slideshowMapper.mapFrom(slideshowDto);
         SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntity);
@@ -70,6 +72,7 @@ public class SlideshowController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity deleteSlideshow(@PathVariable("id") long id) {
         if (!slideshowService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -79,6 +82,7 @@ public class SlideshowController {
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<SlideshowDto> updateSlideshow(@PathVariable("id") long id,
             @RequestBody SlideshowDto slideshowDto) {
         if (!slideshowService.isExists(id)) {
@@ -93,6 +97,7 @@ public class SlideshowController {
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<SlideshowDto> patchSlideshow(@PathVariable("id") long id,
             @RequestBody SlideshowDto slideshowDto) {
         if (!slideshowService.isExists(id)) {
@@ -106,6 +111,7 @@ public class SlideshowController {
     }
 
     @PatchMapping(path = "/{id}/visual_media_inclusions")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<SlideshowDto> addVisualMediaInclusion(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
