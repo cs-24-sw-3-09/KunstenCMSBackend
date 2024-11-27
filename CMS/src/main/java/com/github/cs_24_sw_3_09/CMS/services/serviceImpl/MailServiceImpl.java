@@ -17,9 +17,14 @@ public class MailServiceImpl implements EmailService {
     @Value("${spring.mail.username}")
     private String sender;
 
+    @Value("${EMAIL.RECIVER}")
+    private String emailReceiver;
+
     @Override
     public String sendSimpleMail(EmailDetailsEntity details) {
         // Try block to check for exceptions
+        System.out.println(sender);
+        System.out.println(details.toString());
         try {
 
             // Creating a simple mail message
@@ -38,8 +43,18 @@ public class MailServiceImpl implements EmailService {
 
         // Catch block to handle the exceptions
         catch (Exception e) {
-            return "Error while Sending Mail";
+            return "Error while Sending Mail: " + e.getMessage();
         }
+    }
+
+    public String sendDDDisconnectMail(int id) {
+        EmailDetailsEntity email = EmailDetailsEntity.builder()
+                .recipient(emailReceiver) // Use the injected value
+                .msgBody("Screen with ID " + id + " have disconnected")
+                .subject("Disconnected Screen: " + id)
+                .build();
+
+        return sendSimpleMail(email);
     }
 
 }
