@@ -41,8 +41,7 @@ public class SecurityConfig {
                         //Allow auth request without token
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         //Need to be authenticated for all other routes
-                        //.anyRequest().authenticated()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

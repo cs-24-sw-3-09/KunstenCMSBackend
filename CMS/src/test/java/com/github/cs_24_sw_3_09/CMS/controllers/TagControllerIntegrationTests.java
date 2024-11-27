@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +37,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles = "PLANNER")
     public void testThatCreateTagReturnsHttpStatus201Created() throws Exception {
         TagDto tagDto = TestDataUtil.createTagDto();
         String createdTagJson = objectMapper.writeValueAsString(tagDto);

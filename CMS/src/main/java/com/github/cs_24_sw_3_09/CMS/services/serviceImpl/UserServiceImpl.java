@@ -85,4 +85,8 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> user = userRepository.findByEmail(username);
         return user.map(UserEntityDetails::new).orElseThrow(() -> new UsernameNotFoundException("Email not found: " + username));
     }
+
+    public boolean existsByAdmin() {
+        return userRepository.existsByAdmin(true);
+    }
 }

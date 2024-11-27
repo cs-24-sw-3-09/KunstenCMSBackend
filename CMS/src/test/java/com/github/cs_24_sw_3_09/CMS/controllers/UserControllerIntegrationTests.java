@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +36,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatCreateUserSuccessfullyReturnsHttp201Created() throws Exception {
         // Have to be hardcoded as a Json string, due to the password only being write and not read
         String userJson = "{\"firstName\": \"FirstTestName\", \"lastName\":\"LastTestName\", \"email\":\"test@test.com\", \"password\":\"testtest1234\"}";
@@ -48,6 +50,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatGetUserSuccessfullyReturnsHttp200() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/users")
@@ -56,6 +59,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatGetUserSuccessfullyReturnsListOfUsers() throws Exception {
         UserEntity testUserEntity = TestDataUtil.createUserEntity();
         userService.save(testUserEntity);
@@ -63,34 +67,36 @@ public class UserControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/users")
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
+                MockMvcResultMatchers.jsonPath("content.[1].id").isNumber()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("content.[0].firstName").value(testUserEntity.getFirstName())
+                MockMvcResultMatchers.jsonPath("content.[1].firstName").value(testUserEntity.getFirstName())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("content.[0].email").value(testUserEntity.getEmail())
+                MockMvcResultMatchers.jsonPath("content.[1].email").value(testUserEntity.getEmail())
         ).andExpect(
                 MockMvcResultMatchers.status().isOk());
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatGetUserReturnsStatus200WhenUserExists() throws Exception {
-        UserEntity userEntity = TestDataUtil.createUserEntity();
-        userService.save(userEntity);
+        UserEntity user = TestDataUtil.createUserEntity();
+        userService.save(user);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/users/1")
+                MockMvcRequestBuilders.get("/api/users/2")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("id").isNumber()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("firstName").value(userEntity.getFirstName())
+                MockMvcResultMatchers.jsonPath("firstName").value(user.getFirstName())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("email").value(userEntity.getEmail())
+                MockMvcResultMatchers.jsonPath("email").value(user.getEmail())
         );
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatGetUserReturnsStatus404WhenNoUserExists() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/users/100000")
@@ -99,6 +105,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatDeleteUserReturnsStatus200() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
         UserEntity savedUserEntiity = userService.save(userEntity);
@@ -112,6 +119,7 @@ public class UserControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatDeleteUserReturnsStatus404() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/users/99")
@@ -121,6 +129,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatFullUpdateUserReturnsStatus404WhenNoUserExists() throws Exception {
         UserDto userDto = TestDataUtil.createUserDto();
         String userDtoJson = objectMapper.writeValueAsString(userDto);
@@ -135,6 +144,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatFullUpdateUserReturnsStatus200WhenUserExists() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
         UserEntity savedUserEntity = userService.save(userEntity);
@@ -151,6 +161,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatPatchUpdateUserReturnsStatus200() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
         UserEntity savedUserEntity = userService.save(userEntity);
@@ -174,12 +185,13 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="ADMIN")
     public void testThatPatchUpdateUserReturnsStatus404() throws Exception {
         UserDto userDto = TestDataUtil.createUserDto();
         String userDtoJson = objectMapper.writeValueAsString(userDto);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/users/1")
+                MockMvcRequestBuilders.patch("/api/users/2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userDtoJson)
         ).andExpect(

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -41,6 +42,7 @@ public class VisualMediaInclusionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> createVisualMediaInclusion(
             @RequestBody VisualMediaInclusionDto visualMediaInclusionDto) {
         VisualMediaInclusionEntity visualMediaInclusionEntity = visualMediaInclusionMapper
@@ -63,6 +65,7 @@ public class VisualMediaInclusionController {
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> fullUpdateVisualMediaInclusion(@PathVariable("id") Long id,
             @RequestBody VisualMediaInclusionDto visualMediaInclusionDto) {
         if (!visualMediaInclusionService.isExists(id)) {
@@ -78,6 +81,7 @@ public class VisualMediaInclusionController {
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> partialUpdateDisplayDevice(@PathVariable("id") Long id,
             @RequestBody VisualMediaInclusionDto visualMediaInclusionDto) {
         if (!visualMediaInclusionService.isExists(id)) {
@@ -92,6 +96,7 @@ public class VisualMediaInclusionController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> deleteVisualMediaInclusion(@PathVariable("id") Long id) {
         if (!visualMediaInclusionService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -102,6 +107,7 @@ public class VisualMediaInclusionController {
     }
 
     @PatchMapping(path = "/{id}/visual_media")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> setVisualMedia(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
