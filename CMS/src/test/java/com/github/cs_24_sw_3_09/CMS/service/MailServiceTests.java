@@ -41,7 +41,6 @@ class MailServiceTests {
         String mockReceiver = "receiver@example.com";
 
         mailService.setSender(mockSender);
-        mailService.setReceiver(mockReceiver);
 
         EmailDetailsEntity emailDetails = EmailDetailsEntity.builder()
                 .recipient(mockReceiver)
@@ -64,7 +63,6 @@ class MailServiceTests {
         String mockReceiver = "receiver@example.com";
 
         mailService.setSender(mockSender);
-        mailService.setReceiver(mockReceiver);
 
         EmailDetailsEntity emailDetails = EmailDetailsEntity.builder()
                 .recipient(mockReceiver)
@@ -86,10 +84,9 @@ class MailServiceTests {
         String mockReceiver = "receiver@example.com";
         String mockSender = "sender@example.com";
 
-        mailService.setReceiver(mockReceiver);
         mailService.setSender(mockSender);
 
-        String result = mailService.sendDDDisconnectMail(123);
+        String result = mailService.sendDDDisconnectMail(123, mockReceiver);
 
         assertEquals("Mail Sent Successfully...", result);
     }

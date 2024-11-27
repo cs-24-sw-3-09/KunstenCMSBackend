@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.EmailDetailsEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.EmailService;
 
 import lombok.Setter;
@@ -20,11 +21,11 @@ public class MailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Autowired
+    private DisplayDeviceRepository displayDeviceRepository;
+
     @Value("${EMAIL.USERNAME:}")
     private String sender;
-
-    @Value("${EMAIL.RECEIVER:}")
-    private String receiver;
 
     @Override
     public String sendSimpleMail(EmailDetailsEntity details) {
@@ -53,10 +54,15 @@ public class MailServiceImpl implements EmailService {
         }
     }
 
-    public String sendDDDisconnectMail(int id) {
+    @Override
+    public String sendDDDisconnectMail(int id, String receiver) {
+        if (!displayDeviceRepository.existsById(id)) {
+            return "Did not sent to DD, as it is not found in DB";
+        }
+
         EmailDetailsEntity email = EmailDetailsEntity.builder()
                 .recipient(receiver) // Use the injected value
-                .msgBody("Screen with ID " + id + " have disconnected")
+                .msgBody("<b>Screen with ID</b> " + id + " have disconnected")
                 .subject("Disconnected Screen: " + id)
                 .build();
 
