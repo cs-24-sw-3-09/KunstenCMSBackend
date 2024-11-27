@@ -164,7 +164,7 @@ public class TestDataUtil {
                 .endDate(Date.valueOf(endDateTime.toLocalDate()))
                 .startTime(Time.valueOf(startDateTime.toLocalTime()))
                 .endTime(Time.valueOf(endDateTime.toLocalTime()))
-                .weekdaysChosen(3)
+                .weekdaysChosen(127)
                 .displayContent(assignedSlideshow())
                 .displayDevices(assignDisplayDevice())
                 .build();
