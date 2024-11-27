@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import com.github.cs_24_sw_3_09.CMS.model.entities.EmailDetailsEntity;
 import com.github.cs_24_sw_3_09.CMS.services.EmailService;
 
+import lombok.Setter;
+
 @Service
+@Setter
 public class MailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
@@ -43,7 +46,7 @@ public class MailServiceImpl implements EmailService {
 
         // Catch block to handle the exceptions
         catch (Exception e) {
-            return "Error while Sending Mail: " + e.getMessage();
+            return "Error while Sending Mail...";
         }
     }
 
