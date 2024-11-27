@@ -27,7 +27,6 @@ public class DisplayDeviceDto {
     private String displayOrientation;
     @Pattern(regexp = "^\\d+x\\d+$", message = "Resolution must be in the format 'widthxheight' (e.g., 1920x1080)")
     private String resolution;
-    private Boolean connectedState;
     private ContentEntity fallbackContent;
     private List<TimeSlotEntity> timeSlots;
 

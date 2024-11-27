@@ -27,7 +27,6 @@ public class TestDataUtil {
 
         return DisplayDeviceDto.builder()
                 .displayOrientation("horizontal")
-                .connectedState(false)
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
@@ -38,7 +37,6 @@ public class TestDataUtil {
 
         return DisplayDeviceEntity.builder()
                 .displayOrientation("horizontal")
-                .connectedState(false)
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
                 .resolution("1920x1080")
@@ -144,7 +142,6 @@ public class TestDataUtil {
 
         DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
                 .displayOrientation("horizontal")
-                .connectedState(false)
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")

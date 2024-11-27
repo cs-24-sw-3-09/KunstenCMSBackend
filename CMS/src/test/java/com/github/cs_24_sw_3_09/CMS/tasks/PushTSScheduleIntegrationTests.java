@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.tasks;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
@@ -17,15 +18,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.URI;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
 import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.PushTSServiceImpl;
+import com.github.cs_24_sw_3_09.CMS.socketConnection.SocketIOModule;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -36,25 +44,40 @@ public class PushTSScheduleIntegrationTests {
     private DisplayDeviceService displayDeviceService;
     private DisplayDeviceRepository displayDeviceRepository;
     private PushTSService pushTSService;
-
-    @Autowired
-    public PushTSScheduleIntegrationTests(DisplayDeviceRepository displayDeviceRepository,
-            DisplayDeviceService displayDeviceService, PushTSService pushTSService) {
-        this.displayDeviceService = displayDeviceService;
-        this.displayDeviceRepository = displayDeviceRepository;
-        this.pushTSService = pushTSService;
+    private SocketIOModule socketIoModule;
+    
+        @Autowired
+        public PushTSScheduleIntegrationTests(SocketIOModule socketIoModule, DisplayDeviceRepository displayDeviceRepository,
+                DisplayDeviceService displayDeviceService, PushTSService pushTSService) {
+            this.displayDeviceService = displayDeviceService;
+            this.displayDeviceRepository = displayDeviceRepository;
+            this.pushTSService = pushTSService;
+            this.socketIoModule = socketIoModule;
     }
 
-    @Test
-    public void testThatOnlyGetTheDisplayDevicesThatIsConnected() throws Exception {
-        DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDeviceEntity);
-        displayDeviceEntity.setConnectedState(true);
-        displayDeviceService.save(displayDeviceEntity);
+    private CountDownLatch lock = new CountDownLatch(1);
 
-        Iterable<DisplayDeviceEntity> ddDB = displayDeviceRepository.findConnectedDisplayDevices();
-        List<DisplayDeviceEntity> connectedDevices = StreamSupport.stream(ddDB.spliterator(), false).toList();
-        assertEquals(1, connectedDevices.size(), "There are not one connected screen in the DB");
+    @Test
+    public void testThatDisplayDeviceConnects() throws Exception {
+        DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
+        DisplayDeviceEntity dd = displayDeviceService.save(displayDeviceEntity);
+
+    
+        Socket client = IO.socket(URI.create("http://localhost:3051"), IO.Options.builder()
+        .setQuery("id=1")
+        .setForceNew(true)
+        .build());
+        client.connect();
+        System.out.println("yespspdpasdsa");
+
+        client.on("connect", (event) -> {
+            System.out.println("Connected");
+            lock.countDown();
+        });
+
+        lock.await(5000, TimeUnit.MILLISECONDS);
+
+        assertEquals(true, socketIoModule.isConnected(dd.getId()), "Socket device is not connected");
     }
 
     @Test
@@ -65,7 +88,6 @@ public class PushTSScheduleIntegrationTests {
         listTS.add(TestDataUtil.createTimeSlotEntityWithCurrentTime());
         listTS.add(TestDataUtil.createTimeSlotEntityWithCurrentTime());
         displayDeviceEntity.setTimeSlots(listTS);
-        displayDeviceEntity.setConnectedState(true);
         displayDeviceService.save(displayDeviceEntity);
 
         Set<Integer> result = pushTSService.updateDisplayDevicesToNewTimeSlots();
@@ -78,7 +100,6 @@ public class PushTSScheduleIntegrationTests {
         List<TimeSlotEntity> listTS = new ArrayList<>();
         listTS.add(TestDataUtil.createTimeSlotEntity());
         displayDeviceEntity.setTimeSlots(listTS);
-        displayDeviceEntity.setConnectedState(true);
         displayDeviceService.save(displayDeviceEntity);
 
         Set<Integer> result = pushTSService.updateDisplayDevicesToNewTimeSlots();
