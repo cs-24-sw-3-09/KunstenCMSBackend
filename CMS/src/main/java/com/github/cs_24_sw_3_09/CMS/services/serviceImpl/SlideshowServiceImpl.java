@@ -1,5 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
@@ -29,13 +34,15 @@ public class SlideshowServiceImpl implements SlideshowService {
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
     private TimeSlotRepository timeSlotRepository;
+    private Mapper<SlideshowEntity, SlideshowDto> slideshowMapper;
 
     public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
-            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService, TimeSlotRepository timeSlotRepository) {
+            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService, TimeSlotRepository timeSlotRepository, Mapper<SlideshowEntity, SlideshowDto> slideshowMapper) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.timeSlotRepository = timeSlotRepository;
+        this.slideshowMapper = slideshowMapper;
     }
 
     @Override
@@ -67,8 +74,20 @@ public class SlideshowServiceImpl implements SlideshowService {
     }
 
     @Override
-    public Set<SlideshowEntity> findPartOfSlideshows(Long id){        
-        return slideshowRepository.findSlideshowsByVisualMediaId(id);     
+    public Set<SlideshowDto> findPartOfSlideshows(Long id){    
+        Set<SlideshowEntity> setOfSlideshowEntities = slideshowRepository.findSlideshowsByVisualMediaId(id);
+
+        if (setOfSlideshowEntities == null) {
+            return Collections.emptySet();
+        }
+
+        Set<SlideshowDto> setOfSlideshowDtos = new HashSet<>();
+
+        for (SlideshowEntity entity : setOfSlideshowEntities) {
+            SlideshowDto slideshowDto = slideshowMapper.mapTo(entity);
+            setOfSlideshowDtos.add(slideshowDto);
+        }        
+        return setOfSlideshowDtos;   
     }
 
     @Override

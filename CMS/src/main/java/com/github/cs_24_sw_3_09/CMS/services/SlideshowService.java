@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
@@ -21,7 +22,7 @@ public interface SlideshowService {
 
     boolean isExists(Long id);
 
-    Set<SlideshowEntity>findPartOfSlideshows(Long id);
+    Set<SlideshowDto>findPartOfSlideshows(Long id);
 
     SlideshowEntity partialUpdate(Long id, SlideshowEntity slideshowEntity);
 
