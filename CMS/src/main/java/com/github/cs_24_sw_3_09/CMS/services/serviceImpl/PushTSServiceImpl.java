@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
@@ -98,12 +100,16 @@ public class PushTSServiceImpl implements PushTSService {
         socketIOModule.sendContent(displayDeviceEntity.getId(), contentEntity);
     }
 
+    public Set<Integer> updateDisplayDevicesToNewTimeSlots() {
+        return updateDisplayDevicesToNewTimeSlots(true);
+    }
+
     @Override
-    public int updateDisplayDevicesToNewTimeSlots() {
+    public Set<Integer> updateDisplayDevicesToNewTimeSlots(boolean sendToDisplayDevices) {
         // Fetch the list of connected display devices
         List<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findConnectedDisplayDevices();
-        // Counts amount of DD that gets a TS
-        int i = 0;
+        // Holder for the TS id's that is shown
+        Set<Integer> timeSlotsInUse = new HashSet<>();
         for (DisplayDeviceEntity dd : displayDevices) {
             List<TimeSlotEntity> timeSlots = dd.getTimeSlots();
 
@@ -111,13 +117,15 @@ public class PushTSServiceImpl implements PushTSService {
                     displayDeviceMapper.mapTo(dd));
             if (timeSlotToBeDisplayed == null) {
                 System.out.println("PRIO for " + dd.getId() + ": null");
-                sendTimeSlotToDisplayDevice(dd.getFallbackContent(), dd);
+                if (sendToDisplayDevices)
+                    sendTimeSlotToDisplayDevice(dd.getFallbackContent(), dd);
             } else {
                 System.out.println("PRIO for ddId " + dd.getId() + ": " + timeSlotToBeDisplayed.getName());
-                sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
-                i++;
+                if (sendToDisplayDevices)
+                    sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
+                timeSlotsInUse.add(timeSlotToBeDisplayed.getId());
             }
         }
-        return i;
+        return timeSlotsInUse;
     }
 }
