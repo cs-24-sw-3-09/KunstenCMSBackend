@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,6 +45,7 @@ public class TimeSlotController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
 
         // Done to decouple the persistence layer from the presentation and service
@@ -70,6 +72,7 @@ public class TimeSlotController {
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> fullUpdateTimeSlot(@PathVariable("id") Long id,
             @Valid @RequestBody TimeSlotDto timeSlotDto) {
         if (!timeSlotService.isExists(id)) {
@@ -83,6 +86,7 @@ public class TimeSlotController {
     }
 
     @PatchMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> partialUpdateTimeSlot(@PathVariable("id") Long id,
             @Valid @RequestBody TimeSlotDto timeSlotDto) {
         if (!timeSlotService.isExists(id)) {
@@ -95,6 +99,7 @@ public class TimeSlotController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<Object> deleteTimeSlot(@PathVariable("id") Long id) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -104,6 +109,7 @@ public class TimeSlotController {
     }
 
     @DeleteMapping(path = "/{id}/display_devices")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<Object> deleteRelation(@PathVariable("id") Long tsId,
                                                  @RequestBody Map<String, Object> requestBody) {
         // Validate input and extract fallbackId
