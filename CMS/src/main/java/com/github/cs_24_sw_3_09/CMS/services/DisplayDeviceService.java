@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,6 +8,7 @@ import org.springframework.data.web.PagedModel;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface DisplayDeviceService {
     DisplayDeviceEntity save(DisplayDeviceEntity displayDevice);
@@ -18,6 +20,8 @@ public interface DisplayDeviceService {
     Optional<DisplayDeviceEntity> findOne(Long id);
 
     boolean isExists(Long id);
+
+    Set<DisplayDeviceDto> findDisplayDevicesWhoUsesSlideshowAsFallback(Long id);
 
     DisplayDeviceEntity partialUpdate(Long id, DisplayDeviceEntity displayDeviceEntity);
 

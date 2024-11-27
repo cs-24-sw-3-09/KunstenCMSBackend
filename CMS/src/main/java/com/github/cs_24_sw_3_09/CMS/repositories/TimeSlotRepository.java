@@ -30,13 +30,6 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
     @Query("SELECT ts FROM TimeSlotEntity ts WHERE ts.displayDevices IS EMPTY")
     List<TimeSlotEntity> findTimeSlotsWithNoDisplayDevices();
 
-    /*@Query(value = "SELECT DISTINCT ts.* " +
-               "FROM time_slots ts " +
-               "INNER JOIN slideshows ss ON ss.id = ts.time_slot_content " +
-               "WHERE ss.id = :slidehowId",
-                nativeQuery = true)
-    Set<TimeSlotEntity> findSetOfTimeSlotsBySlideshowId(@Param("slidehowId") Long slideshowId);*/
-
     @Query("SELECT DISTINCT ts FROM TimeSlotEntity ts " +
        "JOIN ts.displayContent dc " +
        "JOIN SlideshowEntity ss ON dc.id = ss.id " +
@@ -44,13 +37,4 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
        "WHERE ss.id = :slideshowId")
     Set<TimeSlotEntity> findSetOfTimeSlotsBySlideshowId(@Param("slideshowId") Long slideshowId);
 
-    /*@Query(value = "SELECT DISTINCT ts.* " +
-               "FROM time_slots ts " +
-               "INNER JOIN contents c ON ts.time_slot_content = c.id " +
-               "INNER JOIN slideshows ss ON c.id = ss.id " +
-               "LEFT JOIN time_slot_display_device tsdd ON ts.id = tsdd.time_slot_id " +
-               "LEFT JOIN display_devices dd ON dd.id = tsdd.display_device_id " +
-               "WHERE ss.id = :slideshowId",
-               nativeQuery = true)
-            Set<TimeSlotEntity> findSetOfTimeSlotsBySlideshowId(@Param("slideshowId") Long slideshowId);*/
 }

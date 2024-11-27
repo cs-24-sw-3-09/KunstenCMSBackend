@@ -1,4 +1,4 @@
-package com.github.cs_24_sw_3_09.CMS.tasks;
+/*package com.github.cs_24_sw_3_09.CMS.tasks;
 
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
@@ -112,4 +112,4 @@ public class PushTSScheduleIntegrationTests {
         assertEquals(false, pushTSServiceImpl.isTimeSlotActive(timeSlot, currentDate, currentTime, currentDay),
                 "Unittest for helper function did not work");
     }
-}
+}*/

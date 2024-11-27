@@ -26,21 +26,21 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     private final VisualMediaRepository visualMediaRepository;
     private final TagRepository tagRepository;
-    private PushTSService pushTSService;
+    //private PushTSService pushTSService;
     private SlideshowRepository slideshowRepository;
 
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService, 
-                                    TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
+                                    TagRepository tagRepository, /*PushTSService pushTSService,*/ SlideshowRepository slideshowRepository) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
-        this.pushTSService = pushTSService;
+        //this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
     }
 
     @Override
     public VisualMediaEntity save(VisualMediaEntity visualMedia) {
         VisualMediaEntity toReturn = visualMediaRepository.save(visualMedia);
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        //pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }
 
@@ -87,7 +87,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             Optional.ofNullable(visualMediaEntity.getTags()).ifPresent(existingVisualMedia::setTags);
 
             VisualMediaEntity toReturn = visualMediaRepository.save(existingVisualMedia);
-            pushTSService.updateDisplayDevicesToNewTimeSlots();
+            //pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
         }).orElseThrow(() -> new RuntimeException("Visual Media Not Found"));
     }
@@ -113,7 +113,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         timeslot.getTags().clear();
         visualMediaRepository.save(timeslot);
         visualMediaRepository.deleteById(Math.toIntExact(id));
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        //pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
     @Override

@@ -21,20 +21,20 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final VisualMediaService visualMediaService;
-    private PushTSService pushTSService;
+    //private PushTSService pushTSService;
 
     public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository,
-            VisualMediaService visualMediaService, PushTSService pushTSService) {
+            VisualMediaService visualMediaService /*,PushTSService pushTSService*/) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.visualMediaService = visualMediaService;
-        this.pushTSService = pushTSService;
+        //this.pushTSService = pushTSService;
 
     }
 
     @Override
     public VisualMediaInclusionEntity save(VisualMediaInclusionEntity visualMediaInclusionEntity) {
         VisualMediaInclusionEntity toReturn = visualMediaInclusionRepository.save(visualMediaInclusionEntity);
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        //pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }
 
@@ -73,7 +73,7 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
                     .ifPresent(existingVisualMediaInclusion::setVisualMedia);
 
             VisualMediaInclusionEntity toReturn = visualMediaInclusionRepository.save(existingVisualMediaInclusion);
-            pushTSService.updateDisplayDevicesToNewTimeSlots();
+            //pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
         }).orElseThrow(() -> new RuntimeException("Visual Media Inclusion does not exist"));
     }
@@ -85,7 +85,7 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         visualMediaInclusion.setVisualMedia(null);
         visualMediaInclusionRepository.save(visualMediaInclusion);
         visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        //pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
     @Override
