@@ -7,7 +7,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
-import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,6 +45,7 @@ public class SlideshowControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatCreateSlideshowReturnsHttpStatus201Created() throws Exception {
         SlideshowDto slideshow = TestDataUtil.createSlideshowDto();
         String slideshowJson = objectMapper.writeValueAsString(slideshow);
@@ -57,6 +58,7 @@ public class SlideshowControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatCreateSlideshowReturnsCreatedSlideshow() throws Exception {
         SlideshowDto slideshow = TestDataUtil.createSlideshowDto();
         String slideshowJson = objectMapper.writeValueAsString(slideshow);
@@ -73,6 +75,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetSlideshowSuccessfullyReturnsHttp200() throws Exception {
 
         mockMvc.perform(
@@ -81,6 +84,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetSlideshowsSuccessfullyReturnsListOfSlideshows() throws Exception {
         SlideshowEntity testSlideshowEntity = TestDataUtil.createSlideshowEntity();
         slideshowService.save(testSlideshowEntity);
@@ -96,6 +100,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetSlideshowReturnsStatus200WhenExists() throws Exception {
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         slideshowService.save(slideshowEntity);
@@ -107,6 +112,7 @@ public class SlideshowControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser
     public void testThatGetSlideshowReturnsStatus404WhenNoSlideshowExists() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/slideshows/99")).andExpect(
@@ -114,6 +120,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetSlideshowReturnsSlideshowWhenSlideshowExists() throws Exception {
         SlideshowEntity slideshow = TestDataUtil.createSlideshowEntity();
         slideshowService.save(slideshow);
@@ -128,6 +135,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateSlideshowReturnsStatus404WhenNoSlideshowExists() throws Exception {
         SlideshowDto slideshowDto = TestDataUtil.createSlideshowDto();
         String slideshowDtoJson = objectMapper.writeValueAsString(slideshowDto);
@@ -141,6 +149,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteSlideshowReturnsStatus200() throws Exception {
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntity);
@@ -151,6 +160,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteSlideshowReturnsStatus404() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/slideshows/99")).andExpect(
@@ -158,6 +168,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateSlideshowReturnsStatus200WhenSlideshowExists() throws Exception {
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntity);
@@ -174,6 +185,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateSlideshowReturnsStatus200() throws Exception {
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntity);
@@ -194,6 +206,7 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateSlideshowReturnsStatus404() throws Exception {
         SlideshowDto slideshowDto = TestDataUtil.createSlideshowDto();
         String slideshowDtoJson = objectMapper.writeValueAsString(slideshowDto);
@@ -207,8 +220,9 @@ public class SlideshowControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatAddVisualMediaInclusionToSlideShowReturnsSlideshowWithVisualMediaInclusionAdded() throws Exception {
-        VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionEntity();
+        VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
         VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity);
 
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();

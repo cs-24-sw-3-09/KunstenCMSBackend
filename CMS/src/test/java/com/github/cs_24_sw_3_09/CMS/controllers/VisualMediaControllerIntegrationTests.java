@@ -3,12 +3,14 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,21 +47,24 @@ public class VisualMediaControllerIntegrationTests {
     private VisualMediaService visualMediaService;
     private SlideshowService slideshowService;
     private TagService tagService;
+    private VisualMediaInclusionService visualMediaInclusionService;
 
 
     @Autowired
-    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService, TagService tagService, SlideshowService slideshowService) {
+    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService, TagService tagService, SlideshowService slideshowService, VisualMediaInclusionService visualMediaInclusionService) {
         this.mockMvc = mockMvc;
         this.visualMediaService = visualMediaService;
         this.objectMapper = objectMapper;
         this.tagService = tagService;
         this.objectMapper = objectMapper;
-  
+        this.slideshowService = slideshowService;
+        this.visualMediaInclusionService = visualMediaInclusionService;
+
 
     }
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatCreateVisualMediaReturnsHttpStatus201Created() throws Exception {
 
 
@@ -72,7 +78,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatCreateVisualMediaReturnsCreatedVisualMedia() throws Exception {
         MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
@@ -134,48 +140,59 @@ public class VisualMediaControllerIntegrationTests {
                 MockMvcResultMatchers.status().isNotFound()
         );
     }
-    
+
     @Test
     @WithMockUser
-    public void testThatVisualMediaPartOfSlideshowsReturnsSlideshows() throws Exception{
+    public void testThatVisualMediaPartOfSlideshowsReturnsSlideshows() throws Exception {
         SlideshowEntity testSlideshowEntity = TestDataUtil.createSlideshowEntity();
-        slideshowService.save(testSlideshowEntity);
+        SlideshowEntity savedSlideshow = slideshowService.save(testSlideshowEntity);
 
-        Set<VisualMediaInclusionEntity> inclusions = testSlideshowEntity.getVisualMediaInclusionCollection();
+        VisualMediaInclusionEntity testVisualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionEntity();
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(testVisualMediaInclusionEntity);
+
+
+        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+
+        visualMediaInclusionService.setVisualMedia((long) savedVisualMediaInclusionEntity.getId(), (long) savedVisualMediaEntity.getId());
+
+        SlideshowEntity updatedSlideshow = slideshowService.addVisualMediaInclusion((long) savedSlideshow.getId(), (long) savedVisualMediaInclusionEntity.getId());
+        System.out.println(updatedSlideshow);
+        Set<VisualMediaInclusionEntity> inclusions = updatedSlideshow.getVisualMediaInclusionCollection();
         //convert to List so that indexing can be used
         List<VisualMediaInclusionEntity> inclusionList = new ArrayList<>(inclusions);
 
         long visualMediaId = inclusionList.get(0).getVisualMedia().getId();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias/"+visualMediaId+"/risk")
-        )
-        .andExpect(MockMvcResultMatchers.status().isOk()
-        )
-        .andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].id").value(testSlideshowEntity.getId())      
-        );
+                        MockMvcRequestBuilders.get("/api/visual_medias/" + visualMediaId + "/risk")
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk()
+                )
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].id").value(updatedSlideshow.getId())
+                );
     }
 
     @Test
     @WithMockUser
-    public void testThatVisualMediaPartOfSlideshowsReturnsEmptySetWhenNoSlideshowUsesIt() throws Exception{
+    public void testThatVisualMediaPartOfSlideshowsReturnsEmptySetWhenNoSlideshowUsesIt() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(visualMediaEntity);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/visual_medias/"+visualMediaEntity.getId()+"/risk")
-        )
-        .andExpect(MockMvcResultMatchers.status().isOk()
-        )
-        .andExpect(
-                MockMvcResultMatchers.jsonPath("$").isEmpty()     
-        );
+                        MockMvcRequestBuilders.get("/api/visual_medias/" + visualMediaEntity.getId() + "/risk")
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk()
+                )
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$").isEmpty()
+                );
     }
 
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatFullUpdateVisualMediaReturnsStatus200WhenVisualMediaExists() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
@@ -194,7 +211,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatFullUpdateVisualMediaReturnsStatus404WhenNoVisualMediaExists() throws Exception {
         VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
         String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
@@ -210,7 +227,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateVisualMediaReturnsStatus200() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
@@ -233,7 +250,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateVisualMediaReturnsStatus404() throws Exception {
         VisualMediaDto visualMediaDto = TestDataUtil.createVisualMediaDto();
         String visualMediaDtoJson = objectMapper.writeValueAsString(visualMediaDto);
@@ -250,7 +267,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatDeleteVisualMediaReturnsStatus200() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
@@ -264,7 +281,7 @@ public class VisualMediaControllerIntegrationTests {
 
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatDeleteVisualMediaReturnsStatus404() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/visual_medias/99")
@@ -274,6 +291,7 @@ public class VisualMediaControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles = "PLANNER")
     public void testThatAddTagToVisualMediaReturnsVisualMediaWithAddedTag() throws Exception {
         TagEntity tag = TestDataUtil.createTagEntity();
         TagEntity savedTagEntity = tagService.save(tag);

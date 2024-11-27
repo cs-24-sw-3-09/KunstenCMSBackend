@@ -1,7 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
@@ -181,9 +179,18 @@ public class TestDataUtil {
                 .build();
     }
 
-    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
+    public static VisualMediaInclusionEntity createVisualMediaInclusionWithVisualMediaEntity() {
         return VisualMediaInclusionEntity.builder()
                 .visualMedia(createVisualMediaEntity())
+                .id(1)
+                .slideDuration(10)
+                .slideshowPosition(2)
+                .build();
+    }
+
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
+        return VisualMediaInclusionEntity.builder()
+                .visualMedia(null)
                 .id(1)
                 .slideDuration(10)
                 .slideshowPosition(2)
@@ -201,13 +208,25 @@ public class TestDataUtil {
         return SlideshowEntity.builder()
                 .name("testSS")
                 .isArchived(false)
-                .visualMediaInclusionCollection(Collections.singleton(createVisualMediaInclusionEntity()))
+                .visualMediaInclusionCollection(null)
                 .build();
     }
 
     public static TagEntity createTagEntity() {
         return TagEntity.builder()
                 .text("Cool image")
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowWithVisualMediaEntity() {
+
+        HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntity());
+
+        return SlideshowEntity.builder()
+                .name("testSS")
+                .isArchived(false)
+                .visualMediaInclusionCollection(visualMediaInclusionEntities)
                 .build();
     }
 }

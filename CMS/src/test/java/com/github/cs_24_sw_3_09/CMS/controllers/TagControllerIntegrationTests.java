@@ -52,6 +52,7 @@ public class TagControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatCreateTagReturnsCreatedTag() throws Exception {
         TagDto tag = TestDataUtil.createTagDto();
         String tagJson = objectMapper.writeValueAsString(tag);
@@ -67,6 +68,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTagSuccessfullyReturnsHttp200() throws Exception {
 
         mockMvc.perform(
@@ -75,6 +77,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTagsSuccessfullyReturnsListOfTags() throws Exception {
         TagEntity testTagEntity = TestDataUtil.createTagEntity();
         tagService.save(testTagEntity);
@@ -87,6 +90,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTagReturnsStatus200WhenExists() throws Exception {
         TagEntity tagEntity = TestDataUtil.createTagEntity();
         tagService.save(tagEntity);
@@ -98,6 +102,7 @@ public class TagControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser
     public void testThatGetTagReturnsStatus404WhenNoTagExists() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/tags/99")).andExpect(
@@ -105,6 +110,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser
     public void testThatGetTagReturnsTagWhenTagExists() throws Exception {
         TagEntity tag = TestDataUtil.createTagEntity();
         tagService.save(tag);
@@ -118,6 +124,7 @@ public class TagControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteTagReturnsStatus200() throws Exception {
         TagEntity tagEntity = TestDataUtil.createTagEntity();
         TagEntity savedTagEntity = tagService.save(tagEntity);
@@ -128,6 +135,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatDeleteTagReturnsStatus404() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/tags/99")).andExpect(
@@ -136,6 +144,7 @@ public class TagControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateTagReturnsStatus200() throws Exception {
         TagEntity tagEntity = TestDataUtil.createTagEntity();
         TagEntity savedTagEntity = tagService.save(tagEntity);
@@ -154,6 +163,7 @@ public class TagControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateTagReturnsStatus404() throws Exception {
         TagDto tagDto = TestDataUtil.createTagDto();
         String tagDtoJson = objectMapper.writeValueAsString(tagDto);

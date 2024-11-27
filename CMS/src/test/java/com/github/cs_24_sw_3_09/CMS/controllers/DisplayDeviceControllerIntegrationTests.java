@@ -228,6 +228,7 @@ public class DisplayDeviceControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatSetFallbackContentToSlideShowSetsFallbackContentToSlideShow() throws Exception {
         SlideshowEntity slideshow = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshow);
@@ -252,6 +253,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatSetFallbackContentToSlideShowReturn404WhenSlideShowNotExists() throws Exception {
 
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
@@ -269,6 +271,7 @@ public class DisplayDeviceControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatSetFallbackContentToVisualMediaSetsFallbackContentToVisualMedia() throws Exception {
         VisualMediaEntity visualMedia = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMedia = visualMediaService.save(visualMedia);
@@ -295,6 +298,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatSetFallbackContentToVisualMediaReturn404WhenVisualMediaNotExists() throws Exception {
 
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
@@ -312,6 +316,7 @@ public class DisplayDeviceControllerIntegrationTests {
     }
 
     @Test
+    @WithMockUser(roles="PLANNER")
     public void testThatAddTimeSlotToDisplayDeviceReturns200OkayWhenBothExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
