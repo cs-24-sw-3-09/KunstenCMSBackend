@@ -100,8 +100,7 @@ public class VisualMediaController {
         }
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
-
-    //TODO: must return DTO
+    
     @GetMapping(path = "/{id}/slideshows")
     public ResponseEntity<Set<SlideshowDto>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id){
         if (!visualMediaService.isExists(id)) {
