@@ -339,7 +339,5 @@ public class DisplayDeviceControllerIntegrationTests {
                         MockMvcResultMatchers.jsonPath("$.timeSlots[0].name").value(savedTimeSlotEntity.getName()))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.timeSlots[0].weekdaysChosen").value(savedTimeSlotEntity.getWeekdaysChosen()));
-
-
     }
 }

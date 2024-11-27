@@ -1,5 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,15 +132,18 @@ public class TimeSlotControllerIntegrationTests {
 
     @Test
     @WithMockUser(roles="PLANNER")
-    public void testThatDeleteTimeSlotReturnsStatus200() throws Exception {
+    public void testThatDeleteTimeSlotReturnsStatus204() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
+		Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
         ).andExpect(
-                MockMvcResultMatchers.status().isNoContent()
+            MockMvcResultMatchers.status().isNoContent()
         );
+
+		assertFalse(timeSlotService.isExists(id));
     }
 
     @Test
@@ -216,6 +222,39 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );
+    }
+
+	@Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDeletesAssociationBetweenTSAndDDWithMoreAssociationsThanOne() throws Exception {
+        TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntityWithMultipleDisplayDevices();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
+		Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+			.content()
+        ).andExpect(
+            MockMvcResultMatchers.status().isNoContent()
+        );
+		
+		assertFalse(timeSlotService.isExists(id));
+    }
+
+	@Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDeletesAssociationBetweenTSAndDDWithOnlyOneAssociation() throws Exception {
+        TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
+		Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
+        ).andExpect(
+            MockMvcResultMatchers.status().isNoContent()
+        );
+		
+		assertFalse(timeSlotService.isExists(id));
     }
 
 }

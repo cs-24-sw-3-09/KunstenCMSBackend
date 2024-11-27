@@ -111,6 +111,20 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static TimeSlotEntity createTimeSlotEntityWithMultipleDisplayDevices() {
+        return TimeSlotEntity.builder()
+            .name("Test2 TimeSlot")
+            .startDate(java.sql.Date.valueOf("2024-11-20"))
+            .endDate(java.sql.Date.valueOf("2024-11-20"))
+            .startTime(java.sql.Time.valueOf("10:20:30"))
+            .endTime(java.sql.Time.valueOf("11:21:31"))
+            .weekdaysChosen(3)
+            .displayContent(assignedSlideshow())
+            .displayDevices(assignDisplayDevice())
+            .displayDevices(assignDisplayDevice())
+            .build();
+    }
+
     public static TimeSlotEntity createTimeSlotEntityWithOutDisplayDevice() {
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")
