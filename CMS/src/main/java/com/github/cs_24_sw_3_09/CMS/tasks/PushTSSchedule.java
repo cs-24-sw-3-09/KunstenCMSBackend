@@ -1,4 +1,4 @@
-/*package com.github.cs_24_sw_3_09.CMS.tasks;
+package com.github.cs_24_sw_3_09.CMS.tasks;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,4 +26,3 @@ public class PushTSSchedule {
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 }
-*/

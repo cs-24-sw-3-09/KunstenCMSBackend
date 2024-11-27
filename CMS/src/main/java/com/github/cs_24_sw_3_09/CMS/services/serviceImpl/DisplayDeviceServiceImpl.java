@@ -30,15 +30,15 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     private DisplayDeviceRepository displayDeviceRepository;
     private VisualMediaRepository visualMediaRepository;
     private SlideshowRepository slideshowRepository;
-    //private PushTSService pushTSService;
+    private PushTSService pushTSService;
     private final Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
 
     public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
-                                   /*PushTSService pushTSService,*/ Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
+                                   PushTSService pushTSService, Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
-        //this.pushTSService = pushTSService;
+        this.pushTSService = pushTSService;
         this.timeSlotService = timeSlotService;
         this.displayDeviceMapper = displayDeviceMapper;
     }
@@ -63,7 +63,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     @Override
     public DisplayDeviceEntity save(DisplayDeviceEntity displayDevice) {
         DisplayDeviceEntity toReturn = displayDeviceRepository.save(displayDevice);
-        //pushTSService.updateDisplayDevicesToNewTimeSlots();
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }
 
@@ -103,7 +103,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
                     .ifPresent(existingDisplayDevice::setFallbackContent);
 
             DisplayDeviceEntity toReturn = displayDeviceRepository.save(existingDisplayDevice);
-            //pushTSService.updateDisplayDevicesToNewTimeSlots();
+            pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }

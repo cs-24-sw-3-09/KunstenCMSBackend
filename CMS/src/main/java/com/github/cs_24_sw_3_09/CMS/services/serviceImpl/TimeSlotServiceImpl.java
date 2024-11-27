@@ -27,19 +27,19 @@ import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 public class TimeSlotServiceImpl implements TimeSlotService {
 
     private TimeSlotRepository timeSlotRepository;
-    //private PushTSService pushTSService;
+    private PushTSService pushTSService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
 
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, /*PushTSService pushTSService,*/ Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper) {
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper) {
         this.timeSlotRepository = timeSlotRepository;
-        //this.pushTSService = pushTSService;
+        this.pushTSService = pushTSService;
         this.timeSlotMapper = timeSlotMapper;
     }
 
     @Override
     public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
-        //pushTSService.updateDisplayDevicesToNewTimeSlots();
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }
 
@@ -94,7 +94,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             Optional.ofNullable(timeSlotEntity.getDisplayContent()).ifPresent(existingTimeSlot::setDisplayContent);
 
             TimeSlotEntity toReturn = timeSlotRepository.save(existingTimeSlot);
-            //pushTSService.updateDisplayDevicesToNewTimeSlots();
+            pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
         }).orElseThrow(() -> new RuntimeException("Author does not exist"));
     }

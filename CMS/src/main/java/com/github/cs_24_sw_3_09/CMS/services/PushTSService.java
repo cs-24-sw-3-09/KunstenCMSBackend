@@ -19,7 +19,7 @@ public interface PushTSService {
     void sendTimeSlotToDisplayDevice(ContentEntity contentEntity, DisplayDeviceEntity displayDeviceEntity);
 
     // This method is to get all TS and DD and figure out and send the new TS for each DD
-    //Set<Integer> updateDisplayDevicesToNewTimeSlots(boolean sendToDisplayDevices);
+    Set<Integer> updateDisplayDevicesToNewTimeSlots(boolean sendToDisplayDevices);
 
     Set<Integer> updateDisplayDevicesToNewTimeSlots();
 

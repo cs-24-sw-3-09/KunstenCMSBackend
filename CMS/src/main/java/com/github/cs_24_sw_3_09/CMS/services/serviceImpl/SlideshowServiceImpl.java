@@ -27,13 +27,13 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowRepository slideshowRepository;
-    //private PushTSService pushTSService;
+    private PushTSService pushTSService;
     private TimeSlotRepository timeSlotRepository;
 
     public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
-            VisualMediaInclusionService visualMediaInclusionService, /*PushTSService pushTSService,*/ TimeSlotRepository timeSlotRepository) {
+            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService, TimeSlotRepository timeSlotRepository) {
         this.slideshowRepository = slideshowRepository;
-        //this.pushTSService = pushTSService;
+        this.pushTSService = pushTSService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.timeSlotRepository = timeSlotRepository;
     }
@@ -42,7 +42,7 @@ public class SlideshowServiceImpl implements SlideshowService {
     @Transactional
     public SlideshowEntity save(SlideshowEntity slideshowEntity) {
         SlideshowEntity toReturn = slideshowRepository.save(slideshowEntity);
-        //pushTSService.updateDisplayDevicesToNewTimeSlots();
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }
 
@@ -83,7 +83,7 @@ public class SlideshowServiceImpl implements SlideshowService {
                     .ifPresent(existingSlideshow::setVisualMediaInclusionCollection);
 
             SlideshowEntity toReturn = slideshowRepository.save(existingSlideshow);
-            //pushTSService.updateDisplayDevicesToNewTimeSlots();
+            pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
 
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
@@ -97,7 +97,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         slideshow.getVisualMediaInclusionCollection().clear();
         slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
-        //pushTSService.updateDisplayDevicesToNewTimeSlots();
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
     @Override

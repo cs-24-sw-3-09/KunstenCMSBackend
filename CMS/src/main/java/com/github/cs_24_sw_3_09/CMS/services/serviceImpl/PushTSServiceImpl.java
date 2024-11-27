@@ -1,4 +1,4 @@
-/*package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
+package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -104,7 +104,7 @@ public class PushTSServiceImpl implements PushTSService {
         return updateDisplayDevicesToNewTimeSlots(true);
     }
 
-    /*@Override
+    @Override
     public Set<Integer> updateDisplayDevicesToNewTimeSlots(boolean sendToDisplayDevices) {
         // Fetch the list of connected display devices
         List<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findConnectedDisplayDevices();
@@ -129,4 +129,4 @@ public class PushTSServiceImpl implements PushTSService {
         return timeSlotsInUse;
     }
 }
-*/
+
