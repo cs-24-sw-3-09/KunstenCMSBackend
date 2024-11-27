@@ -3,7 +3,9 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.github.cs_24_sw_3_09.CMS.mappers.impl.SlideshowMapperImpl;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/slideshows")
@@ -21,12 +24,14 @@ public class SlideshowController {
     private final VisualMediaInclusionService visualMediaInclusionService;
     private final SlideshowMapperImpl slideshowMapper;
     private final SlideshowService slideshowService;
+    private final TimeSlotService timeSlotService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService,
-            VisualMediaInclusionService visualMediaInclusionService) {
+            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.timeSlotService = timeSlotService;
     }
 
     @GetMapping(path = "/{id}")
@@ -43,6 +48,14 @@ public class SlideshowController {
     public Page<SlideshowDto> getSlideshows(Pageable pageable) {
         Page<SlideshowEntity> slideshowEntities = slideshowService.findAll(pageable);
         return slideshowEntities.map(slideshowMapper::mapTo);
+    }
+
+    @GetMapping(path="/{id}/state") 
+    public ResponseEntity<Set<TimeSlotEntity>> getSetOfTimeSlotsSlideshowIsAPartOf(@PathVariable("id") long id){
+        if (!slideshowService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(timeSlotService.findSetOfTimeSlotsSlideshowIsAPartOf(id), HttpStatus.OK); 
     }
 
     @PostMapping

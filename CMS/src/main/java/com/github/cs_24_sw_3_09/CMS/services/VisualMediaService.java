@@ -25,8 +25,6 @@ public interface VisualMediaService {
 
     List<TagEntity> getVisualMediaTags(Long id);
 
-    Set<SlideshowEntity>findPartOfSlideshows(Long id);
-
     boolean isExists(Long id);
 
     VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity);

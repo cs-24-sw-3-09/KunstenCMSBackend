@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,16 +31,19 @@ public class VisualMediaController {
     private final VisualMediaService visualMediaService;
     private final TagService tagService;
     private FileStorageService fileStorageService;
+    private final SlideshowService slideshowService;
 
     public VisualMediaController(
             Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
                                  VisualMediaService visualMediaService,
                                  TagService tagService,
-                                 FileStorageService fileStorageService) {
+                                 FileStorageService fileStorageService,
+                                 SlideshowService slideshowService) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
         this.tagService = tagService;
         this.fileStorageService = fileStorageService;
+        this.slideshowService = slideshowService;
     }
 
     @PostMapping
@@ -94,12 +98,12 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{id}/risk")
+    @GetMapping(path = "/{id}/state")
     public ResponseEntity<Set<SlideshowEntity>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id){
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(visualMediaService.findPartOfSlideshows(id), HttpStatus.OK);
+        return new ResponseEntity<>(slideshowService.findPartOfSlideshows(id), HttpStatus.OK);
     }
 
     @PutMapping(path = "/{id}")

@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -10,8 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
@@ -24,12 +27,14 @@ public class SlideshowServiceImpl implements SlideshowService {
     private final VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
+    private TimeSlotRepository timeSlotRepository;
 
     public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
-            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService) {
+            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService, TimeSlotRepository timeSlotRepository) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     @Override
@@ -57,6 +62,11 @@ public class SlideshowServiceImpl implements SlideshowService {
     @Override
     public boolean isExists(Long id) {
         return slideshowRepository.existsById(Math.toIntExact(id));
+    }
+
+    @Override
+    public Set<SlideshowEntity> findPartOfSlideshows(Long id){        
+        return slideshowRepository.findSlideshowsByVisualMediaId(id);     
     }
 
     @Override

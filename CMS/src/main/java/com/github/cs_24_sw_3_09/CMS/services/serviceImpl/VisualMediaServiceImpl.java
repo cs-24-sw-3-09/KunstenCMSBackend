@@ -81,11 +81,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public Set<SlideshowEntity> findPartOfSlideshows(Long id){        
-        return slideshowRepository.findSlideshowsByVisualMediaId(id);     
-    }
-
-    @Override
     public boolean isExists(Long id) {
         return visualMediaRepository.existsById(Math.toIntExact(id));
     }

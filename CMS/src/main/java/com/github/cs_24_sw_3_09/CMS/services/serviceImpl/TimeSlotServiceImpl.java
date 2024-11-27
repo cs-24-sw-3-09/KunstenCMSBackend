@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -51,6 +52,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     @Override
     public boolean isExists(Long id) {
         return timeSlotRepository.existsById(Math.toIntExact(id));
+    }
+
+    @Override
+    public Set<TimeSlotEntity> findSetOfTimeSlotsSlideshowIsAPartOf(Long id){
+        return timeSlotRepository.findSetOfTimeSlotsBySlideshowId(id);
     }
 
     @Override

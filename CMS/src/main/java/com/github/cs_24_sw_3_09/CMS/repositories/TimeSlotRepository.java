@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -28,4 +29,12 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
 
     @Query("SELECT ts FROM TimeSlotEntity ts WHERE ts.displayDevices IS EMPTY")
     List<TimeSlotEntity> findTimeSlotsWithNoDisplayDevices();
+
+    @Query(value = "SELECT DISTINCT ts.* " +
+               "FROM time_slots ts " +
+               "INNER JOIN slideshow ss ON ts.id = ss.time_slots.id " +
+               "WHERE ts.id = :timeSlotId",
+                nativeQuery = true)
+    Set<TimeSlotEntity> findSetOfTimeSlotsBySlideshowId(Long timeSlotId);
+
 }
