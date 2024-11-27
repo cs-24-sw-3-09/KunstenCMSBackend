@@ -301,5 +301,4 @@ public class TimeSlotControllerIntegrationTests {
             MockMvcResultMatchers.status().isNotFound()
         );
     }
-
 }
