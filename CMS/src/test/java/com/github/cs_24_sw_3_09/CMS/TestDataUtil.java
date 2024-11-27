@@ -1,22 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TagDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.dto.*;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
@@ -178,18 +168,65 @@ public class TestDataUtil {
                 "Fake JPEG file content".getBytes()
         );
     }
-    
-    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity(){
+
+
+    public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
+        return VisualMediaInclusionDto.builder()
+                .visualMedia(new VisualMediaEntity())
+                .id(1)
+                .slideDuration(5)
+                .slideshowPosition(1)
+                .build();
+    }
+
+    public static VisualMediaInclusionEntity createVisualMediaInclusionWithVisualMediaEntity() {
         return VisualMediaInclusionEntity.builder()
                 .visualMedia(createVisualMediaEntity())
+                .id(1)
+                .slideDuration(10)
+                .slideshowPosition(2)
                 .build();
     }
 
-    public static SlideshowEntity createSlideshowEntity(){
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
+        return VisualMediaInclusionEntity.builder()
+                .visualMedia(null)
+                .id(1)
+                .slideDuration(10)
+                .slideshowPosition(2)
+                .build();
+    }
+
+    public static SlideshowDto createSlideshowDto() {
+        return SlideshowDto.builder()
+                .name("slideshow 1")
+                .isArchived(false)
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowEntity() {
         return SlideshowEntity.builder()
                 .name("testSS")
-                .visualMediaInclusionCollection(Collections.singleton(createVisualMediaInclusionEntity()))
+                .isArchived(false)
+                .visualMediaInclusionCollection(null)
                 .build();
     }
 
+    public static TagEntity createTagEntity() {
+        return TagEntity.builder()
+                .text("Cool image")
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowWithVisualMediaEntity() {
+
+        HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntity());
+
+        return SlideshowEntity.builder()
+                .name("testSS")
+                .isArchived(false)
+                .visualMediaInclusionCollection(visualMediaInclusionEntities)
+                .build();
+    }
 }
