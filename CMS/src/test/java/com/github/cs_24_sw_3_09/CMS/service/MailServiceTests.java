@@ -6,7 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.annotation.DirtiesContext;
@@ -37,7 +41,7 @@ class MailServiceTests {
         String mockReceiver = "receiver@example.com";
 
         mailService.setSender(mockSender);
-        mailService.setEmailReceiver(mockReceiver);
+        mailService.setReceiver(mockReceiver);
 
         EmailDetailsEntity emailDetails = EmailDetailsEntity.builder()
                 .recipient(mockReceiver)
@@ -60,7 +64,7 @@ class MailServiceTests {
         String mockReceiver = "receiver@example.com";
 
         mailService.setSender(mockSender);
-        mailService.setEmailReceiver(mockReceiver);
+        mailService.setReceiver(mockReceiver);
 
         EmailDetailsEntity emailDetails = EmailDetailsEntity.builder()
                 .recipient(mockReceiver)
@@ -82,7 +86,7 @@ class MailServiceTests {
         String mockReceiver = "receiver@example.com";
         String mockSender = "sender@example.com";
 
-        mailService.setEmailReceiver(mockReceiver);
+        mailService.setReceiver(mockReceiver);
         mailService.setSender(mockSender);
 
         String result = mailService.sendDDDisconnectMail(123);
