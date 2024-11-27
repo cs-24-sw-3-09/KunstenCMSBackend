@@ -7,7 +7,11 @@ import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -39,6 +43,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @Table(name = "time_slots")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class TimeSlotEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "time_slot_id_seq")
@@ -65,7 +70,7 @@ public class TimeSlotEntity {
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "time_slot_id") }, inverseJoinColumns = { @JoinColumn(name = "display_device_id") })
-    @JsonIgnore
+    @JsonIgnore 
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
 } 

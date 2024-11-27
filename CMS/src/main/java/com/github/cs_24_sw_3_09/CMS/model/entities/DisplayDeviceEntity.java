@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -41,6 +42,7 @@ public class DisplayDeviceEntity {
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "display_device_id")}, inverseJoinColumns = {@JoinColumn(name = "time_slot_id")})
     @JsonIgnore
+    
     private List<TimeSlotEntity> timeSlots;
 
     public void addTimeSlot(TimeSlotEntity timeSlot) {

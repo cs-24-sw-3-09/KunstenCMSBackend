@@ -1,12 +1,16 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.github.cs_24_sw_3_09.CMS.mappers.impl.SlideshowMapperImpl;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -50,8 +54,8 @@ public class SlideshowController {
         return slideshowEntities.map(slideshowMapper::mapTo);
     }
 
-    @GetMapping(path="/{id}/state") 
-    public ResponseEntity<Set<TimeSlotEntity>> getSetOfTimeSlotsSlideshowIsAPartOf(@PathVariable("id") long id){
+    @GetMapping(path="/{id}/time_slots") 
+    public ResponseEntity<Set<TimeSlotDto>> getSetOfTimeSlotsSlideshowIsAPartOf(@PathVariable("id") long id){
         if (!slideshowService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

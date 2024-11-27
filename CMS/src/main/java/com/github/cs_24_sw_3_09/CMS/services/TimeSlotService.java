@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface TimeSlotService {
@@ -20,7 +21,7 @@ public interface TimeSlotService {
 
     boolean isExists(Long id);
 
-    Set<TimeSlotEntity> findSetOfTimeSlotsSlideshowIsAPartOf(Long id);
+    Set<TimeSlotDto> findSetOfTimeSlotsSlideshowIsAPartOf(Long id);
 
     TimeSlotEntity partialUpdate(Long id, TimeSlotEntity timeSlotEntity);
 
