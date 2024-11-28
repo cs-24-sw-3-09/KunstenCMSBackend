@@ -77,8 +77,6 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             Optional.ofNullable(displayDeviceEntity.getResolution()).ifPresent(existingDisplayDevice::setResolution);
             Optional.ofNullable(displayDeviceEntity.getFallbackContent())
                     .ifPresent(existingDisplayDevice::setFallbackContent);
-            Optional.ofNullable(displayDeviceEntity.getOnHours())
-                    .ifPresent(existingDisplayDevice::setOnHours);
 
             DisplayDeviceEntity toReturn = displayDeviceRepository.save(existingDisplayDevice);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
