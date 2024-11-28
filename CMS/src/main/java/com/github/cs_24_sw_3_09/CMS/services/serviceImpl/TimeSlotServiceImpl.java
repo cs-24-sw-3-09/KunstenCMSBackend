@@ -47,11 +47,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
         TimeSlotEntity newTs = timeSlotRepository.save(timeSlotEntity);
         
-        for(DisplayDeviceEntity displayDevice : newTs.getDisplayDevices()) {
-            displayDevice.addTimeSlot(newTs);
-            displayDeviceRepository.save(displayDevice);        
-        }
-
         pushTSService.updateDisplayDevicesToNewTimeSlots();
 
         return newTs;
