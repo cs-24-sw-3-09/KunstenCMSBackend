@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 import java.util.List;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceOnHoursEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 import jakarta.validation.constraints.Pattern;
@@ -29,5 +30,5 @@ public class DisplayDeviceDto {
     private String resolution;
     private ContentEntity fallbackContent;
     private List<TimeSlotEntity> timeSlots;
-
+    private DisplayDeviceOnHoursEntity onHours;
 }

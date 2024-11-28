@@ -1,7 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import java.util.List;
-import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -40,6 +39,18 @@ public class DisplayDeviceEntity {
             @JoinColumn(name = "display_device_id")}, inverseJoinColumns = {@JoinColumn(name = "time_slot_id")})
     @JsonIgnore
     private List<TimeSlotEntity> timeSlots;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "on_hours")
+    private DisplayDeviceOnHoursEntity onHours;
+
+    @PrePersist
+    @PreUpdate
+    private void ensureOnHoursNotNull() {
+        if (this.onHours == null) {
+            this.onHours = new DisplayDeviceOnHoursEntity();
+        }
+    }
 
     public void addTimeSlot(TimeSlotEntity timeSlot) {
         this.timeSlots.add(timeSlot);
