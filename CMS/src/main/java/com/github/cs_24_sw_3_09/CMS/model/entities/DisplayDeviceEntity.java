@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
+import java.sql.Time;
 import java.util.List;
 import java.util.Set;
 
@@ -42,6 +43,21 @@ public class DisplayDeviceEntity {
             @JoinColumn(name = "display_device_id")}, inverseJoinColumns = {@JoinColumn(name = "time_slot_id")})
     @JsonIgnore
     private List<TimeSlotEntity> timeSlots;
+
+    private Time monday_start;
+    private Time monday_end;
+    private Time tuesday_start;
+    private Time tuesday_end;
+    private Time wednesday_start;
+    private Time wednesday_end;
+    private Time thursday_start;
+    private Time thursday_end;
+    private Time friday_start;
+    private Time friday_end;
+    private Time saturday_start;
+    private Time saturday_end;
+    private Time sunday_start;
+    private Time sunday_end;
 
     public void addTimeSlot(TimeSlotEntity timeSlot) {
         this.timeSlots.add(timeSlot);

@@ -93,6 +93,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
         displayDevice.getTimeSlots().clear();
         displayDevice.setFallbackContent(null);
         displayDeviceRepository.save(displayDevice);
+        //TODO: Gør så den faktisk sletter samt sletter relations korrekt.
     }
 
     @Override
