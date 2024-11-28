@@ -18,6 +18,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.socketConnection.SocketIOModule;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +29,7 @@ public class PushTSServiceImpl implements PushTSService {
     private SocketIOModule socketIOModule;
 
     public PushTSServiceImpl(DisplayDeviceRepository displayDeviceRepository,
-            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper, SocketIOModule socketIOModule) {
+            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper, @Lazy SocketIOModule socketIOModule) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.displayDeviceMapper = displayDeviceMapper;
         this.socketIOModule = socketIOModule;
