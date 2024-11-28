@@ -26,6 +26,6 @@ public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity,
     @Query(value = "SELECT dd FROM DisplayDeviceEntity dd JOIN dd.fallbackContent vm WHERE vm.id = :id")
     List<DisplayDeviceEntity> getDisplayDevicesPartOfVisualMedia(@Param("id") Long id);
 
-    @Query(value = "SELECT dd FROM DisplayDeviceEntity dd WHERE dd.id = :id")
+    @Query(value = "SELECT ts FROM TimeSlotEntity ts JOIN ts.displayContent dc WHERE dc.id = :id")
     List<TimeSlotEntity> getTimeslotsPartOfVisualMedia(@Param("id") Long id);
 }
