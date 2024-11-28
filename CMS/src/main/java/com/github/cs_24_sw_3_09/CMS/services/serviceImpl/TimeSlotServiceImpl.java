@@ -43,14 +43,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
-        DisplayDeviceEntity displayDevice = timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0];
-
-        displayDevice.addTimeSlot(timeSlotEntity);
-        timeSlotEntity.setDisplayDevices(new HashSet<DisplayDeviceEntity>());
-        timeSlotEntity.getDisplayDevices().add(displayDevice);
-        
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
-
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }

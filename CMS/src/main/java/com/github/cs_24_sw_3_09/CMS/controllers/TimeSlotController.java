@@ -48,24 +48,26 @@ public class TimeSlotController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
-        System.out.println("Started here");
+        //System.out.println("Started here");
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
         
         //maybe better error handling here :p
-        Long displayDeviceId = Long.valueOf(timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId());
+        //Long displayDeviceId = Long.valueOf(timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId());
 
-        TimeSlotEntity savedTimeSlotEntity;
+        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+
+        /*TimeSlotEntity savedTimeSlotEntity;
         if (displayDeviceId == null) {
-            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+            
             System.out.println("Here1");
         } else if(displayDeviceService.isExists(Long.valueOf(displayDeviceId))) {
             savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
             System.out.println("Here2");
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        }*/
 
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
     }

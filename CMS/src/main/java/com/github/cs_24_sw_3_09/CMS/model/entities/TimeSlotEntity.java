@@ -59,11 +59,12 @@ public class TimeSlotEntity {
     @ColumnDefault("0")
     private int weekdaysChosen;
     // @NotNull
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "time_slot_content")
     private ContentEntity displayContent;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @NotNull
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "time_slot_id") }, inverseJoinColumns = { @JoinColumn(name = "display_device_id") })
     @JsonIgnore
