@@ -2,12 +2,11 @@ package com.github.cs_24_sw_3_09.CMS.repositories;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
-import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
