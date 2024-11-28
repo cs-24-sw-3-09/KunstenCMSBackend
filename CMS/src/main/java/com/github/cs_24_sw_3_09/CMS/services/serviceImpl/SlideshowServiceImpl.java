@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import jakarta.transaction.Transactional;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
@@ -135,13 +138,13 @@ public class SlideshowServiceImpl implements SlideshowService {
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
 
-    public void findStateOfEverySlideshow(){
+    public JSONArray findStateOfEverySlideshow(){
         List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
         System.out.println("slideshows: "+allSlideshowIds);
         //timeSlots: List of active and future time slots.
         List<TimeSlotEntity> allTimeSlotsWithSlideshowAsContent = timeSlotRepository.getAllTimeSlotsWithSlideshowAsContent();
         System.out.println("ts: "+allTimeSlotsWithSlideshowAsContent.toString());
-        //timeSlotContents: List of mappings between slideshows and time slots. (List of displayContentId which is SSid)
+        //displayContentIds: List of displayContentId for the TS
         List<Integer> displayContentIds = new ArrayList();
         for(TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent){
             displayContentIds.add(ts.getDisplayContent().getId());
@@ -165,12 +168,43 @@ public class SlideshowServiceImpl implements SlideshowService {
         
         Map<Integer, JSONObject> slideshowStatusMap = new HashMap<>();
         //make correct JSON object with necessary data
-        for (int slideshowId : allSlideshowIds) {
+        for (Integer slideshowId : allSlideshowIds) {
             JSONObject slideshowStatus = new JSONObject();
-            slideshowStatus.put("ssid", slideshowId);
+            slideshowStatus.put("slideshowId", slideshowId);
             slideshowStatus.put("color", "red");
 
+            for (TimeSlotEntity ts : activeTimeSlots){
+                for(Integer contentId : displayContentIds){
+                    if(ts.getDisplayContent().getId() == contentId && contentId == slideshowId){
+                        slideshowStatus.put("color", "green");
+                        slideshowStatus.put("displayDevices", ts.getDisplayDevices());
+                        break;
+                    }
+                    if (slideshowStatus.get("color").equals("green")) {
+                        break;
+                    }
+                }
+            }
 
+            if(slideshowStatus.get("color").equals("red")){
+                for (TimeSlotEntity ts : futureTimeSlots){
+                    for(Integer contentId : displayContentIds){
+                        if(ts.getDisplayContent().getId() == contentId && contentId == slideshowId){
+                            slideshowStatus.put("color", "yellow");
+                            break;
+                        }
+                        if (slideshowStatus.get("color").equals("yellow")) {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!slideshowStatus.get("color").equals("green")) {
+                slideshowStatus.remove("DD");
+            }
+            slideshowStatusMap.put(slideshowId, slideshowStatus);
         }
+
+        return new JSONArray(slideshowStatusMap.values());
     }
 }

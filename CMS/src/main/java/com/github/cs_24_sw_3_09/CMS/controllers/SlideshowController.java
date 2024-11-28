@@ -12,7 +12,7 @@ import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 
-
+import org.json.JSONArray;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -77,9 +77,9 @@ public class SlideshowController {
     }
 
     @GetMapping(path="/state")
-    public void getStateOfAllSlideshows(){
+    public ResponseEntity<JSONArray> getStateOfAllSlideshows(){
         System.out.println("found end point");
-        slideshowService.findStateOfEverySlideshow();
+        return new ResponseEntity<JSONArray>(slideshowService.findStateOfEverySlideshow(), HttpStatus.OK);
     }
 
     @PostMapping

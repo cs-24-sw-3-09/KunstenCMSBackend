@@ -4,6 +4,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
+import org.json.JSONArray;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -30,5 +31,5 @@ public interface SlideshowService {
 
     SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId);
 
-    void findStateOfEverySlideshow();
+    JSONArray findStateOfEverySlideshow();
 }
