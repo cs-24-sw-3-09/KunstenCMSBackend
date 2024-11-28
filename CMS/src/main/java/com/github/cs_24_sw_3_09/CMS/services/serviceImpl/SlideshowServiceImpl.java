@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
@@ -152,7 +153,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         }
         //call List of current ts
         Set<Integer> timeSlotsCurrentlyShown = pushTSService.updateDisplayDevicesToNewTimeSlots(false);
-
+        System.out.println("tsCurrent: "+timeSlotsCurrentlyShown.toString());
         List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
 
@@ -165,9 +166,10 @@ public class SlideshowServiceImpl implements SlideshowService {
             }
         }
 
-        
+        System.out.println("active: "+activeTimeSlots.toString());
+        System.out.println("future: "+futureTimeSlots.toString());        
         Map<Integer, JSONObject> slideshowStatusMap = new HashMap<>();
-        //make correct JSON object with necessary data
+        //make JSONArray with data
         for (Integer slideshowId : allSlideshowIds) {
             JSONObject slideshowStatus = new JSONObject();
             slideshowStatus.put("slideshowId", slideshowId);
@@ -177,7 +179,17 @@ public class SlideshowServiceImpl implements SlideshowService {
                 for(Integer contentId : displayContentIds){
                     if(ts.getDisplayContent().getId() == contentId && contentId == slideshowId){
                         slideshowStatus.put("color", "green");
-                        slideshowStatus.put("displayDevices", ts.getDisplayDevices());
+                        
+                        //convert List of display devices to JSONArray
+                        List<JSONObject> jsonObjects = new ArrayList<>();
+                        for (DisplayDeviceEntity obj : ts.getDisplayDevices()) {
+                            JSONObject json = new JSONObject();
+                            json.put("displayDevice", obj);
+                            jsonObjects.add(json);
+                        }
+                        JSONArray jsonArray = new JSONArray(jsonObjects);
+
+                        slideshowStatus.put("displayDevices", jsonArray);
                         break;
                     }
                     if (slideshowStatus.get("color").equals("green")) {
@@ -204,7 +216,7 @@ public class SlideshowServiceImpl implements SlideshowService {
             }
             slideshowStatusMap.put(slideshowId, slideshowStatus);
         }
-
+        System.out.println("result: "+slideshowStatusMap);
         return new JSONArray(slideshowStatusMap.values());
     }
 }
