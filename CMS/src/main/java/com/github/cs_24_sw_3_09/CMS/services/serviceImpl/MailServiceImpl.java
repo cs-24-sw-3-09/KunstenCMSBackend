@@ -1,22 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import java.lang.StackWalker.Option;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.EmailDetailsEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
@@ -60,7 +53,7 @@ public class MailServiceImpl implements EmailService {
 
             // Send the email
             javaMailSender.send(mimeMessage);
-            return "Mail Sent Successfully...";
+            return "Mail Sent Successfully To " + details.getRecipient();
         } catch (Exception e) {
             e.printStackTrace();
             return "Error while Sending Mail..." + e.getMessage();
@@ -70,33 +63,37 @@ public class MailServiceImpl implements EmailService {
 
 
     @Override
-    public String sendDDDisconnectMail(int id, String receiver) {
+    public String sendDDDisconnectMail(int id) {
+        // Checks that the ID is in the database. In order to make sure that the id is a valid DD
         if (!displayDeviceRepository.existsById(id)) {
             return "Did not sent to DD, as it is not found in DB";
         }
-        Optional<DisplayDeviceEntity> displayDeviceEntity = displayDeviceRepository.findById(id);
-        DisplayDeviceEntity dd = displayDeviceEntity.get();
+        DisplayDeviceEntity dd = displayDeviceRepository.findById(id).get(); // Gets the DD from the DB
 
+        // Set up the email data
         EmailDetailsEntity email = EmailDetailsEntity.builder()
                 .msgBody("<b>Screen with the following information has disconnected:</b><br>"
                         + dd.toStringWithoutTSAndFallback())
                 .subject("Disconnected Screen: " + id)
                 .build();
 
+        // Findes all user where that should get a notification and sends a email to them
         Set<UserEntity> userList = userRepository.findUserWithNotificationsEnabled();
         userList = filterUsersOutsidePausePeriod(userList); // filters user outside of perioed
+        String mailResult = "Result from senting disconnect mail on id: " + id + " ";
         for (UserEntity user : userList) {
             try {
                 email.setRecipient(user.getEmail());
-                String mailResult = sendSimpleMail(email);
+                mailResult += "(" + sendSimpleMail(email) + ")";
+
             } catch (Exception e) {
-                // TODO: handle exception
+                mailResult += "(Error: " + e.getMessage() + ")";
             }
         }
-        System.out.println(userList.toString());
-        return "Mail Sent Successfully...";
-    }//
+        return mailResult;
+    }
 
+    // This function takes in a set of User and filters them based on if they are outside of a notification pause period
     public static Set<UserEntity> filterUsersOutsidePausePeriod(Set<UserEntity> users) {
         Date currentTime = new Date();
 

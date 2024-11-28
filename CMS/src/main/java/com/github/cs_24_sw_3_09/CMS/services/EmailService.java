@@ -5,5 +5,5 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.EmailDetailsEntity;
 public interface EmailService {
     String sendSimpleMail(EmailDetailsEntity details);
 
-    String sendDDDisconnectMail(int id, String receiver);
+    String sendDDDisconnectMail(int id);
 }

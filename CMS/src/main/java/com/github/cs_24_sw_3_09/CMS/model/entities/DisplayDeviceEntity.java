@@ -60,9 +60,7 @@ public class DisplayDeviceEntity {
             sb.append("Display Orientation: ").append(displayOrientation).append("<br>");
         if (resolution != null)
             sb.append("Resolution: ").append(resolution).append("<br>");
-        if (connectedState != null)
-            sb.append("Connected State: ").append(connectedState).append("<br>");
 
-        return sb.toString().trim(); // Remove trailing newline
+        return sb.toString()/*.trim()*/;
     }
 }
