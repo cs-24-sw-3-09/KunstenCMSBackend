@@ -24,6 +24,6 @@ public class DELETEAGAINSendMail {
     @Async("asyncTaskExecutor")
     @Scheduled(fixedRate = 60 * 1000 * 100) // Runs every 1 minutes
     public void pushTSSchedule() {
-        System.out.println(emailService.sendDDDisconnectMail(1));
+        //System.out.println(emailService.sendDDDisconnectMail(1));
     }
 }

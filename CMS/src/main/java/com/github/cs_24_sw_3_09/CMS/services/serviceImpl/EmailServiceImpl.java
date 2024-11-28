@@ -15,6 +15,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.EmailDetailsEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.UserRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.EmailService;
 
 import jakarta.mail.internet.MimeMessage;
@@ -22,24 +23,26 @@ import lombok.Setter;
 
 @Setter
 @Service
-public class MailServiceImpl implements EmailService {
-    @Autowired
+public class EmailServiceImpl implements EmailService {
     private JavaMailSender javaMailSender;
 
-    @Autowired
-    private DisplayDeviceRepository displayDeviceRepository;
+    private DisplayDeviceService displayDeviceService;
 
-    @Autowired
     private UserRepository userRepository;
 
     @Value("${EMAIL.USERNAME:}")
     private String sender;
 
+    @Autowired
+    public EmailServiceImpl(DisplayDeviceService displayDeviceService, JavaMailSender javaMailSender,
+            UserRepository userRepository) {
+        this.displayDeviceService = displayDeviceService;
+        this.userRepository = userRepository;
+        this.javaMailSender = javaMailSender;
+    }
+
     @Override
     public String sendSimpleMail(EmailDetailsEntity details) {
-        // Try block to check for exceptions
-        System.out.println(sender);
-        System.out.println(details.toString());
         try {
             // Create a MimeMessage
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -61,14 +64,13 @@ public class MailServiceImpl implements EmailService {
 
     }
 
-
     @Override
     public String sendDDDisconnectMail(int id) {
         // Checks that the ID is in the database. In order to make sure that the id is a valid DD
-        if (!displayDeviceRepository.existsById(id)) {
+        if (!displayDeviceService.isExists((long) id)) {
             return "Did not sent to DD, as it is not found in DB";
         }
-        DisplayDeviceEntity dd = displayDeviceRepository.findById(id).get(); // Gets the DD from the DB
+        DisplayDeviceEntity dd = displayDeviceService.findOne((long) id).get(); // Gets the DD from the DB
 
         // Set up the email data
         EmailDetailsEntity email = EmailDetailsEntity.builder()
