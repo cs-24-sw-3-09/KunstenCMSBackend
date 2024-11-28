@@ -1,6 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,26 +50,24 @@ public class TimeSlotController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
-        //System.out.println("Started here");
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
         
-        //maybe better error handling here :p
-        //Long displayDeviceId = Long.valueOf(timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId());
+        
+        Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
+        boolean checkIds = timeSlotEntity.getDisplayDevices().stream().allMatch(device -> 
+                    displayDeviceService.isExists(Long.valueOf(device.getId()))
+                );
 
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-
-        /*TimeSlotEntity savedTimeSlotEntity;
-        if (displayDeviceId == null) {
-            
-            System.out.println("Here1");
-        } else if(displayDeviceService.isExists(Long.valueOf(displayDeviceId))) {
+        TimeSlotEntity savedTimeSlotEntity;
+        if (optionalDisplayDevice.isPresent() && optionalDisplayDevice.get().getId() == null) {
+            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        } else if(checkIds) {
             savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
-            System.out.println("Here2");
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }*/
+        }
 
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
     }

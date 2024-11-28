@@ -111,6 +111,15 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
+        HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
+        displayDevices.add(
+            DisplayDeviceEntity.builder().id(1).build()
+        );
+        return displayDevices;
+    }
+
+
     public static TimeSlotEntity createTimeSlotEntityWithOutDisplayDevice() {
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")

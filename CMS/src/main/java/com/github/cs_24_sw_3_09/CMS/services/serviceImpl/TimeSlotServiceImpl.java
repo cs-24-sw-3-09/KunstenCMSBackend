@@ -1,9 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+
+import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
@@ -22,23 +24,37 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     private TimeSlotRepository timeSlotRepository;
     private PushTSService pushTSService;
+    private DisplayDeviceRepository displayDeviceRepository;
 
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService) {
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
+        this.displayDeviceRepository = displayDeviceRepository;
     }
 
     @Override
     public TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity) {
-        DisplayDeviceEntity displayDevice = timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0];
+        Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
 
-        displayDevice.addTimeSlot(timeSlotEntity);
-        timeSlotEntity.getDisplayDevices().add(displayDevice);
+        Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
+        for(DisplayDeviceEntity displayDevice : displayDevices) {
+            DisplayDeviceEntity newDisplayDevice = displayDeviceRepository.findById(displayDevice.getId()).get();            
+            newDisplayDevices.add(newDisplayDevice);
+        }
+        timeSlotEntity.getDisplayDevices().clear();
+
+        timeSlotEntity.setDisplayDevices(newDisplayDevices);
+
+        TimeSlotEntity newTs = timeSlotRepository.save(timeSlotEntity);
         
-        TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+        for(DisplayDeviceEntity displayDevice : newTs.getDisplayDevices()) {
+            displayDevice.addTimeSlot(newTs);
+            displayDeviceRepository.save(displayDevice);        
+        }
 
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
+
+        return newTs;
     }
 
     @Override
