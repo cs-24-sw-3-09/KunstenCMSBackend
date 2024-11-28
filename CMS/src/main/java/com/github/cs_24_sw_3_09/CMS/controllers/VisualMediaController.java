@@ -2,11 +2,9 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
@@ -35,18 +33,21 @@ public class VisualMediaController {
     private final VisualMediaService visualMediaService;
     private final TagService tagService;
     private FileStorageService fileStorageService;
+    private Mapper<TimeSlotEntity, TimeSlotDto> timeslotMapper;
 
     public VisualMediaController(
             Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
             VisualMediaService visualMediaService,
             TagService tagService,
             FileStorageService fileStorageService,
-            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
+            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
+            Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
         this.tagService = tagService;
         this.fileStorageService = fileStorageService;
         this.displayDeviceMapper = displayDeviceMapper;
+        this.timeslotMapper = timeslotMapper;
     }
 
     @PostMapping
@@ -111,6 +112,7 @@ public class VisualMediaController {
     }
 
     @GetMapping(path = "/{id}/display_devices")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<List<DisplayDeviceDto>> getDisplayDevicesVisualMediaIsPartOf(@PathVariable("id") Long id) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -123,6 +125,22 @@ public class VisualMediaController {
                 .toList();
 
         return new ResponseEntity<>(foundDisplayDeviceDtos, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{id}/timeslots")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<List<TimeSlotDto>> getTimeslotsVisualMediaIsPartOf(@PathVariable("id") Long id) {
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<TimeSlotEntity> foundTimeslots = visualMediaService.findTimeslotsVisualMediaIsPartOf(id);
+
+        List<TimeSlotDto> foundTimeslotDtos = foundTimeslots.stream()
+                .map(timeslotMapper::mapTo) // Assuming `mapTo` converts an entity to a DTO
+                .toList();
+
+        return new ResponseEntity<>(foundTimeslotDtos, HttpStatus.OK);
     }
 
     @PutMapping(path = "/{id}")

@@ -1,9 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -39,4 +36,6 @@ public interface VisualMediaService {
     void deleteRelation(Long visualMediaId, Long tagId);
 
     List<DisplayDeviceEntity> findDisplayDevicesVisualMediaIsPartOf(Long id);
+
+    List<TimeSlotEntity> findTimeslotsVisualMediaIsPartOf(Long id);
 }

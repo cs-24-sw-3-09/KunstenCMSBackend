@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,4 +25,7 @@ public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity,
 
     @Query(value = "SELECT dd FROM DisplayDeviceEntity dd JOIN dd.fallbackContent vm WHERE vm.id = :id")
     List<DisplayDeviceEntity> getDisplayDevicesPartOfVisualMedia(@Param("id") Long id);
+
+    @Query(value = "SELECT dd FROM DisplayDeviceEntity dd WHERE dd.id = :id")
+    List<TimeSlotEntity> getTimeslotsPartOfVisualMedia(@Param("id") Long id);
 }

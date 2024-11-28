@@ -6,14 +6,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
@@ -132,5 +129,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public List<DisplayDeviceEntity> findDisplayDevicesVisualMediaIsPartOf(Long id) {
         return visualMediaRepository.getDisplayDevicesPartOfVisualMedia(id);
+    }
+
+    @Override
+    public List<TimeSlotEntity> findTimeslotsVisualMediaIsPartOf(Long id) {
+        return visualMediaRepository.getTimeslotsPartOfVisualMedia(id);
     }
 }
