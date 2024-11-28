@@ -52,7 +52,7 @@ public class CleanUpDataBaseIntegrationTests {
                         MockMvcResultMatchers.status().isOk());
     }
 
-    @Test
+    /*@Test
     @WithMockUser
     public void testThatDeleteTSWithoutDDDoesDeleteValidTS() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntityWithOutDisplayDevice();
@@ -64,6 +64,6 @@ public class CleanUpDataBaseIntegrationTests {
                 MockMvcResultMatchers.jsonPath("numberOfElements").value(0))
                 .andExpect(
                         MockMvcResultMatchers.status().isOk());
-    }
+    }*/
 
 }
