@@ -44,6 +44,10 @@ public class SocketIOModule {
         roomOperations.sendEvent("content", contentEntity);
     }
 
+    public boolean isConnected(int screenId) {
+        return server.getRoomOperations(String.valueOf(screenId)).getClients().size() > 0;
+    }
+
     public void start() {
         server.start();
     }

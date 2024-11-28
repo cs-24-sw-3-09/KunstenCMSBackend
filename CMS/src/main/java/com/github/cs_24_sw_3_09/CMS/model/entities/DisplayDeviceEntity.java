@@ -32,8 +32,6 @@ public class DisplayDeviceEntity {
     private String displayOrientation;
     @NotNull
     private String resolution;
-    @ColumnDefault("false")
-    private Boolean connectedState;
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
