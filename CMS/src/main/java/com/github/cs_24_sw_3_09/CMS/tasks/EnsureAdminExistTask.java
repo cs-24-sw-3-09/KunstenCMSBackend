@@ -35,5 +35,4 @@ public class EnsureAdminExistTask {
         userService.save(adminEntity);
         System.out.println("Admin user created");
     }
-    
 }
