@@ -1,5 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashSet;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +20,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
 import ch.qos.logback.core.net.SyslogOutputStream;
@@ -29,12 +37,17 @@ public class TimeSlotControllerIntegrationTests {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
     private TimeSlotService timeSlotService;
+    private DisplayDeviceRepository displayDeviceRepository;
 
     @Autowired
-    public void TimeSlotControllerIntegration(MockMvc mockMvc, ObjectMapper objectMapper, TimeSlotService timeSlotService){
+    public void TimeSlotControllerIntegration(
+        MockMvc mockMvc, ObjectMapper objectMapper, 
+        TimeSlotService timeSlotService, DisplayDeviceRepository displayDeviceRepository
+	){
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.timeSlotService = timeSlotService;
+        this.displayDeviceRepository = displayDeviceRepository;
     }
 
     @Test
@@ -216,6 +229,46 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );
+    }
+
+    @Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatUploadesTimeSlotWithDisplayDeviceThatOnlyHasId() throws Exception {
+        
+        DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+        DisplayDeviceEntity displayDeviceEntity = displayDeviceRepository.save(displayDeviceToSave);
+
+        System.out.println(displayDeviceEntity.getName()+ "\n"+ displayDeviceEntity.getId() + 
+        "\n"+ displayDeviceEntity.getTimeSlots());
+        System.out.println(displayDeviceRepository.existsById(1));
+
+
+        String timeSlot = "{"
+        + "\"name\": \"Time slot Example\","
+        + "\"startDate\": \"2024-11-25\","
+        + "\"endDate\": \"2024-11-26\","
+        + "\"startTime\": \"12:00:00\","
+        + "\"endTime\": \"16:00:00\","
+        + "\"weekdaysChosen\": 1,"
+        + "\"displayDevices\": [{\"id\": 1}]"
+        +"}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(timeSlot)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
+        );
+
+        assertTrue(timeSlotService.isExists((long) 1));
+
+		TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
+
+        /*assertEquals(
+			timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId(),
+			displayDeviceEntity.getId()
+		);*/
     }
 
 }
