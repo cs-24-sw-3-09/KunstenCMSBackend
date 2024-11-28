@@ -84,13 +84,8 @@ public class EmailServiceImpl implements EmailService {
         userList = filterUsersOutsidePausePeriod(userList); // filters user outside of perioed
         String mailResult = "Result from senting disconnect mail on id: " + id + " ";
         for (UserEntity user : userList) {
-            try {
-                email.setRecipient(user.getEmail());
-                mailResult += "(" + sendSimpleMail(email) + ")";
-
-            } catch (Exception e) {
-                mailResult += "(Error: " + e.getMessage() + ")";
-            }
+            email.setRecipient(user.getEmail());
+            mailResult += "(" + sendSimpleMail(email) + ")";
         }
         return mailResult;
     }
