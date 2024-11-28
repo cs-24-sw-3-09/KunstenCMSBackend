@@ -73,4 +73,23 @@ public class TimeSlotEntity {
     @JsonIgnore 
     private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
 
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("TimeSlot {");
+        sb.append("id=").append(id).append(", ");
+        sb.append("name='").append(name).append("', ");
+        sb.append("startDate=").append(startDate).append(", ");
+        sb.append("endDate=").append(endDate).append(", ");
+        sb.append("startTime=").append(startTime).append(", ");
+        sb.append("endTime=").append(endTime).append(", ");
+        sb.append("weekdaysChosen=").append(weekdaysChosen).append(", ");
+        sb.append("displayContent=").append(displayContent != null ? displayContent.getClass().getSimpleName() : "null").append(", ");
+        sb.append("displayDevices=").append(displayDevices != null ? displayDevices.size() : 0);
+        sb.append("}");
+        
+        return sb.toString();
+    }
 } 

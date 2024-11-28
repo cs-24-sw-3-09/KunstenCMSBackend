@@ -48,4 +48,27 @@ public class DisplayDeviceEntity {
     public void addTimeSlot(TimeSlotEntity timeSlot) {
         this.timeSlots.add(timeSlot);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("DisplayDeviceEntity {");
+        sb.append("id=").append(id).append(", ");
+        sb.append("name='").append(name).append("', ");
+        sb.append("location='").append(location).append("', ");
+        sb.append("displayOrientation='").append(displayOrientation).append("', ");
+        sb.append("resolution='").append(resolution).append("', ");
+        sb.append("connectedState=").append(connectedState).append(", ");
+        
+        // Check if fallbackContent is null or not, and append accordingly
+        sb.append("fallbackContent=").append(fallbackContent != null ? fallbackContent.getClass().getSimpleName() : "null").append(", ");
+        
+        // For timeSlots, we print the number of associated time slots to avoid printing large collections
+        sb.append("timeSlotsCount=").append(timeSlots != null ? timeSlots.size() : 0);
+        
+        sb.append("}");
+        
+        return sb.toString();
+    } 
 }

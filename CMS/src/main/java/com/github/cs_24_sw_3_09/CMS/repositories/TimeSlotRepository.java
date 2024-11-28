@@ -36,4 +36,9 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
        "WHERE ss.id = :slideshowId")
     Set<TimeSlotEntity> findSetOfTimeSlotsBySlideshowId(@Param("slideshowId") Long slideshowId);
 
+    @Query("SELECT DISTINCT ts FROM TimeSlotEntity ts " + 
+           "JOIN ts.displayContent c " +
+            "JOIN SlideshowEntity ss ON c.id = ss.id ")
+    List<TimeSlotEntity> getAllTimeSlotsWithSlideshowAsContent();
+
 }

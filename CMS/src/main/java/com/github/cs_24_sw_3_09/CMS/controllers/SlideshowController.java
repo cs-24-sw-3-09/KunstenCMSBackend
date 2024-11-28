@@ -76,6 +76,12 @@ public class SlideshowController {
         return new ResponseEntity<>(displayDeviceService.findDisplayDevicesWhoUsesSlideshowAsFallback(id), HttpStatus.OK);
     }
 
+    @GetMapping(path="/state")
+    public void getStateOfAllSlideshows(){
+        System.out.println("found end point");
+        slideshowService.findStateOfEverySlideshow();
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<SlideshowDto> createSlideshow(@RequestBody SlideshowDto slideshowDto) {

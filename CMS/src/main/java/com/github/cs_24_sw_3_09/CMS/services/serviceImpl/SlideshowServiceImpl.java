@@ -1,12 +1,16 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.json.JSONObject;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -129,5 +133,44 @@ public class SlideshowServiceImpl implements SlideshowService {
 
             return slideshowRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
+    }
+
+    public void findStateOfEverySlideshow(){
+        List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
+        System.out.println("slideshows: "+allSlideshowIds);
+        //timeSlots: List of active and future time slots.
+        List<TimeSlotEntity> allTimeSlotsWithSlideshowAsContent = timeSlotRepository.getAllTimeSlotsWithSlideshowAsContent();
+        System.out.println("ts: "+allTimeSlotsWithSlideshowAsContent.toString());
+        //timeSlotContents: List of mappings between slideshows and time slots. (List of displayContentId which is SSid)
+        List<Integer> displayContentIds = new ArrayList();
+        for(TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent){
+            displayContentIds.add(ts.getDisplayContent().getId());
+            System.out.println("an id(i hope): "+ts.getDisplayContent().getId());
+        }
+        //call List of current ts
+        Set<Integer> timeSlotsCurrentlyShown = pushTSService.updateDisplayDevicesToNewTimeSlots(false);
+
+        List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
+        List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
+
+        //Devide slideshows in lists being shown and planned
+        for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent){
+            if (timeSlotsCurrentlyShown.contains(ts.getId())){
+                activeTimeSlots.add(ts);
+            } else {
+                futureTimeSlots.add(ts);
+            }
+        }
+
+        
+        Map<Integer, JSONObject> slideshowStatusMap = new HashMap<>();
+        //make correct JSON object with necessary data
+        for (int slideshowId : allSlideshowIds) {
+            JSONObject slideshowStatus = new JSONObject();
+            slideshowStatus.put("ssid", slideshowId);
+            slideshowStatus.put("color", "red");
+
+
+        }
     }
 }

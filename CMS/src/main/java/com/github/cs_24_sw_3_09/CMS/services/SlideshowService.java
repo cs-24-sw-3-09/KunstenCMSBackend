@@ -29,4 +29,6 @@ public interface SlideshowService {
     void delete(Long id);
 
     SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId);
+
+    void findStateOfEverySlideshow();
 }
