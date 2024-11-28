@@ -33,7 +33,7 @@ public class VisualMediaController {
     private final VisualMediaService visualMediaService;
     private final TagService tagService;
     private FileStorageService fileStorageService;
-    private Mapper<TimeSlotEntity, TimeSlotDto> timeslotMapper;
+    private Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
 
     public VisualMediaController(
             Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
@@ -47,7 +47,7 @@ public class VisualMediaController {
         this.tagService = tagService;
         this.fileStorageService = fileStorageService;
         this.displayDeviceMapper = displayDeviceMapper;
-        this.timeslotMapper = timeslotMapper;
+        this.timeSlotMapper = timeSlotMapper;
     }
 
     @PostMapping
@@ -128,7 +128,6 @@ public class VisualMediaController {
     }
 
     @GetMapping(path = "/{id}/timeslots")
-    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<List<TimeSlotDto>> getTimeslotsVisualMediaIsPartOf(@PathVariable("id") Long id) {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -137,10 +136,10 @@ public class VisualMediaController {
         List<TimeSlotEntity> foundTimeslots = visualMediaService.findTimeslotsVisualMediaIsPartOf(id);
 
         List<TimeSlotDto> foundTimeslotDtos = foundTimeslots.stream()
-                .map(timeslotMapper::mapTo) // Assuming `mapTo` converts an entity to a DTO
+                .map(timeSlotMapper::mapTo) // Assuming `mapTo` converts an entity to a DTO
                 .toList();
-
         return new ResponseEntity<>(foundTimeslotDtos, HttpStatus.OK);
+
     }
 
     @PutMapping(path = "/{id}")
