@@ -1,7 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
@@ -26,8 +29,28 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
+    public TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity) {
+        DisplayDeviceEntity displayDevice = timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0];
+
+        displayDevice.addTimeSlot(timeSlotEntity);
+        timeSlotEntity.getDisplayDevices().add(displayDevice);
+        
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        return toReturn;
+    }
+
+    @Override
+    public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
+        DisplayDeviceEntity displayDevice = timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0];
+
+        displayDevice.addTimeSlot(timeSlotEntity);
+        timeSlotEntity.setDisplayDevices(new HashSet<DisplayDeviceEntity>());
+        timeSlotEntity.getDisplayDevices().add(displayDevice);
+        
+        TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }

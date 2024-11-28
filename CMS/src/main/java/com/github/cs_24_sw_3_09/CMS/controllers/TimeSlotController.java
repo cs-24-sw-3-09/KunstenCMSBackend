@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -47,11 +48,25 @@ public class TimeSlotController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
-
+        System.out.println("Started here");
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        
+        //maybe better error handling here :p
+        Long displayDeviceId = Long.valueOf(timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId());
+
+        TimeSlotEntity savedTimeSlotEntity;
+        if (displayDeviceId == null) {
+            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+            System.out.println("Here1");
+        } else if(displayDeviceService.isExists(Long.valueOf(displayDeviceId))) {
+            savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
+            System.out.println("Here2");
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
     }
 
