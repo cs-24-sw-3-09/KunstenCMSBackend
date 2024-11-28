@@ -265,10 +265,10 @@ public class TimeSlotControllerIntegrationTests {
 
 		TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
 
-        /*assertEquals(
+        assertEquals(
 			timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId(),
 			displayDeviceEntity.getId()
-		);*/
+		);
     }
 
 }
