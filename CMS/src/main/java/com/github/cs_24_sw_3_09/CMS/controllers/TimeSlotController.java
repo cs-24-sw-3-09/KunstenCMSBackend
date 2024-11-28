@@ -1,6 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -47,11 +50,25 @@ public class TimeSlotController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
-
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        
+        
+        Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
+        boolean checkIds = timeSlotEntity.getDisplayDevices().stream().allMatch(device -> 
+                    displayDeviceService.isExists(Long.valueOf(device.getId()))
+                );
+
+        TimeSlotEntity savedTimeSlotEntity;
+        if (optionalDisplayDevice.isPresent() && optionalDisplayDevice.get().getId() == null) {
+            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        } else if(checkIds) {
+            savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
     }
 
