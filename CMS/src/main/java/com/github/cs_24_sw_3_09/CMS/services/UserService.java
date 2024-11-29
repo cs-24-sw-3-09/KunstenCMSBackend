@@ -26,4 +26,6 @@ public interface UserService extends UserDetailsService {
 
     boolean existsByAdmin();
 
+    Optional<UserEntity> getLoggedInUser();
+
 }

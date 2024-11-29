@@ -33,8 +33,8 @@ public class UserDto {
     private Date pauseNotificationStart;
     @DateTimeFormat(pattern = "yyyy-mm-dd") // If the numbers is not right, it is converted into something valid
     private Date pauseNotificationEnd;
-    private boolean notificationState;
-    private boolean mediaPlanner;
-    private boolean admin;
+    private Boolean notificationState;
+    private Boolean mediaPlanner;
+    private Boolean admin;
 
 }
