@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
@@ -238,11 +239,6 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity displayDeviceEntity = displayDeviceRepository.save(displayDeviceToSave);
 
-        System.out.println(displayDeviceEntity.getName()+ "\n"+ displayDeviceEntity.getId() + 
-        "\n"+ displayDeviceEntity.getTimeSlots());
-        System.out.println(displayDeviceRepository.existsById(1));
-
-
         String timeSlot = "{"
         + "\"name\": \"Time slot Example\","
         + "\"startDate\": \"2024-11-25\","
@@ -270,5 +266,32 @@ public class TimeSlotControllerIntegrationTests {
 			displayDeviceEntity.getId()
 		);
     }
+
+	@Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatTriesToUploadTimeSlotButReturns404() throws Exception {
+
+        String timeSlot = "{"
+        + "\"name\": \"Time slot Example\","
+        + "\"startDate\": \"2024-11-25\","
+        + "\"endDate\": \"2024-11-26\","
+        + "\"startTime\": \"12:00:00\","
+        + "\"endTime\": \"16:00:00\","
+        + "\"weekdaysChosen\": 1,"
+        + "\"displayDevices\": [{\"id\": 1}]"
+        +"}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(timeSlot)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        );
+
+        assertFalse(timeSlotService.isExists((long) 1));
+    }
+
+	//Todo: Tilføj test, som har flere ID's med
 
 }
