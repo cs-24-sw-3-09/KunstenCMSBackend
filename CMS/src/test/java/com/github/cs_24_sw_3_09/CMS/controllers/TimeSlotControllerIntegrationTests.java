@@ -301,7 +301,6 @@ public class TimeSlotControllerIntegrationTests {
         assertFalse(timeSlotService.isExists((long) 1));
     }
 
-	//Todo: Tilføj test, som har flere ID's med
 	@Test
     @WithMockUser(roles={"PLANNER"}) 
     public void testThatUploadesTimeSlotWithDisplayDevicesThatOnlyHasId() throws Exception {
@@ -343,4 +342,16 @@ public class TimeSlotControllerIntegrationTests {
 		));
     }
 
+	//todo: Tilføj tests for TS med Vm og Dd
+	@Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatUploadesTimeSlotWithVisualMediaThatOnlyHasId() throws Exception {}
+
+	@Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatUploadesTimeSlotWithSlideShowThatOnlyHasId() throws Exception {}
+
+	@Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatUploadesTimeSlotWithInvalidVisualMediaAndReturns404() throws Exception {}
 }
