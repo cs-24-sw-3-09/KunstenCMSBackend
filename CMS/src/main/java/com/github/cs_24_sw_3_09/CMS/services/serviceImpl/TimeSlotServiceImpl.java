@@ -2,7 +2,6 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 
 import java.util.Set;
-import java.lang.classfile.ClassFile.Option;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -59,14 +58,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
         return newTs;
     }
-
-    /*@Override
-    public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
-        TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
-        pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
-    }*/
-
 
     @Override
     public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
