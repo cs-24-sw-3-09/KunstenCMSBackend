@@ -24,6 +24,16 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static DisplayDeviceDto createDisplayDeviceWithVisualMediaDto() {
+
+        return DisplayDeviceDto.builder()
+                .displayOrientation("horizontal")
+                .location("Aalborg")
+                .name("Skærm Esbjerg1")
+                .resolution("1920x1080")
+                .build();
+    }
+
     public static DisplayDeviceEntity createDisplayDeviceEntity() {
 
         return DisplayDeviceEntity.builder()
