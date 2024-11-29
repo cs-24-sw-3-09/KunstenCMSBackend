@@ -73,12 +73,24 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             Optional.ofNullable(displayDeviceEntity.getName()).ifPresent(existingDisplayDevice::setName);
             Optional.ofNullable(displayDeviceEntity.getDisplayOrientation())
                     .ifPresent(existingDisplayDevice::setDisplayOrientation);
-            Optional.ofNullable(displayDeviceEntity.getConnectedState())
-                    .ifPresent(existingDisplayDevice::setConnectedState);
             Optional.ofNullable(displayDeviceEntity.getLocation()).ifPresent(existingDisplayDevice::setLocation);
             Optional.ofNullable(displayDeviceEntity.getResolution()).ifPresent(existingDisplayDevice::setResolution);
             Optional.ofNullable(displayDeviceEntity.getFallbackContent())
                     .ifPresent(existingDisplayDevice::setFallbackContent);
+            Optional.ofNullable(displayDeviceEntity.getMonday_start()).ifPresent(existingDisplayDevice::setMonday_start);
+            Optional.ofNullable(displayDeviceEntity.getMonday_end()).ifPresent(existingDisplayDevice::setMonday_end);
+            Optional.ofNullable(displayDeviceEntity.getTuesday_start()).ifPresent(existingDisplayDevice::setTuesday_start);
+            Optional.ofNullable(displayDeviceEntity.getTuesday_end()).ifPresent(existingDisplayDevice::setTuesday_end);
+            Optional.ofNullable(displayDeviceEntity.getWednesday_start()).ifPresent(existingDisplayDevice::setWednesday_start);
+            Optional.ofNullable(displayDeviceEntity.getWednesday_end()).ifPresent(existingDisplayDevice::setWednesday_end);
+            Optional.ofNullable(displayDeviceEntity.getThursday_start()).ifPresent(existingDisplayDevice::setThursday_start);
+            Optional.ofNullable(displayDeviceEntity.getThursday_end()).ifPresent(existingDisplayDevice::setThursday_end);
+            Optional.ofNullable(displayDeviceEntity.getFriday_start()).ifPresent(existingDisplayDevice::setFriday_start);
+            Optional.ofNullable(displayDeviceEntity.getFriday_end()).ifPresent(existingDisplayDevice::setFriday_end);
+            Optional.ofNullable(displayDeviceEntity.getSaturday_start()).ifPresent(existingDisplayDevice::setSaturday_start);
+            Optional.ofNullable(displayDeviceEntity.getSaturday_end()).ifPresent(existingDisplayDevice::setSaturday_end);
+            Optional.ofNullable(displayDeviceEntity.getSunday_start()).ifPresent(existingDisplayDevice::setSunday_start);
+            Optional.ofNullable(displayDeviceEntity.getSunday_end()).ifPresent(existingDisplayDevice::setSunday_end);
 
             DisplayDeviceEntity toReturn = displayDeviceRepository.save(existingDisplayDevice);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
@@ -95,6 +107,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
         displayDevice.getTimeSlots().clear();
         displayDevice.setFallbackContent(null);
         displayDeviceRepository.save(displayDevice);
+        //TODO: Gør så den faktisk sletter samt sletter relations korrekt.
     }
 
     @Override

@@ -4,14 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TagEntity;
-import com.github.cs_24_sw_3_09.CMS.services.TagService;
-import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
-import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
-import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
-import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.model.entities.*;
+import com.github.cs_24_sw_3_09.CMS.services.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +42,11 @@ public class VisualMediaControllerIntegrationTests {
     private SlideshowService slideshowService;
     private TagService tagService;
     private VisualMediaInclusionService visualMediaInclusionService;
+    private DisplayDeviceService displayDeviceService;
 
 
     @Autowired
-    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService, TagService tagService, SlideshowService slideshowService, VisualMediaInclusionService visualMediaInclusionService) {
+    public VisualMediaControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaService visualMediaService, TagService tagService, SlideshowService slideshowService, VisualMediaInclusionService visualMediaInclusionService, DisplayDeviceService displayDeviceService) {
         this.mockMvc = mockMvc;
         this.visualMediaService = visualMediaService;
         this.objectMapper = objectMapper;
@@ -59,6 +54,7 @@ public class VisualMediaControllerIntegrationTests {
         this.objectMapper = objectMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.displayDeviceService = displayDeviceService;
 
 
     }
@@ -309,6 +305,29 @@ public class VisualMediaControllerIntegrationTests {
                         MockMvcResultMatchers.status().isOk())
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.tags[0].text").value(savedTagEntity.getText()));
+
+
+    }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatGetDisplayDevicesVisualMediaIsPartOfReturnsDisiplayDevices() throws Exception {
+        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+
+        DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
+        DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+
+        DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.setFallbackContent((long) savedDisplayDeviceEntity.getId(), (long) savedVisualMediaEntity.getId(), "VisualMediaEntity");
+
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/display_devices")
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].name").value(savedDisplayDeviceEntity.getName()));
 
 
     }

@@ -2,7 +2,6 @@ package com.github.cs_24_sw_3_09.CMS.model.dto;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
 import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,8 +11,6 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
