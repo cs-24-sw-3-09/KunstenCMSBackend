@@ -22,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -166,7 +165,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "ADMIN")
 	public void testThatDeleteDisplayDeviceReturnsStatus200() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.delete("/api/display_devices/" + savedDisplayDeviceEntity.getId())).andExpect(
@@ -185,7 +184,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "ADMIN")
 	public void testThatFullUpdateDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
@@ -202,7 +201,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "ADMIN")
 	public void testThatPatchUpdateDisplayDeviceReturnsStatus200() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
@@ -241,7 +240,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": " + savedSlideshowEntity.getId() + "}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -264,7 +263,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": 99}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -284,7 +283,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": " + savedVisualMedia.getId() + "}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -310,7 +309,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": 99}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -329,7 +328,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity).get();
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
 
 		String requestBodyJson = "{\"timeSlotId\": " + savedTimeSlotEntity.getId() + "}";
 
@@ -349,7 +348,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
-	@WithMockUser(roles = { "PLANNER" })
+	@WithMockUser(roles = { "ADMIN" })
 	public void testThatUploadesDisplayDeviceWithVisualMediaIdAndReturns201() throws Exception {
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
 		visualMediaService.save(visualMediaToSave);
@@ -389,7 +388,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 	
 	@Test
-	@WithMockUser(roles = { "PLANNER" })
+	@WithMockUser(roles = { "ADMIN" })
 	public void testThatUploadesDisplayDeviceWithSlideshowIdAndReturns201() throws Exception {
 		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
 		slideshowService.save(slideshowToSave);
@@ -420,7 +419,7 @@ public class DisplayDeviceControllerIntegrationTests {
         );
 
 		assertTrue(displayDeviceService.isExists((long) 1));
-		assertTrue(visualMediaService.isExists((long) 1));
+		assertTrue(slideshowService.isExists((long) 1));
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
@@ -428,7 +427,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
-	@WithMockUser(roles = { "PLANNER" })
+	@WithMockUser(roles = { "ADMIN" })
 	public void testThatUploadesDisplayDeviceWithInvalidContentIdAndReturns404() throws Exception {
 		String fallbackId = 
 		"{"

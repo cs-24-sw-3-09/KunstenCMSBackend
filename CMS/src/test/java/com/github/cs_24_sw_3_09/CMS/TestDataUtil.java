@@ -172,8 +172,8 @@ public class TestDataUtil {
 
     public static TimeSlotEntity createTimeSlotEntityWithCurrentTime() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDateTime = now.minusHours(2);
-        LocalDateTime endDateTime = now.plusHours(2);
+        LocalDateTime startDateTime = now.minusMinutes(2);
+        LocalDateTime endDateTime = now.plusMinutes(2);
 
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")
