@@ -160,7 +160,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
-        //todo: Overvej om der skal gøres brug af den periodiske sletning i stedet
         int associations = timeSlotRepository.countAssociations(tsId);
 
         if (associations == 1) {
