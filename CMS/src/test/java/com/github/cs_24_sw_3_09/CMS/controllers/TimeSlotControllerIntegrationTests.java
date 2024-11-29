@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -129,7 +130,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser
     public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity);
+        TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity).get();
         System.out.println(s.getDisplayDevices().toArray()[0]);
 
 
@@ -159,7 +160,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatDeleteTimeSlotReturnsStatus200() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
 
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
@@ -196,7 +197,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatFullUpdateTimeSlotReturnsStatus200WhenTimeSlotExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
 
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
@@ -213,7 +214,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatPatchUpdateTimeSlotReturnsStatus200() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity);
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
 
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
@@ -357,9 +358,9 @@ public class TimeSlotControllerIntegrationTests {
 		//Create a Display Device and visual media such that the id exists
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         displayDeviceRepository.save(displayDeviceToSave);
+		assertTrue(displayDeviceRepository.findById(1).isPresent());
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
 		VisualMediaEntity visualMediaToCompare = visualMediaRepository.save(visualMediaToSave);
-		assertTrue(displayDeviceRepository.findById(1).isPresent());
 		assertTrue(visualMediaRepository.findById(1).isPresent());
 
 		String timeSlot = 
@@ -371,7 +372,8 @@ public class TimeSlotControllerIntegrationTests {
 		+ 	"\"endTime\": \"16:00:00\","
 		+ 	"\"weekdaysChosen\": 1,"
 		+ 	"\"displayContent\": {"
-		+ 		"\"id\": 1" 
+		+ 		"\"id\": 1,"
+		+		"\"type\": \"visualMedia\""
 		+	"},"
 		+ 	"\"displayDevices\": [" 
 				+"{\"id\": 1}"
@@ -416,7 +418,8 @@ public class TimeSlotControllerIntegrationTests {
 		+ 	"\"endTime\": \"16:00:00\","
 		+ 	"\"weekdaysChosen\": 1,"
 		+ 	"\"displayContent\": {"
-		+ 		"\"id\": 1" 
+		+ 		"\"id\": 1," 
+		+		"\"type\": \"slideshow\""
 		+	"},"
 		+ 	"\"displayDevices\": [" 
 				+"{\"id\": 1}"
@@ -458,7 +461,8 @@ public class TimeSlotControllerIntegrationTests {
 		+ 	"\"endTime\": \"16:00:00\","
 		+ 	"\"weekdaysChosen\": 1,"
 		+ 	"\"displayContent\": {"
-		+ 		"\"id\": 1" 
+		+ 		"\"id\": 1,"
+		+		"\"type\": \"slideshow\"" 
 		+	"},"
 		+ 	"\"displayDevices\": [" 
 				+"{\"id\": 1}"
