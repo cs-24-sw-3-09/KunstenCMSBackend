@@ -34,6 +34,16 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static DisplayDeviceEntity createSecDisplayDeviceEntity() {
+
+        return DisplayDeviceEntity.builder()
+                .displayOrientation("vertical")
+                .location("Esbjerg2")
+                .name("Skærm Esbjerg2")
+                .resolution("1920x1080")
+                .build();
+    }
+
     public static TagDto createTagDto() {
         return TagDto.builder()
                 .text("Test Tag")
