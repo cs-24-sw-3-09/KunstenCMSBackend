@@ -321,7 +321,7 @@ public class DisplayDeviceControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatAddTimeSlotToDisplayDeviceReturns200OkayWhenBothExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity).get();
 
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);

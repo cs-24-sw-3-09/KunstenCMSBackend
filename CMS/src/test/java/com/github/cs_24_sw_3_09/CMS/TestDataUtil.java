@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
@@ -29,6 +30,16 @@ public class TestDataUtil {
                 .displayOrientation("horizontal")
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
+                .resolution("1920x1080")
+                .build();
+    }
+
+    public static DisplayDeviceEntity createSecDisplayDeviceEntity() {
+
+        return DisplayDeviceEntity.builder()
+                .displayOrientation("vertical")
+                .location("Esbjerg2")
+                .name("Skærm Esbjerg2")
                 .resolution("1920x1080")
                 .build();
     }

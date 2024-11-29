@@ -55,7 +55,7 @@ public class TimeSlotController {
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
         
         
-        Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
+        /*Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
         boolean checkIds = timeSlotEntity.getDisplayDevices().stream().allMatch(device -> 
                     displayDeviceService.isExists(Long.valueOf(device.getId()))
                 );
@@ -67,9 +67,13 @@ public class TimeSlotController {
             savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        }*/
 
-        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
+
+        Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -98,8 +102,10 @@ public class TimeSlotController {
 
         timeSlotDto.setId(Math.toIntExact(id));
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.OK);
+        Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/{id}")

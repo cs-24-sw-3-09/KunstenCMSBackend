@@ -12,10 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -25,11 +28,16 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private TimeSlotRepository timeSlotRepository;
     private PushTSService pushTSService;
     private DisplayDeviceRepository displayDeviceRepository;
+    private SlideshowRepository slideshowRepository;
+    private VisualMediaRepository visualMediaRepository; 
 
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository) {
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository,
+    SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
+        this.slideshowRepository = slideshowRepository;
+        this.visualMediaRepository = visualMediaRepository;
     }
 
     @Override
@@ -42,26 +50,65 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             newDisplayDevices.add(newDisplayDevice);
         }
         timeSlotEntity.getDisplayDevices().clear();
-
         timeSlotEntity.setDisplayDevices(newDisplayDevices);
 
         TimeSlotEntity newTs = timeSlotRepository.save(timeSlotEntity);
         
-        for(DisplayDeviceEntity displayDevice : newTs.getDisplayDevices()) {
-            displayDevice.addTimeSlot(newTs);
-            displayDeviceRepository.save(displayDevice);        
-        }
-
         pushTSService.updateDisplayDevicesToNewTimeSlots();
 
         return newTs;
     }
 
     @Override
-    public TimeSlotEntity save(TimeSlotEntity timeSlotEntity) {
+    public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
+        //Handle display devices
+        Optional<TimeSlotEntity> displayDevice = addDisplayDevice(timeSlotEntity);
+        if(displayDevice.isEmpty()) return Optional.empty();
+        timeSlotEntity = displayDevice.get();
+
+        //Handle display content
+        if(timeSlotEntity.getDisplayContent() != null) {
+            Optional<TimeSlotEntity> displayContent = addDisplayContent(timeSlotEntity);
+            if(displayContent.isEmpty()) return Optional.empty();
+            timeSlotEntity = displayContent.get();
+        }
+
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
+        return Optional.of(toReturn);
+    }
+
+    private Optional<TimeSlotEntity> addDisplayDevice(TimeSlotEntity timeSlotEntity) {
+        Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
+
+        Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
+        for(DisplayDeviceEntity displayDevice : displayDevices) {
+            DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);
+
+            if (newDisplayDevice == null) return Optional.empty();
+
+            newDisplayDevices.add(newDisplayDevice);
+        }
+        timeSlotEntity.getDisplayDevices().clear();
+        timeSlotEntity.setDisplayDevices(newDisplayDevices);
+        return Optional.of(timeSlotEntity);
+    }
+
+    private Optional<TimeSlotEntity> addDisplayContent(TimeSlotEntity timeSlotEntity) {
+        Integer currentContentId = timeSlotEntity.getDisplayContent().getId();
+        Optional<ContentEntity> optionalContent = currentContentId == null ? Optional.of(timeSlotEntity.getDisplayContent()) : findContentById(currentContentId);
+        if (optionalContent.isEmpty()) return Optional.empty(); 
+        timeSlotEntity.setDisplayContent(optionalContent.get());
+        return Optional.of(timeSlotEntity);
+    }
+
+    private Optional<ContentEntity> findContentById(Integer contentId) {
+        if (slideshowRepository.existsById(contentId)) {
+            return Optional.of(slideshowRepository.findById(contentId).orElse(null));
+        } else if (visualMediaRepository.existsById(contentId)) {
+            return Optional.of(visualMediaRepository.findById(contentId).orElse(null));
+        }
+        return Optional.empty();
     }
 
     @Override
