@@ -19,8 +19,8 @@ public class UserEntityDetails implements UserDetails {
         this.password = userEntity.getPassword();
         this.authorities = new ArrayList<>();
         // If user has certain roles, grant them the authority roles.
-        if (userEntity.isAdmin()) this.authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        if (userEntity.isMediaPlanner()) this.authorities.add(new SimpleGrantedAuthority("ROLE_PLANNER"));
+        if (userEntity.getAdmin()) this.authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (userEntity.getMediaPlanner()) this.authorities.add(new SimpleGrantedAuthority("ROLE_PLANNER"));
     }
 
     @Override

@@ -1,6 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
+
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -47,12 +51,30 @@ public class TimeSlotController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
-
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.CREATED);
+        
+        
+        /*Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
+        boolean checkIds = timeSlotEntity.getDisplayDevices().stream().allMatch(device -> 
+                    displayDeviceService.isExists(Long.valueOf(device.getId()))
+                );
+
+        TimeSlotEntity savedTimeSlotEntity;
+        if (optionalDisplayDevice.isPresent() && optionalDisplayDevice.get().getId() == null) {
+            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        } else if(checkIds) {
+            savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }*/
+
+
+        Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -74,21 +96,23 @@ public class TimeSlotController {
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> fullUpdateTimeSlot(@PathVariable("id") Long id,
-            @Valid @RequestBody TimeSlotDto timeSlotDto) {
+                                                          @Valid @RequestBody TimeSlotDto timeSlotDto) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         timeSlotDto.setId(Math.toIntExact(id));
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
-        TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity), HttpStatus.OK);
+        Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
+        if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> partialUpdateTimeSlot(@PathVariable("id") Long id,
-            @Valid @RequestBody TimeSlotDto timeSlotDto) {
+                                                             @Valid @RequestBody TimeSlotDto timeSlotDto) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -131,6 +155,23 @@ public class TimeSlotController {
 
         timeSlotService.deleteRelation(tsId, ddId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping(path = "/{id}/display_devices")
+    public ResponseEntity<TimeSlotDto> addDisplayDevice(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestBody) {
+        if (!requestBody.containsKey("displayDeviceId")) {
+            return ResponseEntity.badRequest().build();
+        }
+        Long displayDeviceId = ((Integer) requestBody.get("displayDeviceId")).longValue();
+        if (!timeSlotService.isExists(id) || !displayDeviceService.isExists(displayDeviceId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        TimeSlotEntity updatedTimeSlot = timeSlotService.addDisplayDevice(id, displayDeviceId);
+
+
+        // If tag was not found, updatedVisualMedia will be null.
+        if (updatedTimeSlot == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot), HttpStatus.OK);
     }
 
 }

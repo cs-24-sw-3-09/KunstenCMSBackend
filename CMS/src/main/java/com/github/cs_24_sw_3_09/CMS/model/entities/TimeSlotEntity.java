@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -62,10 +63,14 @@ public class TimeSlotEntity {
     @JoinColumn(name = "time_slot_content")
     private ContentEntity displayContent;
 
+    @NotNull
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
-            @JoinColumn(name = "time_slot_id") }, inverseJoinColumns = { @JoinColumn(name = "display_device_id") })
+            @JoinColumn(name = "time_slot_id")}, inverseJoinColumns = {@JoinColumn(name = "display_device_id")})
     @JsonIgnore
-    private Set<DisplayDeviceEntity> displayDevices = new HashSet<DisplayDeviceEntity>();
+    private Set<DisplayDeviceEntity> displayDevices;
 
-} 
+    public void addDisplayDevice(DisplayDeviceEntity displayDevice) {
+        this.displayDevices.add(displayDevice);
+    }
+}

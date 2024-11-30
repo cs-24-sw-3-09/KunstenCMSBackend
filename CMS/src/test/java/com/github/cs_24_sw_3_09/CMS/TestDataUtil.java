@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
@@ -16,7 +17,16 @@ public class TestDataUtil {
 
         return DisplayDeviceDto.builder()
                 .displayOrientation("horizontal")
-                .connectedState(false)
+                .location("Aalborg")
+                .name("Skærm Esbjerg1")
+                .resolution("1920x1080")
+                .build();
+    }
+
+    public static DisplayDeviceDto createDisplayDeviceWithVisualMediaDto() {
+
+        return DisplayDeviceDto.builder()
+                .displayOrientation("horizontal")
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
@@ -27,9 +37,18 @@ public class TestDataUtil {
 
         return DisplayDeviceEntity.builder()
                 .displayOrientation("horizontal")
-                .connectedState(false)
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
+                .resolution("1920x1080")
+                .build();
+    }
+
+    public static DisplayDeviceEntity createSecDisplayDeviceEntity() {
+
+        return DisplayDeviceEntity.builder()
+                .displayOrientation("vertical")
+                .location("Esbjerg2")
+                .name("Skærm Esbjerg2")
                 .resolution("1920x1080")
                 .build();
     }
@@ -110,6 +129,15 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
+        HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
+        displayDevices.add(
+            DisplayDeviceEntity.builder().id(1).build()
+        );
+        return displayDevices;
+    }
+
+
     public static TimeSlotEntity createTimeSlotEntityWithOutDisplayDevice() {
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")
@@ -133,7 +161,6 @@ public class TestDataUtil {
 
         DisplayDeviceEntity dd = DisplayDeviceEntity.builder()
                 .displayOrientation("horizontal")
-                .connectedState(false)
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
@@ -144,8 +171,8 @@ public class TestDataUtil {
 
     public static TimeSlotEntity createTimeSlotEntityWithCurrentTime() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDateTime = now.minusHours(2);
-        LocalDateTime endDateTime = now.plusHours(2);
+        LocalDateTime startDateTime = now.minusMinutes(2);
+        LocalDateTime endDateTime = now.plusMinutes(2);
 
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")
