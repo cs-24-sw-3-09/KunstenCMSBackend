@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 
 import java.util.Set;
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -125,6 +126,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     @Override
     public Page<TimeSlotEntity> findAll(Pageable pageable) {
         return timeSlotRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<TimeSlotEntity> findAll(Date start, Date end) {
+        return timeSlotRepository.findAllInTimeFrame(start, end);
     }
 
     @Override
