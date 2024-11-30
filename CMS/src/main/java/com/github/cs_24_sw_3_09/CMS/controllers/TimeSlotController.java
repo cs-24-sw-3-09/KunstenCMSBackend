@@ -2,14 +2,12 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
+import com.github.cs_24_sw_3_09.CMS.utils.SetTSContentValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -42,6 +39,7 @@ public class TimeSlotController {
     private final DisplayDeviceService displayDeviceService;
     private final SlideshowService slideshowService;
     private final VisualMediaService visualMediaService;
+    private ContentUtils contentUtils;
 
     @Autowired
     public TimeSlotController(
@@ -49,13 +47,15 @@ public class TimeSlotController {
             Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
             DisplayDeviceService displayDeviceService,
             VisualMediaService visualMediaService,
-            SlideshowService slideshowService
+            SlideshowService slideshowService,
+            ContentUtils contentUtils
     ) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
         this.displayDeviceService = displayDeviceService;
         this.visualMediaService = visualMediaService;
         this.slideshowService = slideshowService;
+        this.contentUtils = contentUtils;
     }
 
     @PostMapping
@@ -172,41 +172,32 @@ public class TimeSlotController {
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
 
-        // Validate input and extract fallbackId
-        if (!requestBody.containsKey("displayContentId") || !requestBody.containsKey("type")) {
+        //validate request body (check if contentType, id, and type of these are correct)
+        SetTSContentValidationResult validationResult = contentUtils.validateRequestBody(requestBody);
+        if (!validationResult.isValid()) {
             return ResponseEntity.badRequest().build();
         }
 
-        // check if id is a number && type is valid
-        Long displayContentId;
-        String displayContentType = requestBody.get("type").toString();
-        try {
-            displayContentId = Long.valueOf(requestBody.get("displayContentId").toString());
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        //Getting the data from the previous result
+        Long displayContentId = validationResult.getDisplayContentId();
+        String displayContentType = validationResult.getDisplayContentType();
 
-        if(!displayContentType.equals("visualMedia") && !displayContentType.equals("slideshow")) {
-            return ResponseEntity.badRequest().build();
-        }
-
-
-        // validate existence of TS
+        // Validate existence of time slot
         if (!timeSlotService.isExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        //Check if content exists
-        if (displayContentType.equals("visualMedia") && !visualMediaService.isExists(displayContentId)
-                || displayContentType.equals("slideshow") && !slideshowService.isExists(displayContentId)) {
+        // Validate existence of the referenced content
+        if (!contentUtils.isDisplayContentValid(displayContentId, displayContentType)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-
-        // Update the display device and return the response
+        // Update the display content
         TimeSlotEntity updatedTimeSlotEntity = timeSlotService.setDisplayContent(id, displayContentId, displayContentType);
 
         return ResponseEntity.ok(timeSlotMapper.mapTo(updatedTimeSlotEntity));
     }
+
+
 
 }
