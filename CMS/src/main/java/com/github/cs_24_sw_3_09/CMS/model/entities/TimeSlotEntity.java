@@ -66,7 +66,11 @@ public class TimeSlotEntity {
     @NotNull
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
-            @JoinColumn(name = "time_slot_id") }, inverseJoinColumns = { @JoinColumn(name = "display_device_id") })
+            @JoinColumn(name = "time_slot_id")}, inverseJoinColumns = {@JoinColumn(name = "display_device_id")})
     @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices;
+
+    public void addDisplayDevice(DisplayDeviceEntity displayDevice) {
+        this.displayDevices.add(displayDevice);
+    }
 }

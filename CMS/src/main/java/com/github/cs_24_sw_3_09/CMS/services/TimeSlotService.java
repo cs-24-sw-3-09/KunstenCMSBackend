@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface TimeSlotService {
-    Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity);   
-    
+    Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity);
+
     TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity);
-    
+
     List<TimeSlotEntity> findAll();
 
     Page<TimeSlotEntity> findAll(Pageable pageable);
@@ -26,4 +26,6 @@ public interface TimeSlotService {
     void delete(Long id);
 
     void deleteRelation(Long tsId, Long ddId);
+
+    TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException;
 } 
