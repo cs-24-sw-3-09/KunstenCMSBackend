@@ -2,7 +2,9 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
@@ -88,9 +90,11 @@ public class DisplayDeviceController {
         displayDeviceDto.setId(Math.toIntExact(id));
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDeviceDto);
 
-        //todo Make this work with new save method
-        DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
-        return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity), HttpStatus.OK);
+        Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
+        if (savedDisplayDeviceEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity.get()), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/{id}")
@@ -178,6 +182,22 @@ public class DisplayDeviceController {
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
 
+     @PatchMapping(path = "/{id}/fallback")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<DisplayDeviceDto> addFallback(@PathVariable("id") Long id,
+                                                 @RequestBody Map<String, Object> requestBody) {
+        Long fallbackId = ((Integer) requestBody.get("fallbackId")).longValue();
 
+        if (!displayDeviceService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
+        Optional<DisplayDeviceEntity> updatedDisplayDevice = displayDeviceService.addFallback(id, fallbackId);
+
+        // If fallback content was not found, updatedDisplayDevice will be empty.
+        if (updatedDisplayDevice.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(displayDeviceMapper.mapTo(updatedDisplayDevice.get()), HttpStatus.OK);
+    }
 }
