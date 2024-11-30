@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -78,6 +79,19 @@ public class TestDataUtil {
                 .name("Billede navn")
                 .build();
     }
+
+    public static VisualMediaEntity createVisualMediaEntityWithTags() {
+        return VisualMediaEntity.builder()
+                .description("dkaoidkao test descpt")
+                .fileType("jpg")
+                // .lastDateModified("30/10/2003")
+                .location("/djao/dhau")
+                .name("Billede navn")
+                .tags(createTagEntitySet())
+                .build();
+    }
+
+    
 
     public static UserDto createUserDto() {
         return UserDto.builder()
@@ -242,6 +256,21 @@ public class TestDataUtil {
         return TagEntity.builder()
                 .text("Cool image")
                 .build();
+    }
+
+    public static TagEntity createTagEntity2() {
+        return TagEntity.builder()
+                .text("Cool image")
+                .build();
+    }
+
+    public static Set<TagEntity> createTagEntitySet() {
+        Set<TagEntity> tag = new HashSet<>(); 
+
+        tag.add(createTagEntity());
+        tag.add(createTagEntity2());
+
+        return tag;         
     }
 
     public static SlideshowEntity createSlideshowWithVisualMediaEntity() {
