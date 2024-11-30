@@ -36,5 +36,4 @@ public class UserDto {
     private Boolean notificationState;
     private Boolean mediaPlanner;
     private Boolean admin;
-
 }

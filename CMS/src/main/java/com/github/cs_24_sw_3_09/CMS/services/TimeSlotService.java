@@ -9,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface TimeSlotService {
-    TimeSlotEntity save(TimeSlotEntity timeSlotEntity);    
+    Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity);   
+    
+    TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity);
     
     List<TimeSlotEntity> findAll();
 
