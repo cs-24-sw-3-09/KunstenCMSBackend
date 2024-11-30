@@ -200,4 +200,21 @@ public class TimeSlotController {
 
 
 
+    @PatchMapping(path = "/{id}/display_devices")
+    public ResponseEntity<TimeSlotDto> addDisplayDevice(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestBody) {
+        if (!requestBody.containsKey("displayDeviceId")) {
+            return ResponseEntity.badRequest().build();
+        }
+        Long displayDeviceId = ((Integer) requestBody.get("displayDeviceId")).longValue();
+        if (!timeSlotService.isExists(id) || !displayDeviceService.isExists(displayDeviceId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        TimeSlotEntity updatedTimeSlot = timeSlotService.addDisplayDevice(id, displayDeviceId);
+
+
+        // If tag was not found, updatedVisualMedia will be null.
+        if (updatedTimeSlot == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot), HttpStatus.OK);
+    }
+
 }

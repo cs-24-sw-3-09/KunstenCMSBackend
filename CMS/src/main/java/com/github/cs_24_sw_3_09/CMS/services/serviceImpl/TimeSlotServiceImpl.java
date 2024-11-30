@@ -34,8 +34,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private SlideshowService slideshowService;
 
     public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository,
-                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository,
-                               VisualMediaService visualMediaService, SlideshowService slideshowService) {
+                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService, slideshowService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
@@ -192,8 +191,17 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             existingTimeSlot.setDisplayContent(foundDisplayContent);
 
             return timeSlotRepository.save(existingTimeSlot);
-        }).orElseThrow(() -> new RuntimeException("Time Slot does not exist"));
-
-
+         }).orElseThrow(() -> new RuntimeException("Time Slot does not exist"));
+    } 
+    
+    @Override
+    public TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException {
+        return timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
+            DisplayDeviceEntity foundDisplayDevice = displayDeviceRepository.findById(Math.toIntExact(displayDeviceId)).orElseThrow();
+            existingTimeSlot.addDisplayDevice(foundDisplayDevice);
+            existingTimeSlot.setId(Math.toIntExact(id));
+            TimeSlotEntity updatedTimeslot = timeSlotRepository.save(existingTimeSlot);
+            return timeSlotRepository.save(updatedTimeslot);
+        }).orElseThrow();
     }
 }
