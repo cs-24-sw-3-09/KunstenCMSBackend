@@ -1,10 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -178,5 +175,27 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             TimeSlotEntity updatedTimeslot = timeSlotRepository.save(existingTimeSlot);
             return timeSlotRepository.save(updatedTimeslot);
         }).orElseThrow();
+    }
+
+    @Override
+    public List<TimeSlotEntity> findOverlappingTimeSlots(Long id) {
+        // Fetch the requested time slot, throw exception if not found
+        TimeSlotEntity timeSlotEntity = timeSlotRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new IllegalArgumentException("TimeSlotEntity not found for id: " + id));
+
+        Set<TimeSlotEntity> overlappingTimeSlots = new HashSet<>();
+
+        // Iterate through associated display devices and their time slots
+        for (DisplayDeviceEntity displayDevice : timeSlotEntity.getDisplayDevices()) {
+            for (TimeSlotEntity deviceTimeSlot : displayDevice.getTimeSlots()) {
+                // Check for overlap and add to the result set
+                if (deviceTimeSlot.overlaps(timeSlotEntity) && !deviceTimeSlot.equals(timeSlotEntity)) {
+                    overlappingTimeSlots.add(deviceTimeSlot);
+                }
+            }
+        }
+
+        // Return the overlapping time slots as a list
+        return new ArrayList<>(overlappingTimeSlots);
     }
 }

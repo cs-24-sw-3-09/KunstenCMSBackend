@@ -28,4 +28,6 @@ public interface TimeSlotService {
     void deleteRelation(Long tsId, Long ddId);
 
     TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException;
-} 
+
+    List<TimeSlotEntity> findOverlappingTimeSlots(Long id);
+}

@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -174,4 +175,19 @@ public class TimeSlotController {
         return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/{id}/overlapping_time_slots")
+    public ResponseEntity<List<TimeSlotDto>> getOverlappingTimeSlots(@PathVariable("id") Long id) {
+        if (!timeSlotService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<TimeSlotEntity> overlappingTimeSlots = timeSlotService.findOverlappingTimeSlots(id);
+        List<TimeSlotDto> overlappingTimeSlotDtos = overlappingTimeSlots.stream()
+                .map(timeSlotMapper::mapTo).toList();
+
+        return new ResponseEntity<>(overlappingTimeSlotDtos, HttpStatus.OK);
+    }
+
+
 }
+

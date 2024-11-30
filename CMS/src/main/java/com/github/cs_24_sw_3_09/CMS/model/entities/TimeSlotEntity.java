@@ -73,4 +73,36 @@ public class TimeSlotEntity {
     public void addDisplayDevice(DisplayDeviceEntity displayDevice) {
         this.displayDevices.add(displayDevice);
     }
+
+    public boolean overlaps(TimeSlotEntity timeSlotEntity) {
+// this shiet not working
+        if (this.startDate.after(timeSlotEntity.startDate) && this.endDate.before(timeSlotEntity.endDate)) {
+            return true;
+        }
+
+        if (this.startDate.before(timeSlotEntity.startDate) && this.endDate.after(timeSlotEntity.endDate)) {
+            return true;
+        }
+
+        if (this.startDate.before(timeSlotEntity.startDate) && this.endDate.equals(timeSlotEntity.endDate)) {
+            return this.endTime.after(timeSlotEntity.endTime);
+        }
+
+        if (this.startDate.after(timeSlotEntity.startDate) && this.endDate.equals(timeSlotEntity.endDate)) {
+            return this.endTime.before(timeSlotEntity.endTime);
+        }
+        if (this.startDate.equals(timeSlotEntity.startDate) && this.endDate.after(timeSlotEntity.endDate)) {
+            return this.startTime.before(timeSlotEntity.endTime);
+        }
+
+        if (this.startDate.equals(timeSlotEntity.startDate) && this.endDate.before(timeSlotEntity.endDate)) {
+            return this.endTime.after(timeSlotEntity.startTime);
+        }
+
+        if (this.startDate.equals(timeSlotEntity.startDate) && this.endDate.equals(timeSlotEntity.endDate)) {
+            return this.startTime.before(timeSlotEntity.endTime) && this.endTime.after(timeSlotEntity.startTime);
+        }
+
+        return false;
+    }
 }
