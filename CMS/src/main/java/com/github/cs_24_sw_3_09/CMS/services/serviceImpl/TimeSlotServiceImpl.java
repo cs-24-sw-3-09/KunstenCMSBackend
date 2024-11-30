@@ -182,19 +182,25 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
-        int associations = countDisplayDeviceAssociations(tsId);
-
-        if (associations <= 1) {
+        if (countDisplayDeviceAssociations(tsId) <= 1) 
             delete(tsId);
-        } else {
-            timeSlotRepository.deleteAssociation(tsId, ddId);
-        }
+        else 
+            deleteAssociation(tsId, ddId);
+    }
+
+    private void deleteAssociation(Long tsId, Long ddId) {
+        TimeSlotEntity ts = timeSlotRepository.findById(Math.toIntExact(tsId)).get();
+        DisplayDeviceEntity dd = displayDeviceRepository.findById(Math.toIntExact(ddId)).get();
+
+        ts.getDisplayDevices().remove(dd);
+        timeSlotRepository.save(ts);
     }
 
     @Override 
     public int countDisplayDeviceAssociations(Long timeSlotId) {
-        return timeSlotRepository.countAssociations(timeSlotId);
+        return timeSlotRepository.findById(Math.toIntExact(timeSlotId)).get().getDisplayDevices().size();
     }
+
 
     @Override
     public TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException {
