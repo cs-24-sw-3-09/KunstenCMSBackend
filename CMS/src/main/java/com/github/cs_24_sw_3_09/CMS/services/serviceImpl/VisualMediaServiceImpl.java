@@ -98,17 +98,19 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public VisualMediaEntity addTag(Long id, Long tagId) {
-        //TODO: Add Error Handling
+    public Optional<VisualMediaEntity> addTag(Long id, Long tagId) {
+        //Have already checked that it exists in the controller
         VisualMediaEntity foundVisualMedia = visualMediaRepository.findById(Math.toIntExact(id)).get();
 
-        TagEntity foundTag = tagRepository.findById(tagId).get();
+        TagEntity foundTag = tagRepository.findById(tagId).orElse(null);
+
+        if (foundTag == null) return Optional.empty();
 
         foundVisualMedia.addTag(foundTag);
         foundVisualMedia.setId(Math.toIntExact(id));
         visualMediaRepository.save(foundVisualMedia);
 
-        return foundVisualMedia;
+        return Optional.of(foundVisualMedia);
     }
 
     @Override
