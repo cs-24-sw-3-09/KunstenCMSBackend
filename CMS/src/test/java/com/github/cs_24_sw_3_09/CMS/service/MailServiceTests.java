@@ -33,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Optional;
@@ -175,6 +176,23 @@ class MailServiceTests {
         DisplayDeviceEntity displayDeviceEntity = new DisplayDeviceEntity();
         displayDeviceEntity.setId(1);
         displayDeviceEntity.setName("Test Device");
+        Time start = Time.valueOf("08:00:00");
+        Time end = Time.valueOf("16:00:00");
+        displayDeviceEntity.setMonday_start(start);
+        displayDeviceEntity.setMonday_end(end);
+        displayDeviceEntity.setTuesday_start(start);
+        displayDeviceEntity.setTuesday_end(end);
+        displayDeviceEntity.setWednesday_start(start);
+        displayDeviceEntity.setWednesday_end(end);
+        displayDeviceEntity.setThursday_start(start);
+        displayDeviceEntity.setThursday_end(end);
+        displayDeviceEntity.setFriday_start(start);
+        displayDeviceEntity.setFriday_end(end);
+        displayDeviceEntity.setSaturday_start(start);
+        displayDeviceEntity.setSaturday_end(end);
+        displayDeviceEntity.setSunday_start(start);
+        displayDeviceEntity.setSunday_end(end);
+
         when(displayDeviceService.isExists(1L)).thenReturn(true);
         when(displayDeviceService.findOne(1L)).thenReturn(Optional.of(displayDeviceEntity));
 
