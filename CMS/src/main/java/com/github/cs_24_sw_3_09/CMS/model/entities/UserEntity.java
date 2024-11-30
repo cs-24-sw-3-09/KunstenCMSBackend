@@ -33,10 +33,10 @@ public class UserEntity {
     private Date pauseNotificationStart;
     private Date pauseNotificationEnd;
     @ColumnDefault("false")
-    private boolean notificationState;
+    private Boolean notificationState;
     @ColumnDefault("false")
-    private boolean mediaPlanner;
+    private Boolean mediaPlanner;
     @ColumnDefault("false")
-    private boolean admin;
+    private Boolean admin;
 
 }
