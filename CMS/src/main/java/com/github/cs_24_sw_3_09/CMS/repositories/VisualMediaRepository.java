@@ -17,12 +17,6 @@ import java.util.List;
 public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity, Integer>,
         PagingAndSortingRepository<VisualMediaEntity, Integer> {
 
-    /*@Transactional
-    @Modifying
-    @Query(value = "DELETE FROM visual_media_tag WHERE tag_id = :tagId and visual_media_id = :vmId", nativeQuery = true)
-    void deleteAssociation(@Param("vmId") Long vmId, @Param("tagId") Long tagId);*/
-
-
     @Query(value = "SELECT dd FROM DisplayDeviceEntity dd JOIN dd.fallbackContent vm WHERE vm.id = :id")
     List<DisplayDeviceEntity> getDisplayDevicesPartOfVisualMedia(@Param("id") Long id);
 
