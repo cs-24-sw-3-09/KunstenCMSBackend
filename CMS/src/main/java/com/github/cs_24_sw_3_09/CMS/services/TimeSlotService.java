@@ -26,4 +26,6 @@ public interface TimeSlotService {
     void delete(Long id);
 
     void deleteRelation(Long tsId, Long ddId);
+
+    TimeSlotEntity setDisplayContent(Long tsId, Long dcId, String type);
 } 

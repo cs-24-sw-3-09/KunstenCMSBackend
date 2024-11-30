@@ -1,10 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,16 +40,22 @@ public class TimeSlotController {
     private final TimeSlotService timeSlotService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
     private final DisplayDeviceService displayDeviceService;
+    private final SlideshowService slideshowService;
+    private final VisualMediaService visualMediaService;
 
     @Autowired
     public TimeSlotController(
             TimeSlotService timeSlotService,
             Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
-            DisplayDeviceService displayDeviceService
+            DisplayDeviceService displayDeviceService,
+            VisualMediaService visualMediaService,
+            SlideshowService slideshowService
     ) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
         this.displayDeviceService = displayDeviceService;
+        this.visualMediaService = visualMediaService;
+        this.slideshowService = slideshowService;
     }
 
     @PostMapping
@@ -95,7 +106,7 @@ public class TimeSlotController {
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> fullUpdateTimeSlot(@PathVariable("id") Long id,
-            @Valid @RequestBody TimeSlotDto timeSlotDto) {
+                                                          @Valid @RequestBody TimeSlotDto timeSlotDto) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -111,7 +122,7 @@ public class TimeSlotController {
     @PatchMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> partialUpdateTimeSlot(@PathVariable("id") Long id,
-            @Valid @RequestBody TimeSlotDto timeSlotDto) {
+                                                             @Valid @RequestBody TimeSlotDto timeSlotDto) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -154,6 +165,48 @@ public class TimeSlotController {
 
         timeSlotService.deleteRelation(tsId, ddId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping(path = "/{id}/display_content")
+    public ResponseEntity<TimeSlotDto> setContent(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("displayContentId") || !requestBody.containsKey("type")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // check if id is a number && type is valid
+        Long displayContentId;
+        String displayContentType = requestBody.get("type").toString();
+        try {
+            displayContentId = Long.valueOf(requestBody.get("displayContentId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if(!displayContentType.equals("visualMedia") && !displayContentType.equals("slideshow")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+
+        // validate existence of TS
+        if (!timeSlotService.isExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        //Check if content exists
+        if (displayContentType.equals("visualMedia") && !visualMediaService.isExists(displayContentId)
+                || displayContentType.equals("slideshow") && !slideshowService.isExists(displayContentId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+
+        // Update the display device and return the response
+        TimeSlotEntity updatedTimeSlotEntity = timeSlotService.setDisplayContent(id, displayContentId, displayContentType);
+
+        return ResponseEntity.ok(timeSlotMapper.mapTo(updatedTimeSlotEntity));
     }
 
 }
