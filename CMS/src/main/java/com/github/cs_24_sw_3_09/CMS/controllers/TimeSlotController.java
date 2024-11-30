@@ -84,20 +84,6 @@ public class TimeSlotController {
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.CREATED);
     }
 
-    /*@GetMapping
-    public Page<TimeSlotDto> getTimeSlots(Pageable pageable,
-            @RequestParam("start") Date startDate,
-            @RequestParam("end") Date endDate) {
-        if (startDate != null && endDate != null) {
-            List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
-            return timeSlotEntities.stream()
-                    .map(timeSlotMapper::mapTo)
-                    .collect(Collectors.toPage());
-        }
-        Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
-        return timeSlotEntities.map(timeSlotMapper::mapTo);
-    }*/
-
     @GetMapping
     public Page<TimeSlotDto> getTimeSlots(Pageable pageable,
             @RequestParam(value = "start", required = false) Date startDate,
@@ -116,16 +102,6 @@ public class TimeSlotController {
         Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
         return timeSlotEntities.map(timeSlotMapper::mapTo);
     }
-
-    /*@GetMapping("/!SAD")
-    public List<TimeSlotDto> getTimeSlots(
-            @RequestParam("start") Date startDate,
-            @RequestParam("end") Date endDate) {
-        List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
-        return timeSlotEntities.stream()
-                .map(timeSlotMapper::mapTo)
-                .collect(Collectors.toPage());
-    }*/
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<TimeSlotDto> getTimeSlot(@PathVariable("id") Long id) {
