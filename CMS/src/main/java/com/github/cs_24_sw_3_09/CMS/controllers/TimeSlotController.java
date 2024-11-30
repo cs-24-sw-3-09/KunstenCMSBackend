@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -84,20 +85,47 @@ public class TimeSlotController {
     }
 
     /*@GetMapping
-    public Page<TimeSlotDto> getTimeSlots(Pageable pageable) {
+    public Page<TimeSlotDto> getTimeSlots(Pageable pageable,
+            @RequestParam("start") Date startDate,
+            @RequestParam("end") Date endDate) {
+        if (startDate != null && endDate != null) {
+            List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
+            return timeSlotEntities.stream()
+                    .map(timeSlotMapper::mapTo)
+                    .collect(Collectors.toPage());
+        }
         Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
         return timeSlotEntities.map(timeSlotMapper::mapTo);
     }*/
 
     @GetMapping
+    public Page<TimeSlotDto> getTimeSlots(Pageable pageable,
+            @RequestParam(value = "start", required = false) Date startDate,
+            @RequestParam(value = "end", required = false) Date endDate) {
+
+        // If one want to find based on date
+        if (startDate != null && endDate != null) {
+            List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
+            List<TimeSlotDto> timeSlotDtos = timeSlotEntities.stream()
+                    .map(timeSlotMapper::mapTo)
+                    .collect(Collectors.toList());
+
+            return new PageImpl<>(timeSlotDtos, pageable, timeSlotDtos.size());
+        }
+
+        Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
+        return timeSlotEntities.map(timeSlotMapper::mapTo);
+    }
+
+    /*@GetMapping("/!SAD")
     public List<TimeSlotDto> getTimeSlots(
             @RequestParam("start") Date startDate,
             @RequestParam("end") Date endDate) {
         List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
         return timeSlotEntities.stream()
                 .map(timeSlotMapper::mapTo)
-                .collect(Collectors.toList());
-    }
+                .collect(Collectors.toPage());
+    }*/
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<TimeSlotDto> getTimeSlot(@PathVariable("id") Long id) {
