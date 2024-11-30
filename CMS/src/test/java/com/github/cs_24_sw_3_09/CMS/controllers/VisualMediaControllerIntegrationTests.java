@@ -456,6 +456,34 @@ public class VisualMediaControllerIntegrationTests {
 		assertTrue(tagService.isExists((long) 1));
     }
 
+	@Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatDeletesAssociationBetweenVisualMediaAndTagWhenVisualMediaDoesntExist() throws Exception {
+    	TagEntity tagToSave = TestDataUtil.createTagEntity();
+		tagService.save(tagToSave);
+
+        assertFalse(visualMediaService.isExists((long) 1));
+		assertTrue(tagService.isExists((long) 1));
+		assertEquals(
+			0,
+			tagService.findOne((long) 1).get().getVisualMedias().size()
+		);
+        
+        String body = "{\"tagId\": 1 }";
+
+        mockMvc.perform(
+			MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(body)
+					
+		).andExpect(
+				MockMvcResultMatchers.status().isNotFound()
+		); 
+
+		assertFalse(visualMediaService.isExists((long) 1));
+		assertTrue(tagService.isExists((long) 1));
+    }
+
 }
 
 

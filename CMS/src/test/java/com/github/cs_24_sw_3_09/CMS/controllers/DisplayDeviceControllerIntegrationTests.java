@@ -163,13 +163,18 @@ public class DisplayDeviceControllerIntegrationTests {
 
 	@Test
 	@WithMockUser(roles = "ADMIN")
-	public void testThatDeleteDisplayDeviceReturnsStatus200() throws Exception {
+	public void testThatDeleteDisplayDeviceReturnsStatus204() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		displayDeviceService.save(displayDeviceEntity);
+		assertTrue(displayDeviceService.isExists((long) 1));
 
 		mockMvc.perform(
-				MockMvcRequestBuilders.delete("/api/display_devices/" + savedDisplayDeviceEntity.getId())).andExpect(
-						MockMvcResultMatchers.status().isNoContent());
+				MockMvcRequestBuilders.delete("/api/display_devices/1")
+		).andExpect(
+						MockMvcResultMatchers.status().isNoContent()
+		);
+
+		//assertFalse(displayDeviceService.isExists((long) 1));
 	}
 
 	@Test
