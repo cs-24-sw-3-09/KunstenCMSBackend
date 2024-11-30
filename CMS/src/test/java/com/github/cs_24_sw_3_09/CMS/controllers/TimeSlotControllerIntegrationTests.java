@@ -299,6 +299,8 @@ public class TimeSlotControllerIntegrationTests {
 		for(DisplayDeviceEntity dd : timeSlotService.findOne(tsId).get().getDisplayDevices()) {
 			assertNotEquals(ddId, dd.getId());
 		}
+
+        assertEquals(1, timeSlotService.countDisplayDeviceAssociations((long) 1));
     }
 
 	@Test

@@ -41,6 +41,7 @@ public class TestDataUtil {
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -161,6 +162,7 @@ public class TestDataUtil {
                 .endTime(java.sql.Time.valueOf("11:21:31"))
                 .weekdaysChosen(3)
                 .displayContent(assignedSlideshow())
+                .displayDevices(new HashSet<>())
                 .build();
     }
 

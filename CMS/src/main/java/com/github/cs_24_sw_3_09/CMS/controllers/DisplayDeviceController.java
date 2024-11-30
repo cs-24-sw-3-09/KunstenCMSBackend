@@ -182,7 +182,7 @@ public class DisplayDeviceController {
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
 
-     @PatchMapping(path = "/{id}/fallback")
+    @PatchMapping(path = "/{id}/fallback")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<DisplayDeviceDto> addFallback(@PathVariable("id") Long id,
                                                  @RequestBody Map<String, Object> requestBody) {
