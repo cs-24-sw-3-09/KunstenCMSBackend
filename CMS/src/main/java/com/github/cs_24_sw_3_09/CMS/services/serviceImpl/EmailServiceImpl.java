@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
@@ -81,7 +82,7 @@ public class EmailServiceImpl implements EmailService {
         DisplayDeviceEntity dd = displayDeviceService.findOne((long) id).get(); // Gets the DD from the DB
 
         // Making sure that the should be on
-        if (!shallDDSendMailForWeek(dd, currentTime))
+        if (!shallDDSendMailForWeek(dd, currentTime, LocalDate.now().getDayOfWeek()))
             return "Did not sent mail, as DD should be off";
 
         // Set up the email data
@@ -124,9 +125,8 @@ public class EmailServiceImpl implements EmailService {
         return currentTime.before(start) || currentTime.after(end);
     }
 
-    private static boolean shallDDSendMailForWeek(DisplayDeviceEntity dd, Time currentTime) {
-        // Use a switch statement to handle each day
-        switch (LocalDate.now().getDayOfWeek()) {
+    private static boolean shallDDSendMailForWeek(DisplayDeviceEntity dd, Time currentTime, DayOfWeek dayOfWeek) {
+        switch (dayOfWeek) {
             case MONDAY:
                 return shallDDSendMailForSingleDay(dd.getMonday_start(), dd.getMonday_end(), currentTime);
             case TUESDAY:
@@ -141,10 +141,8 @@ public class EmailServiceImpl implements EmailService {
                 return shallDDSendMailForSingleDay(dd.getSaturday_start(), dd.getSaturday_end(), currentTime);
             case SUNDAY:
                 return shallDDSendMailForSingleDay(dd.getSunday_start(), dd.getSunday_end(), currentTime);
-            default:
-                System.err.println("Unknown day! of the week");
-                return false;
         }
+        return false;
     }
 
     private static boolean shallDDSendMailForSingleDay(Time start, Time end, Time currentTime) {

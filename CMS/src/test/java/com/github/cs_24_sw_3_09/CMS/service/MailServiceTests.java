@@ -32,8 +32,10 @@ import jakarta.mail.internet.MimeMessage;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
+import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Optional;
@@ -129,6 +131,22 @@ class MailServiceTests {
         DisplayDeviceEntity displayDeviceEntity = new DisplayDeviceEntity();
         displayDeviceEntity.setId(1);
         displayDeviceEntity.setName("Test Device");
+        Time start = Time.valueOf("08:00:00");
+        Time end = Time.valueOf("16:00:00");
+        displayDeviceEntity.setMonday_start(start);
+        displayDeviceEntity.setMonday_end(end);
+        displayDeviceEntity.setTuesday_start(start);
+        displayDeviceEntity.setTuesday_end(end);
+        displayDeviceEntity.setWednesday_start(start);
+        displayDeviceEntity.setWednesday_end(end);
+        displayDeviceEntity.setThursday_start(start);
+        displayDeviceEntity.setThursday_end(end);
+        displayDeviceEntity.setFriday_start(start);
+        displayDeviceEntity.setFriday_end(end);
+        displayDeviceEntity.setSaturday_start(start);
+        displayDeviceEntity.setSaturday_end(end);
+        displayDeviceEntity.setSunday_start(start);
+        displayDeviceEntity.setSunday_end(end);
         when(displayDeviceService.isExists(1L)).thenReturn(true);
         when(displayDeviceService.findOne(1L)).thenReturn(Optional.of(displayDeviceEntity));
 
@@ -141,7 +159,7 @@ class MailServiceTests {
         mailService.setSender(mockSender);
 
         // Call the method under test
-        String result = mailService.sendDDDisconnectMail(1);
+        String result = mailService.sendDDDisconnectMail(1, Time.valueOf("10:00:00"));
 
         // Verify interactions
         verify(displayDeviceService, times(1)).isExists(1L);
@@ -160,7 +178,7 @@ class MailServiceTests {
         String result = mailService.sendDDDisconnectMail(1);
 
         // Assert the result
-        assertEquals("Did not sent to DD, as it is not found in DB",
+        assertEquals("Did not sent mail, as DD is not found in DB",
                 result);
     }
 
@@ -205,7 +223,8 @@ class MailServiceTests {
         mailService.setSender(mockSender);
         doThrow(new RuntimeException("Mail server is down")).when(javaMailSender).send(any(SimpleMailMessage.class));
         // Call the method under test
-        String result = mailService.sendDDDisconnectMail(1);
+        Time currentTime = Time.valueOf("12:00:00");
+        String result = mailService.sendDDDisconnectMail(1, currentTime);
 
         System.out.println(result);
         // Assert the result
@@ -238,5 +257,75 @@ class MailServiceTests {
 
         setUsers = mailService.filterUsersOutsidePausePeriod(setUsers);
         assertEquals(setUsers.size(), 1);
+    }
+
+    @Test
+    void unitTestFor_shallDDSendMailForWeek() throws Exception {
+        EmailServiceImpl emailServiceImpl = new EmailServiceImpl(null, null, null);
+        DisplayDeviceEntity dd = new DisplayDeviceEntity();
+        Time currentTime = Time.valueOf("12:00:00");
+
+        // Access the private method via reflection
+        Method method = EmailServiceImpl.class.getDeclaredMethod(
+                "shallDDSendMailForWeek", DisplayDeviceEntity.class, Time.class, DayOfWeek.class);
+        method.setAccessible(true);
+
+        // Iterate over all days of the week
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+            boolean result = (boolean) method.invoke(emailServiceImpl, dd, currentTime, dayOfWeek);
+            assertFalse(result, "Expected false for day: " + dayOfWeek);
+        }
+    }
+
+    @Test
+    void shallDDSendMailForSingleDay() throws Exception {
+        EmailServiceImpl emailServiceImpl = new EmailServiceImpl(null, null, null);
+
+        // Access the private method via reflection
+        Method method = EmailServiceImpl.class.getDeclaredMethod(
+                "shallDDSendMailForSingleDay", Time.class, Time.class, Time.class);
+        method.setAccessible(true);
+
+        // case: 1
+        Time start = null;
+        Time end = null;
+        Time currentTime = Time.valueOf("12:00:00");
+        boolean result = (boolean) method.invoke(emailServiceImpl, start, end, currentTime);
+        assertFalse(result);
+
+        // case: 2
+        start = null;
+        end = Time.valueOf("13:00:00");
+        currentTime = Time.valueOf("12:00:00");
+        result = (boolean) method.invoke(emailServiceImpl, start, end, currentTime);
+        assertFalse(result);
+
+        // case: 3
+        start = Time.valueOf("13:00:00");
+        end = null;
+        currentTime = Time.valueOf("12:00:00");
+        result = (boolean) method.invoke(emailServiceImpl, start, end, currentTime);
+        assertFalse(result);
+
+        // case: 4
+        start = Time.valueOf("13:00:00");
+        end = Time.valueOf("14:00:00");
+        currentTime = Time.valueOf("12:00:00");
+        result = (boolean) method.invoke(emailServiceImpl, start, end, currentTime);
+        assertFalse(result);
+
+        // case: 5
+        start = Time.valueOf("10:00:00");
+        end = Time.valueOf("11:00:00");
+        currentTime = Time.valueOf("12:00:00");
+        result = (boolean) method.invoke(emailServiceImpl, start, end, currentTime);
+        assertFalse(result);
+
+        // case: 6
+        start = Time.valueOf("10:00:00");
+        end = Time.valueOf("13:00:00");
+        currentTime = Time.valueOf("12:00:00");
+        result = (boolean) method.invoke(emailServiceImpl, start, end, currentTime);
+        assertTrue(result);
     }
 }
