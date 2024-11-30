@@ -53,10 +53,35 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public DisplayDeviceEntity save(DisplayDeviceEntity displayDevice) {
-        DisplayDeviceEntity toReturn = displayDeviceRepository.save(displayDevice);
+    public Optional<DisplayDeviceEntity> save(DisplayDeviceEntity displayDeviceEntity) {
+        if (displayDeviceEntity.getFallbackContent() != null) {
+            Optional<DisplayDeviceEntity> displayDevice = addFallbackContent(displayDeviceEntity);
+            if (displayDevice.isEmpty()) return Optional.empty();
+            displayDeviceEntity = displayDevice.get();
+        }
+
+        DisplayDeviceEntity toReturn = displayDeviceRepository.save(displayDeviceEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
+        return Optional.of(toReturn);
+    }
+
+    private Optional<DisplayDeviceEntity> addFallbackContent(DisplayDeviceEntity displayDeviceEntity) {
+        Integer currentContentId = displayDeviceEntity.getFallbackContent().getId();
+        Optional<ContentEntity> optionalContent = findContentById(currentContentId);
+        if (optionalContent.isEmpty()) return Optional.empty(); 
+        displayDeviceEntity.setFallbackContent(optionalContent.get());
+        
+        return Optional.of(displayDeviceEntity);
+    }
+
+
+    private Optional<ContentEntity> findContentById(Integer contentId) {
+        if (slideshowRepository.existsById(contentId)) {
+            return Optional.of(slideshowRepository.findById(contentId).orElse(null));
+        } else if (visualMediaRepository.existsById(contentId)) {
+            return Optional.of(visualMediaRepository.findById(contentId).orElse(null));
+        }
+        return Optional.empty();
     }
 
     @Override

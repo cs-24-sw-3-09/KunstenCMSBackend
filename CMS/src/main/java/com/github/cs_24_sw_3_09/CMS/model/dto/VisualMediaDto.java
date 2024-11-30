@@ -22,7 +22,7 @@ public class VisualMediaDto extends ContentDto {
     private String location;
     // TODO: add validation for filetype?
     private String fileType;
-    @Size(min = 1, max = 100, message = "a desciption must be between 1 and 100 characters")
+    @Size(min = 1, max = 100, message = "a description must be between 1 and 100 characters")
     private String description;
     private LocalDateTime lastDateModified;
     private Set<TagEntity> tags;
