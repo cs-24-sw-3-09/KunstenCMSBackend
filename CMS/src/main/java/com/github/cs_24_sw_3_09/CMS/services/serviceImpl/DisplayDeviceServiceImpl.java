@@ -164,4 +164,17 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
     }
+
+    @Override
+    public Optional<DisplayDeviceEntity> addFallback(Long id, Long fallbackId) {
+        DisplayDeviceEntity displayDevice = displayDeviceRepository.findById(Math.toIntExact(id)).get();
+
+        Optional<ContentEntity> content = findContentById(Math.toIntExact(fallbackId));
+        if (content.isEmpty()) return Optional.empty();
+
+        displayDevice.setFallbackContent(content.get());
+        DisplayDeviceEntity displayToReturn = displayDeviceRepository.save(displayDevice);
+
+        return Optional.of(displayDevice);   
+    }
 }
