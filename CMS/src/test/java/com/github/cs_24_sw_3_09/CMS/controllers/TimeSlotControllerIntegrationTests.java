@@ -161,6 +161,19 @@ public class TimeSlotControllerIntegrationTests {
     public void testThatDeleteTimeSlotReturnsStatus204() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        assertTrue(timeSlotService.isExists((long) 1));
+        assertTrue(displayDeviceService.isExists((long) 1));
+
+        TimeSlotEntity tsToCompare = timeSlotService.findOne((long) 1).get();
+        assertNotEquals(
+            null,
+            tsToCompare.getDisplayDevices()
+        );
+        assertNotEquals(
+            null,
+            tsToCompare.getDisplayContent()
+        );
+
 		Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
 
         mockMvc.perform(
@@ -170,6 +183,11 @@ public class TimeSlotControllerIntegrationTests {
         );
 
 		assertFalse(timeSlotService.isExists(id));
+        assertTrue(
+            displayDeviceService.findOne((long) 1).get()
+            .getTimeSlots().stream()
+            .noneMatch(timeSlot -> timeSlotService.isExists((long) timeSlot.getId()))
+        );
     }
 
     @Test
@@ -261,6 +279,8 @@ public class TimeSlotControllerIntegrationTests {
         assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(
             displayDevice -> displayDeviceService.isExists(displayDevice.getId().longValue())
         ));
+        assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
+        assertEquals(2, timeSlotService.countDisplayDeviceAssociations((long) 1));
 
         Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
 		String body = "{\"ddId\":" + ddId + "}";
@@ -285,12 +305,11 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatDeletesAssociationBetweenTSAndDDWithOnlyOneAssociation() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        timeSlotEntity.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
-
+        
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
         assertTrue(timeSlotService.isExists((long) 1));
         assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
-
+        assertEquals(1, timeSlotService.countDisplayDeviceAssociations((long) 1));
         assertTrue(displayDeviceService.isExists((long) 1));
 
         String body = "{\"ddId\": 1 }";

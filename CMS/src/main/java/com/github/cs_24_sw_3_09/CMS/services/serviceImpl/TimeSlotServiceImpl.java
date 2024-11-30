@@ -19,6 +19,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -155,21 +156,44 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void delete(Long id) {
-        
+        TimeSlotEntity timeSlotToDelete = timeSlotRepository.findById(Math.toIntExact(id)).get();
 
+        Set<DisplayDeviceEntity> displayDevices = timeSlotToDelete.getDisplayDevices(); 
+        for(DisplayDeviceEntity displayDevice : displayDevices) {
+            deleteRelationWithTS(displayDevice, timeSlotToDelete.getId());
+        }
 
-        timeSlotRepository.deleteById(Math.toIntExact(id));
+        timeSlotToDelete.setDisplayContent(null);
+        timeSlotToDelete.getDisplayDevices().clear();
+        timeSlotRepository.save(timeSlotToDelete);
+
+        timeSlotRepository.delete(timeSlotToDelete);
+    }
+
+    private void deleteRelationWithTS(DisplayDeviceEntity displayDevice, Integer timeSlotId) {
+        List<TimeSlotEntity> timeSlots = displayDevice.getTimeSlots();
+        for(int i = 0; i < timeSlots.size(); i++) {
+            if(timeSlots.get(i).getId() == timeSlotId) {
+                timeSlots.remove(i);
+                break; 
+            }
+        }
     }
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
-        int associations = timeSlotRepository.countAssociations(tsId);
+        int associations = countDisplayDeviceAssociations(tsId);
 
-        if (associations == 1) {
+        if (associations <= 1) {
             delete(tsId);
         } else {
             timeSlotRepository.deleteAssociation(tsId, ddId);
         }
+    }
+
+    @Override 
+    public int countDisplayDeviceAssociations(Long timeSlotId) {
+        return timeSlotRepository.countAssociations(timeSlotId);
     }
 
     @Override

@@ -26,8 +26,9 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
-                                   PushTSService pushTSService) {
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, 
+                                    SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
+                                    PushTSService pushTSService) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
