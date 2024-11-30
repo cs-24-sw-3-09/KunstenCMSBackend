@@ -83,17 +83,16 @@ public class TimeSlotController {
         return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.CREATED);
     }
 
-    @GetMapping
+    /*@GetMapping
     public Page<TimeSlotDto> getTimeSlots(Pageable pageable) {
         Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
         return timeSlotEntities.map(timeSlotMapper::mapTo);
-    }
+    }*/
 
     @GetMapping
     public List<TimeSlotDto> getTimeSlots(
             @RequestParam("start") Date startDate,
             @RequestParam("end") Date endDate) {
-        // Call a service to get the list of timeslots in the range
         List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
         return timeSlotEntities.stream()
                 .map(timeSlotMapper::mapTo)
