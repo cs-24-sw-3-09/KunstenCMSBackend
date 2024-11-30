@@ -34,7 +34,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private SlideshowService slideshowService;
 
     public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository,
-                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService, slideshowService) {
+                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService slideshowService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
