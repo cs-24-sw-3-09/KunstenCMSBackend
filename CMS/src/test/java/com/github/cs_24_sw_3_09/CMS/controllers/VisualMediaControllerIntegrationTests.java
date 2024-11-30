@@ -292,11 +292,14 @@ public class VisualMediaControllerIntegrationTests {
     @Test
     @WithMockUser(roles = "PLANNER")
     public void testThatAddTagToVisualMediaReturnsVisualMediaWithAddedTag() throws Exception {
-        TagEntity tag = TestDataUtil.createTagEntity();
-        TagEntity savedTagEntity = tagService.save(tag);
+        TagEntity tagToSave = TestDataUtil.createTagEntity();
+        TagEntity savedTagEntity = tagService.save(tagToSave);
+        assertTrue(tagService.isExists((long) 1));
 
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+        assertTrue(visualMediaService.isExists((long) 1));
+        
 
         String requestBodyJson = "{\"tagId\": " + savedTagEntity.getId() + "}";
 
@@ -309,7 +312,41 @@ public class VisualMediaControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.tags[0].text").value(savedTagEntity.getText()));
 
+        visualMediaService.findOne((long) 1).get().getTags().stream().allMatch(tag -> tagService.isExists((long) tag.getId()));
+    }
 
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatAddTagToVisualMediaWhenTagDoesntExistAndReturns404() throws Exception {
+        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+        
+
+        String requestBodyJson = "{\"tagId\": 1}";
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBodyJson)
+                ).andExpect(
+                        MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatAddTagToVisualMediaWhenVisualMediaDoesntExistAndReturns404() throws Exception {
+        TagEntity tag = TestDataUtil.createTagEntity();
+        tagService.save(tag);
+        assertTrue(tagService.isExists((long) 1));
+        
+        String requestBodyJson = "{\"tagId\": 1}";
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/visual_medias/1/tags")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBodyJson)
+                ).andExpect(
+                        MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test

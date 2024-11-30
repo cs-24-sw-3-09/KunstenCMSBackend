@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -190,13 +189,13 @@ public class VisualMediaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        VisualMediaEntity updatedVisualMedia = visualMediaService.addTag(id, tagId);
+        Optional<VisualMediaEntity> updatedVisualMedia = visualMediaService.addTag(id, tagId);
 
         // If tag was not found, updatedVisualMedia will be null.
-        if (updatedVisualMedia == null)
+        if (updatedVisualMedia.isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia), HttpStatus.OK);
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia.get()), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "{visual_media_Id}/tags")
