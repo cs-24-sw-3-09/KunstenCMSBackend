@@ -29,10 +29,10 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private PushTSService pushTSService;
     private DisplayDeviceRepository displayDeviceRepository;
     private SlideshowRepository slideshowRepository;
-    private VisualMediaRepository visualMediaRepository; 
+    private VisualMediaRepository visualMediaRepository;
 
     public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository,
-    SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository) {
+                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
@@ -45,15 +45,15 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
 
         Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
-        for(DisplayDeviceEntity displayDevice : displayDevices) {
-            DisplayDeviceEntity newDisplayDevice = displayDeviceRepository.findById(displayDevice.getId()).get();            
+        for (DisplayDeviceEntity displayDevice : displayDevices) {
+            DisplayDeviceEntity newDisplayDevice = displayDeviceRepository.findById(displayDevice.getId()).get();
             newDisplayDevices.add(newDisplayDevice);
         }
         timeSlotEntity.getDisplayDevices().clear();
         timeSlotEntity.setDisplayDevices(newDisplayDevices);
 
         TimeSlotEntity newTs = timeSlotRepository.save(timeSlotEntity);
-        
+
         pushTSService.updateDisplayDevicesToNewTimeSlots();
 
         return newTs;
@@ -63,13 +63,13 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
         //Handle display devices
         Optional<TimeSlotEntity> displayDevice = addDisplayDevice(timeSlotEntity);
-        if(displayDevice.isEmpty()) return Optional.empty();
+        if (displayDevice.isEmpty()) return Optional.empty();
         timeSlotEntity = displayDevice.get();
 
         //Handle display content
-        if(timeSlotEntity.getDisplayContent() != null) {
+        if (timeSlotEntity.getDisplayContent() != null) {
             Optional<TimeSlotEntity> displayContent = addDisplayContent(timeSlotEntity);
-            if(displayContent.isEmpty()) return Optional.empty();
+            if (displayContent.isEmpty()) return Optional.empty();
             timeSlotEntity = displayContent.get();
         }
 
@@ -82,7 +82,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
 
         Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
-        for(DisplayDeviceEntity displayDevice : displayDevices) {
+        for (DisplayDeviceEntity displayDevice : displayDevices) {
             DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);
 
             if (newDisplayDevice == null) return Optional.empty();
@@ -97,7 +97,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private Optional<TimeSlotEntity> addDisplayContent(TimeSlotEntity timeSlotEntity) {
         Integer currentContentId = timeSlotEntity.getDisplayContent().getId();
         Optional<ContentEntity> optionalContent = currentContentId == null ? Optional.of(timeSlotEntity.getDisplayContent()) : findContentById(currentContentId);
-        if (optionalContent.isEmpty()) return Optional.empty(); 
+        if (optionalContent.isEmpty()) return Optional.empty();
         timeSlotEntity.setDisplayContent(optionalContent.get());
         return Optional.of(timeSlotEntity);
     }
@@ -167,5 +167,16 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         } else {
             timeSlotRepository.deleteAssociation(tsId, ddId);
         }
+    }
+
+    @Override
+    public TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException {
+        return timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
+            DisplayDeviceEntity foundDisplayDevice = displayDeviceRepository.findById(Math.toIntExact(displayDeviceId)).orElseThrow();
+            existingTimeSlot.addDisplayDevice(foundDisplayDevice);
+            existingTimeSlot.setId(Math.toIntExact(id));
+            TimeSlotEntity updatedTimeslot = timeSlotRepository.save(existingTimeSlot);
+            return timeSlotRepository.save(updatedTimeslot);
+        }).orElseThrow();
     }
 }
