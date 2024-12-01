@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.sql.Date;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +22,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
@@ -35,7 +33,6 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -103,7 +100,37 @@ public class TimeSlotControllerIntegrationTests {
             MockMvcResultMatchers.jsonPath("content.[0].startTime").value(testTimeSlotEntity.getStartTime().toString())
         ).andExpect(
             MockMvcResultMatchers.status().isOk());
+    }
 
+    @Test
+    @WithMockUser
+    public void testThatGetTimeSlotsBasedOnTimeFrame() throws Exception {
+        TimeSlotEntity ts = TestDataUtil.createTimeSlotEntity();
+        ts.setStartDate(Date.valueOf(LocalDate.of(2024, 11, 25)));
+        ts.setEndDate(Date.valueOf(LocalDate.of(2025, 11, 25)));
+        timeSlotService.save(ts);
+        ts = TestDataUtil.createTimeSlotEntity();
+        ts.setStartDate(Date.valueOf(LocalDate.of(2024, 12, 2)));
+        ts.setEndDate(Date.valueOf(LocalDate.of(2025, 11, 25)));
+        timeSlotService.save(ts);
+        ts = TestDataUtil.createTimeSlotEntity();
+        ts.setStartDate(Date.valueOf(LocalDate.of(2025, 2, 25)));
+        ts.setEndDate(Date.valueOf(LocalDate.of(2025, 11, 25)));
+        timeSlotService.save(ts);
+        ts = TestDataUtil.createTimeSlotEntity();
+        ts.setStartDate(Date.valueOf(LocalDate.of(2024, 9, 25)));
+        ts.setEndDate(Date.valueOf(LocalDate.of(2024, 12, 2)));
+        timeSlotService.save(ts);
+        ts = TestDataUtil.createTimeSlotEntity();
+        ts.setStartDate(Date.valueOf(LocalDate.of(2024, 12, 1)));
+        ts.setEndDate(Date.valueOf(LocalDate.of(2024, 12, 2)));
+        timeSlotService.save(ts);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/time_slots?start=2024-11-30&end=2024-12-04"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("numberOfElements").value(4))
+                .andExpect(
+                        MockMvcResultMatchers.status().isOk());
     }
 
     @Test
