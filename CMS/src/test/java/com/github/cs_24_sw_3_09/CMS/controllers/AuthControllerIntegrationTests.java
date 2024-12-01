@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -184,6 +185,38 @@ public class AuthControllerIntegrationTests {
 			MockMvcRequestBuilders.post("/api/account/login")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(loginDtoJson)
+		).andExpect(
+			MockMvcResultMatchers.status().isOk()
+		);
+	}
+
+	@Test
+	public void testThatRequestFailsWithoutTokenType() throws Exception {
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/display_devices")
+		).andExpect(
+			MockMvcResultMatchers.status().isForbidden()
+		);
+	}
+
+	@Test
+	public void testThatRequestFailsWithResetTokenType() throws Exception {
+		String token = jwtService.generateToken("admin@kunsten.dk", TOKEN_TYPE.RESET_TOKEN);
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/display_devices")
+			.header("Authorization", "Bearer " + token)
+		).andExpect(
+			MockMvcResultMatchers.status().isForbidden()
+		);
+	}
+
+	@Test
+	public void testThatSucceedWithAuthTokenType() throws Exception {
+		String token = jwtService.generateToken("admin@kunsten.dk", TOKEN_TYPE.AUTH_TOKEN);
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/display_devices")
+			.header("Authorization", "Bearer " + token)
 		).andExpect(
 			MockMvcResultMatchers.status().isOk()
 		);
