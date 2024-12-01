@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class JwtServiceImpl implements JwtService {
     private Environment environment;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = environment.getProperty("JWT.SECRET").getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = environment.getProperty("JWT.SECRET", "iJnfAXTr9RNZmhWrMfSLzUnlqezjw2mR").getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
