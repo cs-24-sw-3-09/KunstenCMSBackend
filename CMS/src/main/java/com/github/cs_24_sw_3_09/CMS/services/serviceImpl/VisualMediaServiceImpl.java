@@ -125,7 +125,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public void deleteRelation(Long visualMediaId, Long tagId) {
-        visualMediaRepository.deleteAssociation(visualMediaId, tagId);
+        VisualMediaEntity visualMedia = visualMediaRepository.findById(Math.toIntExact(visualMediaId)).get();
+        TagEntity tag = tagRepository.findById(tagId).get();
+
+        visualMedia.getTags().remove(tag);
+        visualMediaRepository.save(visualMedia);
     }
 
     @Override

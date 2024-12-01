@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Date;
@@ -185,14 +186,35 @@ public class TimeSlotControllerIntegrationTests {
 
     @Test
     @WithMockUser(roles="PLANNER")
-    public void testThatDeleteTimeSlotReturnsStatus200() throws Exception {
+    public void testThatDeleteTimeSlotReturnsStatus204() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        assertTrue(timeSlotService.isExists((long) 1));
+        assertTrue(displayDeviceService.isExists((long) 1));
+
+        TimeSlotEntity tsToCompare = timeSlotService.findOne((long) 1).get();
+        assertNotEquals(
+            null,
+            tsToCompare.getDisplayDevices()
+        );
+        assertNotEquals(
+            null,
+            tsToCompare.getDisplayContent()
+        );
+
+		Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
         ).andExpect(
-                MockMvcResultMatchers.status().isNoContent()
+            MockMvcResultMatchers.status().isNoContent()
+        );
+
+		assertFalse(timeSlotService.isExists(id));
+        assertTrue(
+            displayDeviceService.findOne((long) 1).get()
+            .getTimeSlots().stream()
+            .noneMatch(timeSlot -> timeSlotService.isExists((long) timeSlot.getId()))
         );
     }
 
@@ -274,6 +296,94 @@ public class TimeSlotControllerIntegrationTests {
         );
     }
 
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDeletesAssociationBetweenTSAndDDWithMoreAssociationsThanOne() throws Exception {
+        TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
+        timeSlotEntity.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        
+        assertTrue(timeSlotService.isExists((long) 1));
+        assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(
+            displayDevice -> displayDeviceService.isExists(displayDevice.getId().longValue())
+        ));
+        assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
+        assertEquals(2, timeSlotService.countDisplayDeviceAssociations((long) 1));
+
+        Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
+		String body = "{\"ddId\":" + ddId + "}";
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(body)
+        ).andExpect(
+            MockMvcResultMatchers.status().isNoContent()
+        );
+
+		Long tsId = Long.valueOf(savedTimeSlotEntitiy.getId());
+		assertTrue(timeSlotService.isExists(tsId));
+        
+		for(DisplayDeviceEntity dd : timeSlotService.findOne(tsId).get().getDisplayDevices()) {
+			assertNotEquals(ddId, dd.getId());
+		}
+
+        assertEquals(1, timeSlotService.countDisplayDeviceAssociations((long) 1));
+    }
+
+	@Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDeletesAssociationBetweenTSAndDDWithOnlyOneAssociation() throws Exception {
+        TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
+        
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        assertTrue(timeSlotService.isExists((long) 1));
+        assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
+        assertEquals(1, timeSlotService.countDisplayDeviceAssociations((long) 1));
+        assertTrue(displayDeviceService.isExists((long) 1));
+
+        String body = "{\"ddId\": 1 }";
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(body)
+        ).andExpect(
+            MockMvcResultMatchers.status().isNoContent()
+        );
+
+		assertFalse(timeSlotService.isExists((long) 1));
+    }
+
+
+	@Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatTriesToDeleteAssociationButDoesntContainAssociation() throws Exception {
+		//Where Display Device does not exist
+		TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        
+        assertTrue(timeSlotService.isExists((long) 1));
+        assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("{\"ddId\":500}")
+        ).andExpect(
+            MockMvcResultMatchers.status().isNotFound()
+        );
+
+		//Where Time Slot Does not exist
+		Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/time_slots/500/display_devices")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content("{\"ddId\":" + ddId + "}")
+        ).andExpect(
+            MockMvcResultMatchers.status().isNotFound()
+        );
+    }
     @Test
     @WithMockUser(roles={"PLANNER"}) 
     public void testThatUploadesTimeSlotWithDisplayDeviceThatOnlyHasId() throws Exception {

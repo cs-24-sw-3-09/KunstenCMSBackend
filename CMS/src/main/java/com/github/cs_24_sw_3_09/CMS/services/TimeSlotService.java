@@ -26,6 +26,8 @@ public interface TimeSlotService {
 
     TimeSlotEntity partialUpdate(Long id, TimeSlotEntity timeSlotEntity);
 
+    int countDisplayDeviceAssociations(Long timeSlotId);
+
     void delete(Long id);
 
     void deleteRelation(Long tsId, Long ddId);

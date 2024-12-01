@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -10,7 +11,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.*;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
 
@@ -41,6 +41,7 @@ public class TestDataUtil {
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -79,6 +80,19 @@ public class TestDataUtil {
                 .name("Billede navn")
                 .build();
     }
+
+    public static VisualMediaEntity createVisualMediaEntityWithTags() {
+        return VisualMediaEntity.builder()
+                .description("dkaoidkao test descpt")
+                .fileType("jpg")
+                // .lastDateModified("30/10/2003")
+                .location("/djao/dhau")
+                .name("Billede navn")
+                .tags(createTagEntitySet())
+                .build();
+    }
+
+    
 
     public static UserDto createUserDto() {
         return UserDto.builder()
@@ -148,6 +162,7 @@ public class TestDataUtil {
                 .endTime(java.sql.Time.valueOf("11:21:31"))
                 .weekdaysChosen(3)
                 .displayContent(assignedSlideshow())
+                .displayDevices(new HashSet<>())
                 .build();
     }
 
@@ -243,6 +258,21 @@ public class TestDataUtil {
         return TagEntity.builder()
                 .text("Cool image")
                 .build();
+    }
+
+    public static TagEntity createTagEntity2() {
+        return TagEntity.builder()
+                .text("Cool image")
+                .build();
+    }
+
+    public static Set<TagEntity> createTagEntitySet() {
+        Set<TagEntity> tag = new HashSet<>(); 
+
+        tag.add(createTagEntity());
+        tag.add(createTagEntity2());
+
+        return tag;         
     }
 
     public static SlideshowEntity createSlideshowWithVisualMediaEntity() {
