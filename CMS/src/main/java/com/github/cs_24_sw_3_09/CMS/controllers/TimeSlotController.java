@@ -1,14 +1,20 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
@@ -78,7 +85,20 @@ public class TimeSlotController {
     }
 
     @GetMapping
-    public Page<TimeSlotDto> getTimeSlots(Pageable pageable) {
+    public Page<TimeSlotDto> getTimeSlots(Pageable pageable,
+            @RequestParam(value = "start", required = false) Date startDate,
+            @RequestParam(value = "end", required = false) Date endDate) {
+
+        // If one want to find based on date
+        if (startDate != null && endDate != null) {
+            List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
+            List<TimeSlotDto> timeSlotDtos = timeSlotEntities.stream()
+                    .map(timeSlotMapper::mapTo)
+                    .collect(Collectors.toList());
+
+            return new PageImpl<>(timeSlotDtos, pageable, timeSlotDtos.size());
+        }
+
         Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
         return timeSlotEntities.map(timeSlotMapper::mapTo);
     }

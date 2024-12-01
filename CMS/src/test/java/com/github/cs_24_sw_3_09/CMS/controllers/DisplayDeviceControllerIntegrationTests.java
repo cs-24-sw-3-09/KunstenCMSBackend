@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,14 +165,97 @@ public class DisplayDeviceControllerIntegrationTests {
 
 	@Test
 	@WithMockUser(roles = "ADMIN")
-	public void testThatDeleteDisplayDeviceReturnsStatus200() throws Exception {
+	public void testThatDeleteDisplayDeviceReturnsStatus204() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		displayDeviceService.save(displayDeviceEntity);
+		assertTrue(displayDeviceService.isExists((long) 1));
 
 		mockMvc.perform(
-				MockMvcRequestBuilders.delete("/api/display_devices/" + savedDisplayDeviceEntity.getId())).andExpect(
-						MockMvcResultMatchers.status().isNoContent());
+				MockMvcRequestBuilders.delete("/api/display_devices/1")
+		).andExpect(
+						MockMvcResultMatchers.status().isNoContent()
+		);
+
+		assertFalse(displayDeviceService.isExists((long) 1));
 	}
+
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	public void testThatDeleteDisplayDeviceAndTimeSlotWithOnlyOneAssociation() throws Exception {
+		//Creates both a display Device and a time slot
+		TimeSlotEntity timeSlotToSave = TestDataUtil.createTimeSlotEntity();
+		timeSlotService.save(timeSlotToSave);
+
+		
+		assertTrue(displayDeviceService.isExists((long) 1));
+		assertTrue(timeSlotService.isExists((long) 1));
+
+		assertEquals(
+			1, 
+			displayDeviceService.findOne((long) 1).get().getTimeSlots().size()
+		);
+		assertEquals(
+			1, 
+			timeSlotService.countDisplayDeviceAssociations((long) 1)
+		);
+
+		mockMvc.perform(
+				MockMvcRequestBuilders.delete("/api/display_devices/1")
+		).andExpect(
+						MockMvcResultMatchers.status().isNoContent()
+		);
+		assertFalse(displayDeviceService.isExists((long) 1));
+		assertFalse(timeSlotService.isExists((long) 1));
+	}
+
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	public void testThatDeleteDisplayDeviceAndNotTimeSlotWithMoreAssociations() throws Exception {
+		//Creates both a display Device and a time slot
+		TimeSlotEntity timeSlotToSave = TestDataUtil.createTimeSlotEntity();
+		timeSlotToSave.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
+		timeSlotService.save(timeSlotToSave);
+
+
+		
+		assertTrue(displayDeviceService.isExists((long) 1));
+		assertTrue(timeSlotService.isExists((long) 1));
+
+		assertEquals(
+			1, 
+			displayDeviceService.findOne((long) 1).get().getTimeSlots().size()
+		);
+		assertEquals(
+			2, 
+			timeSlotService.countDisplayDeviceAssociations((long) 1)
+		);
+
+
+		mockMvc.perform(
+				MockMvcRequestBuilders.delete("/api/display_devices/1")
+		).andExpect(
+						MockMvcResultMatchers.status().isNoContent()
+		);
+		assertFalse(displayDeviceService.isExists((long) 1));
+		assertTrue(timeSlotService.isExists((long) 1));
+		assertEquals(
+			1, 
+			timeSlotService.countDisplayDeviceAssociations((long) 1)
+		);
+	}
+
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	public void testThatTryDeleteDisplayDeviceAndReturns404() throws Exception {
+		assertFalse(displayDeviceService.isExists((long) 1));
+		mockMvc.perform(
+				MockMvcRequestBuilders.delete("/api/display_devices/1")
+		).andExpect(
+						MockMvcResultMatchers.status().isNotFound()
+		);
+		assertFalse(displayDeviceService.isExists((long) 1));
+	}
+
 
 	@Test
 	@WithMockUser(roles = "ADMIN")

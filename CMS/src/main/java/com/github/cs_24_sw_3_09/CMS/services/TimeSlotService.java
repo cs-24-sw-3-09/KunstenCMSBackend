@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +18,15 @@ public interface TimeSlotService {
 
     Page<TimeSlotEntity> findAll(Pageable pageable);
 
+    List<TimeSlotEntity> findAll(Date start, Date end);
+
     Optional<TimeSlotEntity> findOne(Long id);
 
     boolean isExists(Long id);
 
     TimeSlotEntity partialUpdate(Long id, TimeSlotEntity timeSlotEntity);
+
+    int countDisplayDeviceAssociations(Long timeSlotId);
 
     void delete(Long id);
 

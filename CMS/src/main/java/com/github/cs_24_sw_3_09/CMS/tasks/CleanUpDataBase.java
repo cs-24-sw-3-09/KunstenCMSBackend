@@ -23,6 +23,6 @@ public class CleanUpDataBase {
     @Async("asyncTaskExecutor")
     @Scheduled(fixedRate = 1000 * 60 * 60 * 4) // Runs every 4 hour
     public void deleteTSWithoutDD() {
-        cleanUpDateBaseService.deleteTSWithoutDD();
+        //cleanUpDateBaseService.deleteTSWithoutDD();
     }
 }

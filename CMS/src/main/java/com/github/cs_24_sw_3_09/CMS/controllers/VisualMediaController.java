@@ -215,9 +215,12 @@ public class VisualMediaController {
             return ResponseEntity.badRequest().build();
         }
 
-        if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)) {
+        if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)
+        //Checks if there is an association between the visual media and the tag
+        || !visualMediaService.findOne(visualMediaId).get().getTags().contains(tagService.findOne(tagId).get())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         visualMediaService.deleteRelation(visualMediaId, tagId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -35,7 +35,7 @@ public class TagEntity {
     private String text;
     @ManyToMany(
             mappedBy = "tags",
-            fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+            fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE}
     )
     @JsonIgnore
     private Set<VisualMediaEntity> visualMedias;
