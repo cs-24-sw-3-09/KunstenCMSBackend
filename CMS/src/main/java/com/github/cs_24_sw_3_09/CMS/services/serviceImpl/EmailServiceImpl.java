@@ -134,7 +134,6 @@ public class EmailServiceImpl implements EmailService {
             case FRIDAY -> shallDDSendMailForSingleDay(dd.getFriday_start(), dd.getFriday_end(), currentTime);
             case SATURDAY -> shallDDSendMailForSingleDay(dd.getSaturday_start(), dd.getSaturday_end(), currentTime);
             case SUNDAY -> shallDDSendMailForSingleDay(dd.getSunday_start(), dd.getSunday_end(), currentTime);
-            default -> false;
         };
     }
 
