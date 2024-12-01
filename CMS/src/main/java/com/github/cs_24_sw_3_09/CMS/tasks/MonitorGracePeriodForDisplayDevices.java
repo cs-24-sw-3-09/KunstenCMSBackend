@@ -23,7 +23,7 @@ public class MonitorGracePeriodForDisplayDevices {
             long lastSentTime = lastEmailSentMap.get(ddId);
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSentTime < GRACE_PERIOD_MS) {
-                System.out.println("Email not sent due to grace period.");
+                System.out.println("Email not sent for screen " + ddId + " due to grace period.");
                 return;
             }
         }

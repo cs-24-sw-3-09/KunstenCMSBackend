@@ -1,8 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,7 +11,6 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
-import com.github.cs_24_sw_3_09.CMS.services.EmailService;
 import com.github.cs_24_sw_3_09.CMS.tasks.MonitorGracePeriodForDisplayDevices;
 
 import jakarta.annotation.PreDestroy;
