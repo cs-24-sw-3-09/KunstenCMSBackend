@@ -126,23 +126,16 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private static boolean shallDDSendMailForWeek(DisplayDeviceEntity dd, Time currentTime, DayOfWeek dayOfWeek) {
-        switch (dayOfWeek) {
-            case MONDAY:
-                return shallDDSendMailForSingleDay(dd.getMonday_start(), dd.getMonday_end(), currentTime);
-            case TUESDAY:
-                return shallDDSendMailForSingleDay(dd.getTuesday_start(), dd.getTuesday_end(), currentTime);
-            case WEDNESDAY:
-                return shallDDSendMailForSingleDay(dd.getWednesday_start(), dd.getWednesday_end(), currentTime);
-            case THURSDAY:
-                return shallDDSendMailForSingleDay(dd.getThursday_start(), dd.getThursday_end(), currentTime);
-            case FRIDAY:
-                return shallDDSendMailForSingleDay(dd.getFriday_start(), dd.getFriday_end(), currentTime);
-            case SATURDAY:
-                return shallDDSendMailForSingleDay(dd.getSaturday_start(), dd.getSaturday_end(), currentTime);
-            case SUNDAY:
-                return shallDDSendMailForSingleDay(dd.getSunday_start(), dd.getSunday_end(), currentTime);
+        return switch (dayOfWeek) {
+            case MONDAY -> shallDDSendMailForSingleDay(dd.getMonday_start(), dd.getMonday_end(), currentTime);
+            case TUESDAY-> shallDDSendMailForSingleDay(dd.getTuesday_start(), dd.getTuesday_end(), currentTime);
+            case WEDNESDAY -> shallDDSendMailForSingleDay(dd.getWednesday_start(), dd.getWednesday_end(), currentTime);
+            case THURSDAY -> shallDDSendMailForSingleDay(dd.getThursday_start(), dd.getThursday_end(), currentTime);
+            case FRIDAY -> shallDDSendMailForSingleDay(dd.getFriday_start(), dd.getFriday_end(), currentTime);
+            case SATURDAY -> shallDDSendMailForSingleDay(dd.getSaturday_start(), dd.getSaturday_end(), currentTime);
+            case SUNDAY -> shallDDSendMailForSingleDay(dd.getSunday_start(), dd.getSunday_end(), currentTime);
+            default -> false;
         }
-        return false;
     }
 
     private static boolean shallDDSendMailForSingleDay(Time start, Time end, Time currentTime) {
