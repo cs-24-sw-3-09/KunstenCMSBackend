@@ -75,7 +75,7 @@ public class TimeSlotEntity {
     }
 
     public boolean overlaps(TimeSlotEntity timeSlotEntity) {
-// this shiet not working
+
         if (this.startDate.after(timeSlotEntity.startDate) && this.endDate.before(timeSlotEntity.endDate)) {
             return true;
         }
