@@ -174,6 +174,7 @@ public class TimeSlotController {
     }
 
     @PatchMapping(path = "/{id}/display_content")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> setContent(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestBody) {
@@ -207,6 +208,7 @@ public class TimeSlotController {
 
 
     @PatchMapping(path = "/{id}/display_devices")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> addDisplayDevice(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestBody) {
         if (!requestBody.containsKey("displayDeviceId")) {
             return ResponseEntity.badRequest().build();
