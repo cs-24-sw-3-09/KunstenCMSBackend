@@ -139,7 +139,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
 
-    public JSONArray findStateOfEverySlideshow(){
+    /*public JSONArray findStateOfEverySlideshow(){
         List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
         System.out.println("slideshows: "+allSlideshowIds);
         //timeSlots: List of active and future time slots.
@@ -177,24 +177,28 @@ public class SlideshowServiceImpl implements SlideshowService {
 
             for (TimeSlotEntity ts : activeTimeSlots){
                 for(Integer contentId : displayContentIds){
-                    if(ts.getDisplayContent().getId() == contentId && contentId == slideshowId){
+                    if(ts.getDisplayContent().getId().equals(contentId) && contentId.equals(slideshowId)){
                         slideshowStatus.put("color", "green");
                         
-                        //convert List of display devices to JSONArray
                         List<JSONObject> jsonObjects = new ArrayList<>();
+                        if (slideshowStatus.has("displayDevices")) {
+                            //jsonObjects = (List<JSONObject>) slideshowStatus.get("displayDevices");
+                        }
+
+                        //convert List of display devices to JSONArray
                         for (DisplayDeviceEntity obj : ts.getDisplayDevices()) {
                             JSONObject json = new JSONObject();
+                            //System.out.println("DD: "+obj.toString());
                             json.put("displayDevice", obj);
                             jsonObjects.add(json);
+                            System.out.println("added DD: "+json);
                         }
                         JSONArray jsonArray = new JSONArray(jsonObjects);
+                        System.out.println("List of relevant DD: "+jsonArray);
 
                         slideshowStatus.put("displayDevices", jsonArray);
                         break;
-                    }
-                    if (slideshowStatus.get("color").equals("green")) {
-                        break;
-                    }
+                    }       
                 }
             }
 
@@ -212,11 +216,84 @@ public class SlideshowServiceImpl implements SlideshowService {
                 }
             }
             if (!slideshowStatus.get("color").equals("green")) {
-                slideshowStatus.remove("DD");
+                slideshowStatus.remove("displayDevices");
             }
             slideshowStatusMap.put(slideshowId, slideshowStatus);
         }
         System.out.println("result: "+slideshowStatusMap);
         return new JSONArray(slideshowStatusMap.values());
+    }*/
+
+    public List<Map<String, Object>> findStateOfEverySlideshow() {
+        List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
+        System.out.println("slideshows: " + allSlideshowIds);  
+        List<TimeSlotEntity> allTimeSlotsWithSlideshowAsContent = timeSlotRepository.getAllTimeSlotsWithSlideshowAsContent();
+        System.out.println("ts: " + allTimeSlotsWithSlideshowAsContent.toString());
+        
+        List<Integer> displayContentIds = new ArrayList<>();
+        for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
+            displayContentIds.add(ts.getDisplayContent().getId());
+            System.out.println("id of SS as DC: " + ts.getDisplayContent().getId());
+        }   
+    
+        Set<Integer> timeSlotsCurrentlyShown = pushTSService.updateDisplayDevicesToNewTimeSlots(false);
+        System.out.println("tsCurrent: " + timeSlotsCurrentlyShown.toString());
+        List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
+        List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
+    
+        for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
+            if (timeSlotsCurrentlyShown.contains(ts.getId())) {
+                activeTimeSlots.add(ts);
+            } else {
+                futureTimeSlots.add(ts);
+            }
+        }
+
+        System.out.println("active: " + activeTimeSlots.toString());
+        System.out.println("future: " + futureTimeSlots.toString());
+    
+        List<Map<String, Object>> slideshowStatusList = new ArrayList<>();
+
+        for (Integer slideshowId : allSlideshowIds) {
+            Map<String, Object> slideshowStatus = new HashMap<>();
+            slideshowStatus.put("slideshowId", slideshowId);
+            slideshowStatus.put("color", "red");
+    
+        for (TimeSlotEntity ts : activeTimeSlots) {
+            for (Integer contentId : displayContentIds) {
+                if (ts.getDisplayContent().getId().equals(contentId) && contentId.equals(slideshowId)) {
+                    slideshowStatus.put("color", "green"); // Update color to green
+
+                    // Convert display devices to a list of maps
+                    List<Map<String, Object>> displayDevices = new ArrayList<>();
+                    for (DisplayDeviceEntity obj : ts.getDisplayDevices()) {
+                        Map<String, Object> displayDeviceMap = new HashMap<>();
+                        displayDeviceMap.put("id", obj.getId());
+                        displayDeviceMap.put("name", obj.getName());
+                        displayDevices.add(displayDeviceMap);
+                    }
+                    slideshowStatus.put("displayDevices", displayDevices);
+                    break;
+                }
+            } 
+        }
+        if ("red".equals(slideshowStatus.get("color"))) {
+            for (TimeSlotEntity ts : futureTimeSlots) {
+                for (Integer contentId : displayContentIds) {
+                    if (ts.getDisplayContent().getId().equals(contentId) && contentId.equals(slideshowId)) {
+                        slideshowStatus.put("color", "yellow"); // Update color to yellow
+                        break;
+                    }
+                }
+            }
+        }
+        if (!"green".equals(slideshowStatus.get("color"))) {
+            slideshowStatus.remove("displayDevices");
+        }
+        slideshowStatusList.add(slideshowStatus);
     }
+    System.out.println("result: " + slideshowStatusList);
+    return slideshowStatusList;
+ }
+    
 }

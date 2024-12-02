@@ -82,4 +82,20 @@ public class TimeSlotEntity {
     public int countDisplayDeviceAssociations() {
         return this.getDisplayDevices().size();
     }
+
+    @Override
+public String toString() {
+    return "ClassName{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", startDate=" + startDate +
+            ", endDate=" + endDate +
+            ", startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", weekdaysChosen=" + weekdaysChosen +
+            ", displayContent=" + (displayContent != null ? displayContent.getId() : null) +
+            ", displayDevices=" + (displayDevices != null ? displayDevices.size() : 0) +
+            '}';
+}
+
 }

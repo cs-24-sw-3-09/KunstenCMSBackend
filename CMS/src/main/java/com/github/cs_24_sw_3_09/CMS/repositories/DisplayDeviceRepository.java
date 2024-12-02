@@ -15,9 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEntity, Integer>,
                 PagingAndSortingRepository<DisplayDeviceEntity, Integer> {
-        @Query("SELECT d FROM DisplayDeviceEntity d WHERE d.connectedState = true")
-        List<DisplayDeviceEntity> findConnectedDisplayDevices();
-
         
        @Query("SELECT DISTINCT dd FROM DisplayDeviceEntity dd " +
        "JOIN dd.fallbackContent f " +
