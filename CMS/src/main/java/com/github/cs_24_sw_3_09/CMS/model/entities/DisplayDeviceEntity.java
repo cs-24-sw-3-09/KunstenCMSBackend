@@ -43,7 +43,6 @@ public class DisplayDeviceEntity {
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "display_device_id")}, inverseJoinColumns = {@JoinColumn(name = "time_slot_id")})
     @JsonIgnore
-    
     private List<TimeSlotEntity> timeSlots;
 
     private Time monday_start;

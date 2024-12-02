@@ -112,19 +112,17 @@ public class PushTSServiceImpl implements PushTSService {
         // Holder for the TS id's that is shown
         Set<Integer> timeSlotsInUse = new HashSet<>();
         for (DisplayDeviceEntity dd : displayDevices) {
-            /*if (!socketIOModule.isConnected(dd.getId())) {
+            if (!socketIOModule.isConnected(dd.getId())) {
                 continue;
-            }*/
+            }
             List<TimeSlotEntity> timeSlots = dd.getTimeSlots();
 
             TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(timeSlots,
                     displayDeviceMapper.mapTo(dd));
             if (timeSlotToBeDisplayed == null) {
-                System.out.println("PRIO for " + dd.getId() + ": null");
                 if (sendToDisplayDevices)
                     sendTimeSlotToDisplayDevice(dd.getFallbackContent(), dd);
             } else {
-                System.out.println("PRIO for ddId " + dd.getId() + ": " + timeSlotToBeDisplayed.getName());
                 if (sendToDisplayDevices)
                     sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
                 timeSlotsInUse.add(timeSlotToBeDisplayed.getId());

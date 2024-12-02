@@ -159,7 +159,6 @@ public class TimeSlotControllerIntegrationTests {
     public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity).get();
-        System.out.println(s.getDisplayDevices().toArray()[0]);
 
 
         mockMvc.perform(

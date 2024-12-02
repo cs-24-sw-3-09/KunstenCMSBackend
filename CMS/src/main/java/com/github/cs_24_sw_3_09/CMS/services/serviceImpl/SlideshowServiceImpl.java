@@ -67,8 +67,8 @@ public class SlideshowServiceImpl implements SlideshowService {
     }
 
     @Override
-    public Page<SlideshowEntity> findAll(Pageable pageable) {
-        return slideshowRepository.findAll(pageable);
+    public Iterable<SlideshowEntity> findAll(Pageable pageable) {
+        return slideshowRepository.findAll();
     }
 
     @Override

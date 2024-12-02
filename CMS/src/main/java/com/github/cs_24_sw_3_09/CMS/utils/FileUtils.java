@@ -14,9 +14,6 @@ import static com.google.common.io.Files.getFileExtension;
 public class FileUtils {
     public static File createVisualMediaFile(MultipartFile file, String newFileName) throws IOException {
 
-        System.out.println(newFileName);
-        System.out.println(file.getContentType());
-
         File newFile = createFileFromRoot("files/visual_media", newFileName + mimeToType(file.getContentType()));
         file.transferTo(newFile);
         return newFile;

@@ -18,7 +18,7 @@ public interface SlideshowService {
 
     List<SlideshowEntity> findAll();
 
-    Page<SlideshowEntity> findAll(Pageable pageable);
+    Iterable<SlideshowEntity> findAll(Pageable pageable);
 
     Optional<SlideshowEntity> findOne(Long id);
 

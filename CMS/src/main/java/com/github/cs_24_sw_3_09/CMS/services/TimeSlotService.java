@@ -36,5 +36,7 @@ public interface TimeSlotService {
 
     void deleteRelation(Long tsId, Long ddId);
 
+    TimeSlotEntity setDisplayContent(Long tsId, Long dcId, String type);
+  
     TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException;
 } 
