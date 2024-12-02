@@ -41,7 +41,7 @@ public class SlideshowController {
     }
 
     @GetMapping
-    public Iterable<SlideshowEntity> getSlideshows(Pageable pageable) {
+    public Iterable<SlideshowEntity> getSlideshows() {
         Iterable<SlideshowEntity> slideshowEntities = slideshowService.findAll();
         return slideshowEntities;
     }
