@@ -41,9 +41,9 @@ public class SlideshowController {
     }
 
     @GetMapping
-    public Page<SlideshowDto> getSlideshows(Pageable pageable) {
-        Page<SlideshowEntity> slideshowEntities = slideshowService.findAll(pageable);
-        return slideshowEntities.map(slideshowMapper::mapTo);
+    public Iterable<SlideshowEntity> getSlideshows(Pageable pageable) {
+        Iterable<SlideshowEntity> slideshowEntities = slideshowService.findAll();
+        return slideshowEntities;
     }
 
     @PostMapping
