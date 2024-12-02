@@ -10,6 +10,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
+import com.github.cs_24_sw_3_09.CMS.utils.SetTSContentValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -43,16 +46,25 @@ public class TimeSlotController {
     private final TimeSlotService timeSlotService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
     private final DisplayDeviceService displayDeviceService;
+    private final SlideshowService slideshowService;
+    private final VisualMediaService visualMediaService;
+    private ContentUtils contentUtils;
 
     @Autowired
     public TimeSlotController(
             TimeSlotService timeSlotService,
             Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
-            DisplayDeviceService displayDeviceService
+            DisplayDeviceService displayDeviceService,
+            VisualMediaService visualMediaService,
+            SlideshowService slideshowService,
+            ContentUtils contentUtils
     ) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
         this.displayDeviceService = displayDeviceService;
+        this.visualMediaService = visualMediaService;
+        this.slideshowService = slideshowService;
+        this.contentUtils = contentUtils;
     }
 
     @PostMapping
@@ -176,6 +188,39 @@ public class TimeSlotController {
         timeSlotService.deleteRelation(tsId, ddId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PatchMapping(path = "/{id}/display_content")
+    public ResponseEntity<TimeSlotDto> setContent(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+
+        //validate request body (check if contentType, id, and type of these are correct)
+        SetTSContentValidationResult validationResult = contentUtils.validateRequestBody(requestBody);
+        if (!validationResult.isValid()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Getting the data from the previous result
+        Long displayContentId = validationResult.getDisplayContentId();
+        String displayContentType = validationResult.getDisplayContentType();
+
+        // Validate existence of time slot
+        if (!timeSlotService.isExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Validate existence of the referenced content
+        if (!contentUtils.isDisplayContentValid(displayContentId, displayContentType)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Update the display content
+        TimeSlotEntity updatedTimeSlotEntity = timeSlotService.setDisplayContent(id, displayContentId, displayContentType);
+
+        return ResponseEntity.ok(timeSlotMapper.mapTo(updatedTimeSlotEntity));
+    }
+
+
 
     @PatchMapping(path = "/{id}/display_devices")
     public ResponseEntity<TimeSlotDto> addDisplayDevice(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestBody) {
