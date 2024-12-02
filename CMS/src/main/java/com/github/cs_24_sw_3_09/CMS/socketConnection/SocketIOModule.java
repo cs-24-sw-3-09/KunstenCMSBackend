@@ -1,5 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,9 @@ import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.tasks.MonitorGracePeriodForDisplayDevices;
 
@@ -42,13 +47,11 @@ public class SocketIOModule {
         return (client -> {
             int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
             client.joinRoom(String.valueOf(deviceId));
-            System.out.println("Device " + deviceId + " connected: " + client.getRemoteAddress());
         });
     }
 
     private DisconnectListener onDisconnected() {
         return (client -> {
-            System.out.println("Device disconnected: " + client.getRemoteAddress());
 
             // Extract device ID (assume it's available as part of the client or context)
             int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
@@ -58,7 +61,12 @@ public class SocketIOModule {
 
     public void sendContent(int screenId, ContentEntity contentEntity) {
         BroadcastOperations roomOperations = server.getRoomOperations(String.valueOf(screenId));
-        roomOperations.sendEvent("content", contentEntity);
+        try {
+            String contentJson = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(contentEntity);
+            roomOperations.sendEvent("content", contentJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isConnected(int screenId) {

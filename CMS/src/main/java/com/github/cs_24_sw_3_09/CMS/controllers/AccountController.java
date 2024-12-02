@@ -77,7 +77,7 @@ public class AccountController {
         ));
 
         if (loggedInUserDto == null) {
-            return new ResponseEntity(null, HttpStatus.FORBIDDEN);
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 
         UserEntity userEntity = userMapper.mapFrom(userDto);
