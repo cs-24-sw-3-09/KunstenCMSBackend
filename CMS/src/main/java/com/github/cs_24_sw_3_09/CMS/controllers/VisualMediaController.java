@@ -8,6 +8,8 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -66,7 +68,7 @@ public class VisualMediaController {
         VisualMediaEntity savedEntity = visualMediaService.save(visualMediaEntity);
 
         //Update the location field using the ID
-        String location = "/visual_media/" + savedEntity.getId();
+        String location = "/files/visual_media/" + savedEntity.getId() + FileUtils.mimeToType(savedEntity.getFileType());
         savedEntity.setLocation(location);
         fileStorageService.saveVisualMediaFile(file, String.valueOf(savedEntity.getId()));
 
