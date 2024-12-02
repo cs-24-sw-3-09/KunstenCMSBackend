@@ -152,7 +152,6 @@ public class VisualMediaControllerIntegrationTests {
         visualMediaInclusionService.setVisualMedia((long) savedVisualMediaInclusionEntity.getId(), (long) savedVisualMediaEntity.getId());
 
         SlideshowEntity updatedSlideshow = slideshowService.addVisualMediaInclusion((long) savedSlideshow.getId(), (long) savedVisualMediaInclusionEntity.getId());
-        System.out.println(updatedSlideshow);
         Set<VisualMediaInclusionEntity> inclusions = updatedSlideshow.getVisualMediaInclusionCollection();
         //convert to List so that indexing can be used
         List<VisualMediaInclusionEntity> inclusionList = new ArrayList<>(inclusions);
