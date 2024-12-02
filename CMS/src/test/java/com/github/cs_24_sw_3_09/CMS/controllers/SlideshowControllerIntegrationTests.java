@@ -87,15 +87,16 @@ public class SlideshowControllerIntegrationTests {
     @WithMockUser
     public void testThatGetSlideshowsSuccessfullyReturnsListOfSlideshows() throws Exception {
         SlideshowEntity testSlideshowEntity = TestDataUtil.createSlideshowEntity();
-        slideshowService.save(testSlideshowEntity);
+        System.out.println(slideshowService.save(testSlideshowEntity));
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/slideshows")).andExpect(
-                        MockMvcResultMatchers.jsonPath("content.[0].id").isNumber())
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("content.[0].name").value(testSlideshowEntity.getName()))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("content.[0].isArchived")
+                        MockMvcRequestBuilders.get("/api/slideshows"))
+                        .andExpect(
+                                        MockMvcResultMatchers.jsonPath("[0].id").isNumber())
+                        .andExpect(
+                                        MockMvcResultMatchers.jsonPath("[0].name").value(testSlideshowEntity.getName()))
+                        .andExpect(
+                                        MockMvcResultMatchers.jsonPath("[0].isArchived")
                                 .value(testSlideshowEntity.getIsArchived()));
     }
 
