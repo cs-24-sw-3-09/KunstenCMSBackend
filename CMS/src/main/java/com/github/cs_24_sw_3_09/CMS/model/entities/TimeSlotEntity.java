@@ -77,4 +77,5 @@ public class TimeSlotEntity {
     public int countDisplayDeviceAssociations() {
         return this.getDisplayDevices().size();
     }
+
 }

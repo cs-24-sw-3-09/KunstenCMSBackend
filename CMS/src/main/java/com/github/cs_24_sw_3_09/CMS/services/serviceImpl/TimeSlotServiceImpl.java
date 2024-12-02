@@ -20,6 +20,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
@@ -34,9 +35,12 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private VisualMediaRepository visualMediaRepository;
     private VisualMediaService visualMediaService;
     private SlideshowService slideshowService;
+    private DimensionCheckService dimensionCheckService;
 
     public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository,
-                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService slideshowService) {
+                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, 
+                               VisualMediaService visualMediaService, SlideshowService slideshowService,
+                               DimensionCheckService dimensionCheckService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
@@ -44,6 +48,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         this.visualMediaRepository = visualMediaRepository;
         this.visualMediaService = visualMediaService;
         this.slideshowService = slideshowService;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @Override
@@ -67,11 +72,8 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
-        //Handle display devices
-        Optional<TimeSlotEntity> updatedTimeSlot = addDisplayDevice(timeSlotEntity);
-        if (updatedTimeSlot.isEmpty()) return Optional.empty();
-        timeSlotEntity = updatedTimeSlot.get();
-
+        Optional<TimeSlotEntity> updatedTimeSlot;
+        
         //Handle display content
         if (timeSlotEntity.getDisplayContent() != null) {
             updatedTimeSlot = addDisplayContent(timeSlotEntity);
@@ -79,19 +81,38 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             timeSlotEntity = updatedTimeSlot.get();
         }
 
+        //Handle display devices
+        Optional<Object> object = addDisplayDevice(timeSlotEntity);
+        if (object.isPresent() && (object.get()) instanceof TimeSlotServiceImpl.TimeSlotError) {
+            return (TimeSlotServiceImpl.TimeSlotError) object;
+        } else if (updatedTimeSlot.isEmpty()) 
+            return Optional.empty();
+
+        //updatedTimeSlot = ;
+        timeSlotEntity = (TimeSlotEntity) object.get(); //updatedTimeSlot.get();
+
+        
+
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return Optional.of(toReturn);
     }
 
-    private Optional<TimeSlotEntity> addDisplayDevice(TimeSlotEntity timeSlotEntity) {
+    private Optional<Object> addDisplayDevice(TimeSlotEntity timeSlotEntity, Boolean shouldWarning) {
         Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
+
+
+
 
         Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
         for (DisplayDeviceEntity displayDevice : displayDevices) {
             DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);
 
             if (newDisplayDevice == null) return Optional.empty();
+            
+            if(shouldWarning && dimensionCheckService.checkDimensions(timeSlotEntity.getDisplayContent(), null)) {
+
+            }
 
             newDisplayDevices.add(newDisplayDevice);
         }
@@ -180,16 +201,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         timeSlotRepository.delete(timeSlotToDelete);
     }
 
-    /*private void deleteRelationWithTS(DisplayDeviceEntity displayDevice, Integer timeSlotId) {
-        List<TimeSlotEntity> timeSlots = displayDevice.getTimeSlots();
-        for(int i = 0; i < timeSlots.size(); i++) {
-            if(timeSlots.get(i).getId() == timeSlotId) {
-                timeSlots.remove(i);
-                break; 
-            }
-        }
-    }*/
-
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
         //Checked that it already exists, therefore this will never throw an error 
@@ -205,7 +216,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
         ts.getDisplayDevices().remove(dd);
 
-        //TODO: Added this line
         dd.getTimeSlots().remove(ts);
         
         timeSlotRepository.save(ts);
@@ -248,4 +258,15 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             return timeSlotRepository.save(updatedTimeslot);
         }).orElseThrow();
     }
+
+    public class TimeSlotError {
+        private String errorMessage;
+
+        public TimeSlotError(String errorMessage) {
+            this.errorMessage = errorMessage; 
+        } 
+
+        public String getErrorMessage() { return errorMessage; }
+    }
+
 }
