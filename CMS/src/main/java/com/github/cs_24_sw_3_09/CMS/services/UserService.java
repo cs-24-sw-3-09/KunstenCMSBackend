@@ -28,4 +28,6 @@ public interface UserService extends UserDetailsService {
 
     Optional<UserEntity> getLoggedInUser();
 
+    Optional<UserEntity> findByEmail(String email);
+
 }

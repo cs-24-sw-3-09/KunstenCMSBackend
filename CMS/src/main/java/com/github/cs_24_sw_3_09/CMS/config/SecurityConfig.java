@@ -40,6 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         //Allow auth request without token
                         .requestMatchers(HttpMethod.POST, "/api/account/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/account/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/account/reset-password/new").permitAll()
                         //Need to be authenticated for all other routes
                         .anyRequest().authenticated()
                 )

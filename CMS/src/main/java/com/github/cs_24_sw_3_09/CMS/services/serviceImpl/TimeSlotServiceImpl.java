@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 
 import java.util.Set;
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -66,15 +68,15 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     @Override
     public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
         //Handle display devices
-        Optional<TimeSlotEntity> displayDevice = addDisplayDevice(timeSlotEntity);
-        if (displayDevice.isEmpty()) return Optional.empty();
-        timeSlotEntity = displayDevice.get();
+        Optional<TimeSlotEntity> updatedTimeSlot = addDisplayDevice(timeSlotEntity);
+        if (updatedTimeSlot.isEmpty()) return Optional.empty();
+        timeSlotEntity = updatedTimeSlot.get();
 
         //Handle display content
         if (timeSlotEntity.getDisplayContent() != null) {
-            Optional<TimeSlotEntity> displayContent = addDisplayContent(timeSlotEntity);
-            if (displayContent.isEmpty()) return Optional.empty();
-            timeSlotEntity = displayContent.get();
+            updatedTimeSlot = addDisplayContent(timeSlotEntity);
+            if (updatedTimeSlot.isEmpty()) return Optional.empty();
+            timeSlotEntity = updatedTimeSlot.get();
         }
 
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
@@ -132,6 +134,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
+    public List<TimeSlotEntity> findAll(Date start, Date end) {
+        return timeSlotRepository.findAllInTimeFrame(start, end);
+    }
+
+    @Override
     public boolean isExists(Long id) {
         return timeSlotRepository.existsById(Math.toIntExact(id));
     }
@@ -159,19 +166,56 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void delete(Long id) {
-        timeSlotRepository.deleteById(Math.toIntExact(id));
+        TimeSlotEntity timeSlotToDelete = timeSlotRepository.findById(Math.toIntExact(id)).get();
+
+        Set<DisplayDeviceEntity> displayDevices = timeSlotToDelete.getDisplayDevices(); 
+        for(DisplayDeviceEntity displayDevice : displayDevices) {
+            displayDevice.getTimeSlots().remove(timeSlotToDelete);
+        }
+
+        timeSlotToDelete.setDisplayContent(null);
+        timeSlotToDelete.getDisplayDevices().clear();
+        timeSlotRepository.save(timeSlotToDelete);
+
+        timeSlotRepository.delete(timeSlotToDelete);
     }
+
+    /*private void deleteRelationWithTS(DisplayDeviceEntity displayDevice, Integer timeSlotId) {
+        List<TimeSlotEntity> timeSlots = displayDevice.getTimeSlots();
+        for(int i = 0; i < timeSlots.size(); i++) {
+            if(timeSlots.get(i).getId() == timeSlotId) {
+                timeSlots.remove(i);
+                break; 
+            }
+        }
+    }*/
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
-        int associations = timeSlotRepository.countAssociations(tsId);
-
-        if (associations == 1) {
+        //Checked that it already exists, therefore this will never throw an error 
+        if (countDisplayDeviceAssociations(tsId) <= 1) 
             delete(tsId);
-        } else {
-            timeSlotRepository.deleteAssociation(tsId, ddId);
-        }
+        else 
+            deleteAssociation(tsId, ddId);
     }
+
+    private void deleteAssociation(Long tsId, Long ddId) {
+        TimeSlotEntity ts = timeSlotRepository.findById(Math.toIntExact(tsId)).get();
+        DisplayDeviceEntity dd = displayDeviceRepository.findById(Math.toIntExact(ddId)).get();
+
+        ts.getDisplayDevices().remove(dd);
+
+        //TODO: Added this line
+        dd.getTimeSlots().remove(ts);
+        
+        timeSlotRepository.save(ts);
+    }
+
+    @Override 
+    public int countDisplayDeviceAssociations(Long timeSlotId) {
+        return timeSlotRepository.findById(Math.toIntExact(timeSlotId)).get().getDisplayDevices().size();
+    }
+
 
     @Override
     public TimeSlotEntity setDisplayContent(Long tsId, Long dcId, String dcType) {

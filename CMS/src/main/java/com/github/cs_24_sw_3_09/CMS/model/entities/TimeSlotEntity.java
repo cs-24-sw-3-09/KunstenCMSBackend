@@ -73,4 +73,8 @@ public class TimeSlotEntity {
     public void addDisplayDevice(DisplayDeviceEntity displayDevice) {
         this.displayDevices.add(displayDevice);
     }
+
+    public int countDisplayDeviceAssociations() {
+        return this.getDisplayDevices().size();
+    }
 }
