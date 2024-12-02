@@ -74,22 +74,6 @@ public class TimeSlotController {
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
         
-        
-        /*Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
-        boolean checkIds = timeSlotEntity.getDisplayDevices().stream().allMatch(device -> 
-                    displayDeviceService.isExists(Long.valueOf(device.getId()))
-                );
-
-        TimeSlotEntity savedTimeSlotEntity;
-        if (optionalDisplayDevice.isPresent() && optionalDisplayDevice.get().getId() == null) {
-            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        } else if(checkIds) {
-            savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }*/
-
-
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
         if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 

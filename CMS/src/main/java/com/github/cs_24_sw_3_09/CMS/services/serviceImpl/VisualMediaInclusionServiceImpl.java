@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,4 +101,24 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         }).orElseThrow(() -> new RuntimeException("Visual Media inclusion does not exist"));
 
     }
+
+    @Override
+    public Optional<List<VisualMediaInclusionEntity>> updateSlideshowPosition(
+            List<VisualMediaInclusionEntity> visualMediaInclusions) {
+
+        List<VisualMediaInclusionEntity> visualMediaInclusionsToReturn = new ArrayList<>();
+        for (VisualMediaInclusionEntity visualMediaInclusion : visualMediaInclusions) {
+            VisualMediaInclusionEntity visualMediaInclusionEntityToUpdate = findOne((long) visualMediaInclusion.getId()).orElse(null);
+            
+            if(visualMediaInclusionEntityToUpdate == null) return Optional.empty();
+            visualMediaInclusionEntityToUpdate.setSlideshowPosition(visualMediaInclusion.getSlideshowPosition());
+
+            visualMediaInclusionsToReturn.add(visualMediaInclusionEntityToUpdate);
+        }
+        visualMediaInclusionRepository.saveAll(visualMediaInclusionsToReturn);
+        
+        return Optional.of(visualMediaInclusionsToReturn);
+    }
+
+    
 }
