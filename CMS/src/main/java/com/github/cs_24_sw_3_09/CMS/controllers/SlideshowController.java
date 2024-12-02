@@ -79,8 +79,6 @@ public class SlideshowController {
 
     @GetMapping(path="/state")
     public ResponseEntity<List<Map<String, Object>>> getStateOfAllSlideshows(){
-        //List<Map<String, Object>> result = slideshowService.findStateOfEverySlideshow();
-        //System.out.println(result);
         return new ResponseEntity<>(slideshowService.findStateOfEverySlideshow(), HttpStatus.OK);
     }
 

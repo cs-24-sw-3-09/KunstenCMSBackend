@@ -4,10 +4,19 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +28,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
@@ -32,14 +42,16 @@ public class SlideshowControllerIntegrationTests {
     private ObjectMapper objectMapper;
     private SlideshowService slideshowService;
     private VisualMediaInclusionService visualMediaInclusionService;
+    private TimeSlotService timeSlotService;
 
     @Autowired
     public SlideshowControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, SlideshowService slideshowService,
-                                               VisualMediaInclusionService visualMediaInclusionService) {
+                                               VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.timeSlotService = timeSlotService;
 
     }
 
@@ -242,5 +254,41 @@ public class SlideshowControllerIntegrationTests {
 
     }
 
+    @Test
+    @WithMockUser
+    public void testThatSlideshowsHasCorrectStateAndDisplayDevices() throws Exception{
+       TimeSlotEntity activeTimeSlotEntity = TestDataUtil.createTimeSlotEntityWithCurrentTime();
+       timeSlotService.save(activeTimeSlotEntity);
+       ArrayList<DisplayDeviceEntity> displayDeviceEntities = new ArrayList<>(activeTimeSlotEntity.getDisplayDevices());
+       
+       TimeSlotEntity futureTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
+       timeSlotService.save(futureTimeSlotEntity);
 
+       SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
+       slideshowService.save(slideshowEntity);
+       
+       mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/slideshows/state")
+                ).andDo(MockMvcResultHandlers.print())
+                .andExpect(
+                       MockMvcResultMatchers.jsonPath("$").isArray()
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].slideshowId").value(activeTimeSlotEntity.getDisplayContent().getId())
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].color").value("green")
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].displayDevices[0].id").value(displayDeviceEntities.get(0).getId())
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[1].slideshowId").value(futureTimeSlotEntity.getDisplayContent().getId())
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[1].color").value("yellow")
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[1].displayDevices").doesNotExist()
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[2].slideshowId").value(slideshowEntity.getId())
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[2].color").value("red")
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[1].displayDevices").doesNotExist());
+    }
 }
