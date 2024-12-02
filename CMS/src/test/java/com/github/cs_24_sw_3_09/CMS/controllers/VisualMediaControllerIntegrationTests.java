@@ -83,7 +83,7 @@ public class VisualMediaControllerIntegrationTests {
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fileType").value(MediaType.IMAGE_JPEG_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/visual_media/1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/files/visual_media/1.jpg"));
     }
 
     @Test
