@@ -1,6 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
+import java.sql.Time;
 import java.util.List;
+import java.util.Set;
+
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -33,8 +36,6 @@ public class DisplayDeviceEntity {
     private String displayOrientation;
     @NotNull
     private String resolution;
-    @ColumnDefault("false")
-    private Boolean connectedState;
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fallback_id")
     private ContentEntity fallbackContent;
@@ -45,30 +46,39 @@ public class DisplayDeviceEntity {
     
     private List<TimeSlotEntity> timeSlots;
 
+    private Time monday_start;
+    private Time monday_end;
+    private Time tuesday_start;
+    private Time tuesday_end;
+    private Time wednesday_start;
+    private Time wednesday_end;
+    private Time thursday_start;
+    private Time thursday_end;
+    private Time friday_start;
+    private Time friday_end;
+    private Time saturday_start;
+    private Time saturday_end;
+    private Time sunday_start;
+    private Time sunday_end;
+
     public void addTimeSlot(TimeSlotEntity timeSlot) {
         this.timeSlots.add(timeSlot);
     }
 
-    @Override
-    public String toString() {
+    public String toStringWithoutTSAndFallback() {
         StringBuilder sb = new StringBuilder();
-        
-        sb.append("DisplayDeviceEntity {");
-        sb.append("id=").append(id).append(", ");
-        sb.append("name='").append(name).append("', ");
-        sb.append("location='").append(location).append("', ");
-        sb.append("displayOrientation='").append(displayOrientation).append("', ");
-        sb.append("resolution='").append(resolution).append("', ");
-        sb.append("connectedState=").append(connectedState).append(", ");
-        
-        // Check if fallbackContent is null or not, and append accordingly
-        sb.append("fallbackContent=").append(fallbackContent != null ? fallbackContent.getClass().getSimpleName() : "null").append(", ");
-        
-        // For timeSlots, we print the number of associated time slots to avoid printing large collections
-        sb.append("timeSlotsCount=").append(timeSlots != null ? timeSlots.size() : 0);
-        
-        sb.append("}");
-        
-        return sb.toString();
-    } 
+
+        if (id != null)
+            sb.append("Id: ").append(id).append("<br>");
+        if (name != null)
+            sb.append("Name: ").append(name).append("<br>");
+        if (location != null)
+            sb.append("Location: ").append(location).append("<br>");
+        if (displayOrientation != null)
+            sb.append("Display Orientation: ").append(displayOrientation).append("<br>");
+        if (resolution != null)
+            sb.append("Resolution: ").append(resolution).append("<br>");
+
+        return sb.toString()/*.trim()*/;
+    }
 }

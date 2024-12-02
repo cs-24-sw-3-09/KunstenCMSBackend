@@ -35,7 +35,7 @@ public class VisualMediaEntity extends ContentEntity {
     private String fileType;
     private String description;
     private LocalDateTime lastDateModified;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST })
     @JoinTable(name = "visual_media_tag", joinColumns = {
             @JoinColumn(name = "visual_media_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
     @JsonIgnoreProperties("text")

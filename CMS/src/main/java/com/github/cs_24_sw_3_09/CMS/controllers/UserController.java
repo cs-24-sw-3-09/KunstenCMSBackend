@@ -32,10 +32,12 @@ public class UserController {
 
     private final UserService userService;
     private final Mapper<UserEntity, UserDto> userMapper;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Autowired
     public UserController(UserService userService,
-            Mapper<UserEntity, UserDto> userMapper) {
+                          Mapper<UserEntity, UserDto> userMapper
+    ) {
         this.userService = userService;
         this.userMapper = userMapper;
     }
@@ -43,13 +45,9 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto user) {
-        // Done to decouple the persistence layer from the presentation and service
-        // layer.
-        /*
-        TODO: add så password bliver enkrypteret ved user creation.
-        Evt. bare udkommentar kode nedenstående hvis vi gerne vil gå med det:
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        */
+
+        user.setPassword(encoder.encode(user.getPassword()));
+
         UserEntity userEntity = userMapper.mapFrom(user);
         UserEntity savedUserEntity = userService.save(userEntity);
         return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.CREATED);
@@ -77,7 +75,7 @@ public class UserController {
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> fullUpdateUser(@PathVariable("id") Long id,
-            @Valid @RequestBody UserDto userDto) {
+                                                  @Valid @RequestBody UserDto userDto) {
         if (!userService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -91,7 +89,7 @@ public class UserController {
     @PatchMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserDto> partialUpdateUser(@PathVariable("id") Long id,
-            @Valid @RequestBody UserDto userDto) {
+                                                     @Valid @RequestBody UserDto userDto) {
         if (!userService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

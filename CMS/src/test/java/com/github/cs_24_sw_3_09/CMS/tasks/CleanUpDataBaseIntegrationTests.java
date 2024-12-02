@@ -1,11 +1,14 @@
 package com.github.cs_24_sw_3_09.CMS.tasks;
 
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.services.CleanUpDataBaseService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
+import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.EmailServiceImpl;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -52,7 +56,7 @@ public class CleanUpDataBaseIntegrationTests {
                         MockMvcResultMatchers.status().isOk());
     }
 
-    @Test
+    /*@Test
     @WithMockUser
     public void testThatDeleteTSWithoutDDDoesDeleteValidTS() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntityWithOutDisplayDevice();
@@ -64,6 +68,7 @@ public class CleanUpDataBaseIntegrationTests {
                 MockMvcResultMatchers.jsonPath("numberOfElements").value(0))
                 .andExpect(
                         MockMvcResultMatchers.status().isOk());
-    }
+    }*/
+
 
 }

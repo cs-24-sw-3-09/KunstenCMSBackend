@@ -18,6 +18,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.socketConnection.SocketIOModule;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +29,7 @@ public class PushTSServiceImpl implements PushTSService {
     private SocketIOModule socketIOModule;
 
     public PushTSServiceImpl(DisplayDeviceRepository displayDeviceRepository,
-            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper, SocketIOModule socketIOModule) {
+            Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper, @Lazy SocketIOModule socketIOModule) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.displayDeviceMapper = displayDeviceMapper;
         this.socketIOModule = socketIOModule;
@@ -107,10 +108,13 @@ public class PushTSServiceImpl implements PushTSService {
     @Override
     public Set<Integer> updateDisplayDevicesToNewTimeSlots(boolean sendToDisplayDevices) {
         // Fetch the list of connected display devices
-        List<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findConnectedDisplayDevices();
+        Iterable<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findAll();
         // Holder for the TS id's that is shown
         Set<Integer> timeSlotsInUse = new HashSet<>();
         for (DisplayDeviceEntity dd : displayDevices) {
+            if (!socketIOModule.isConnected(dd.getId())) {
+                continue;
+            }
             List<TimeSlotEntity> timeSlots = dd.getTimeSlots();
 
             TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(timeSlots,
