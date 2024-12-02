@@ -78,11 +78,10 @@ public class SlideshowController {
     }
 
     @GetMapping(path="/state")
-    public ResponseEntity<JSONArray> getStateOfAllSlideshows(){
-        System.out.println("found end point");
-        List<Map<String, Object>> result = slideshowService.findStateOfEverySlideshow();
-        System.out.println(result);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<List<Map<String, Object>>> getStateOfAllSlideshows(){
+        //List<Map<String, Object>> result = slideshowService.findStateOfEverySlideshow();
+        //System.out.println(result);
+        return new ResponseEntity<>(slideshowService.findStateOfEverySlideshow(), HttpStatus.OK);
     }
 
     @PostMapping
