@@ -215,7 +215,17 @@ public class TestDataUtil {
     public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
         return VisualMediaInclusionDto.builder()
                 .visualMedia(new VisualMediaEntity())
-                .id(1)
+                .slideDuration(5)
+                .slideshowPosition(1)
+                .build();
+    }
+
+    public static VisualMediaInclusionDto createVisualMediaInclusionDtoWitVMThaOnlyContainsId(Integer id) {
+        VisualMediaEntity vm = new VisualMediaEntity();
+        vm.setId(id);
+
+        return VisualMediaInclusionDto.builder()
+                .visualMedia(vm)
                 .slideDuration(5)
                 .slideshowPosition(1)
                 .build();

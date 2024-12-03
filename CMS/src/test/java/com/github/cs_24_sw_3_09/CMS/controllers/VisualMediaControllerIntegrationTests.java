@@ -143,7 +143,7 @@ public class VisualMediaControllerIntegrationTests {
         SlideshowEntity savedSlideshow = slideshowService.save(testSlideshowEntity);
 
         VisualMediaInclusionEntity testVisualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(testVisualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(testVisualMediaInclusionEntity).get();
 
 
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();

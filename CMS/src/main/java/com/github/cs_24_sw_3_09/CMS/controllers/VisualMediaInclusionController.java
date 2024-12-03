@@ -52,11 +52,15 @@ public class VisualMediaInclusionController {
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> createVisualMediaInclusion(
             @RequestBody VisualMediaInclusionDto visualMediaInclusionDto) {
+
         VisualMediaInclusionEntity visualMediaInclusionEntity = visualMediaInclusionMapper
                 .mapFrom(visualMediaInclusionDto);
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionRepository
-                .save(visualMediaInclusionEntity);
-        return new ResponseEntity<>(visualMediaInclusionMapper.mapTo(savedVisualMediaInclusionEntity),
+
+        Optional<VisualMediaInclusionEntity> visualMediaInclusionToReturn = 
+        visualMediaInclusionService.save(visualMediaInclusionEntity);
+
+        if (visualMediaInclusionToReturn.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(visualMediaInclusionMapper.mapTo(visualMediaInclusionToReturn.get()),
                 HttpStatus.CREATED);
     }
 
@@ -83,7 +87,7 @@ public class VisualMediaInclusionController {
         VisualMediaInclusionEntity visualMediaInclusionEntity = visualMediaInclusionMapper
                 .mapFrom(visualMediaInclusionDto);
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService
-                .save(visualMediaInclusionEntity);
+                .save(visualMediaInclusionEntity).get();
         return new ResponseEntity<>(visualMediaInclusionMapper.mapTo(savedVisualMediaInclusionEntity), HttpStatus.OK);
     }
 

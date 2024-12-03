@@ -55,11 +55,64 @@ public class VisualMediaInclusionControllerIntegrationTests {
     public void testThatCreateVisualMediaInclusionReturnsHttpStatus201Created() throws Exception {
         VisualMediaInclusionDto visualMediaInclusion = TestDataUtil.createVisualMediaInclusionDto();
         String visualMediaInclusionJson = objectMapper.writeValueAsString(visualMediaInclusion);
+
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/visual_media_inclusions") // Use multipart request
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(visualMediaInclusionJson)                                  // Attach the file
         ).andExpect(MockMvcResultMatchers.status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatCreateVisualMediaInclusionWithVisualMediaIdReturnsHttpStatus201Created() throws Exception {
+        VisualMediaEntity vm = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity visualMediaToCompare = visualMediaService.save(vm);
+
+        assertTrue(visualMediaService.isExists(1l));
+        
+        VisualMediaInclusionDto visualMediaInclusion = 
+        TestDataUtil.createVisualMediaInclusionDtoWitVMThaOnlyContainsId(1);
+
+        String visualMediaInclusionJson = objectMapper.writeValueAsString(visualMediaInclusion);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/visual_media_inclusions") // Use multipart request
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(visualMediaInclusionJson)                                  // Attach the file
+        ).andExpect(MockMvcResultMatchers.status().isCreated()
+		).andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.slideshowPosition").value(visualMediaInclusion.getSlideshowPosition()))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.slideDuration").value(visualMediaInclusion.getSlideDuration()))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMedia.id").value(visualMediaToCompare.getId()))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMedia.name").value(visualMediaToCompare.getName()));
+
+        assertTrue(visualMediaInclusionService.isExists(1l));
+		assertEquals(
+			1,
+			visualMediaInclusionService.findOne(1l).get().getVisualMedia().getId()
+		);
+    }
+
+	@Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatCreateVisualMediaInclusionWithVisualMediaIdThatDoesntExistReturnsHttpStatus404() throws Exception {
+
+        assertFalse(visualMediaService.isExists(1l));
+        
+        VisualMediaInclusionDto visualMediaInclusion = 
+        TestDataUtil.createVisualMediaInclusionDtoWitVMThaOnlyContainsId(1);
+
+        String visualMediaInclusionJson = objectMapper.writeValueAsString(visualMediaInclusion);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/visual_media_inclusions") // Use multipart request
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(visualMediaInclusionJson)                                  // Attach the file
+        ).andExpect(MockMvcResultMatchers.status().isNotFound());
+
+
+        assertFalse(visualMediaInclusionService.isExists(1l));
     }
 
 
@@ -158,7 +211,7 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatDeleteVisualMediaInclusionReturnsStatus200() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/visual_media_inclusions/" + savedVisualMediaInclusionEntity.getId())).andExpect(
@@ -177,7 +230,7 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatFullUpdateVisualMediaInclusionReturnsStatus200WhenVisualMediaInclusionExists() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         VisualMediaInclusionDto visualMediaInclusionDto = TestDataUtil.createVisualMediaInclusionDto();
         String visualMediaInclusionDtoJson = objectMapper.writeValueAsString(visualMediaInclusionDto);
@@ -194,7 +247,7 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateVisualMediaInclusionReturnsStatus200() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         VisualMediaInclusionDto visualMediaInclusionDto = TestDataUtil.createVisualMediaInclusionDto();
         String visualMediaInclusionDtoJson = objectMapper.writeValueAsString(visualMediaInclusionDto);
@@ -229,7 +282,7 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatSetVisualMediaOnVisualMediaInclusionReturnsVisualMediaInclusionWithVisualMediaSet() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         VisualMediaEntity VisualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(VisualMediaEntity);
