@@ -39,7 +39,7 @@ public class AccountController {
     private final Mapper<UserEntity, UserDto> userMapper;
     private final UserService userService;
     private final EmailService emailService;
-    @Value("${FRONTEND.URL}")
+    @Value("${FRONTEND.URL:example.com}")
     private String frontendUrl;
 
     @Autowired
