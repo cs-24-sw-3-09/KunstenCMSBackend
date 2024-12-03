@@ -243,5 +243,25 @@ public class SlideshowControllerIntegrationTests {
 
     }
 
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowWithName() throws Exception {
+    }
+
+
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowWithNoNameGiven() throws Exception {
+    }
+
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowThatDoesNotExist() throws Exception {
+    }
+
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowWithVisualMediaInclusions() throws Exception {
+    }
 
 }

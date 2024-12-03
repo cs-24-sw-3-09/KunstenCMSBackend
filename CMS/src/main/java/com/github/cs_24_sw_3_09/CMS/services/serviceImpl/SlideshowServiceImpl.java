@@ -101,4 +101,14 @@ public class SlideshowServiceImpl implements SlideshowService {
             return slideshowRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
+
+    @Override
+    public Optional<SlideshowEntity> duplicate(Long id, String name) {
+        Optional<SlideshowEntity> slideshowToDuplicate = findOne(id);
+        if(slideshowToDuplicate.isEmpty()) return Optional.empty();
+        
+
+        return Optional.empty();
+    }
+    
 }
