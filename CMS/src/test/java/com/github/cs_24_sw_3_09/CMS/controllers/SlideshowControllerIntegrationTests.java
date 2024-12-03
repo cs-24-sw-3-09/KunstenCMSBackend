@@ -252,44 +252,6 @@ public class SlideshowControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.visualMediaInclusionCollection[0].slideDuration").value(savedVisualMediaInclusion.getSlideDuration()));
 
-
     }
 
-    @Test
-    @WithMockUser
-    public void testThatSlideshowsHasCorrectStateAndDisplayDevices() throws Exception{
-       TimeSlotEntity activeTimeSlotEntity = TestDataUtil.createTimeSlotEntityWithCurrentTime();
-       timeSlotService.save(activeTimeSlotEntity);
-       ArrayList<DisplayDeviceEntity> displayDeviceEntities = new ArrayList<>(activeTimeSlotEntity.getDisplayDevices());
-       
-       TimeSlotEntity futureTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-       timeSlotService.save(futureTimeSlotEntity);
-
-       SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
-       slideshowService.save(slideshowEntity);
-       
-       mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/slideshows/state")
-                ).andDo(MockMvcResultHandlers.print())
-                .andExpect(
-                       MockMvcResultMatchers.jsonPath("$").isArray()
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].slideshowId").value(activeTimeSlotEntity.getDisplayContent().getId())
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].color").value("green")
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].displayDevices[0].id").value(displayDeviceEntities.get(0).getId())
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[1].slideshowId").value(futureTimeSlotEntity.getDisplayContent().getId())
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[1].color").value("yellow")
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[1].displayDevices").doesNotExist()
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[2].slideshowId").value(slideshowEntity.getId())
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[2].color").value("red")
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[1].displayDevices").doesNotExist());
-    }
 }

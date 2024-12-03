@@ -1,7 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -141,34 +143,27 @@ public class SlideshowServiceImpl implements SlideshowService {
     
     public List<Map<String, Object>> findStateOfEverySlideshow() {
         List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
-        System.out.println("slideshows: " + allSlideshowIds);  
         List<TimeSlotEntity> allTimeSlotsWithSlideshowAsContent = timeSlotRepository.getAllTimeSlotsWithSlideshowAsContent();
-        System.out.println("ts: " + allTimeSlotsWithSlideshowAsContent.toString());
         
         List<Integer> displayContentIds = new ArrayList<>();
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
             displayContentIds.add(ts.getDisplayContent().getId());
-            System.out.println("id of SS as DC: " + ts.getDisplayContent().getId());
         }   
     
         Set<Integer> timeSlotsCurrentlyShown = pushTSService.updateDisplayDevicesToNewTimeSlots(false);
-        System.out.println("tsCurrent: " + timeSlotsCurrentlyShown.toString());
         List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
-    
+        
+        //only get Time Slots that are currently shown or in the future
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
             if (timeSlotsCurrentlyShown.contains(ts.getId())) {
                 activeTimeSlots.add(ts);
-            } else {
+            } else if (ts.getStartDate().after(new Date())){
                 futureTimeSlots.add(ts);
             }
         }
-
-        System.out.println("active: " + activeTimeSlots.toString());
-        System.out.println("future: " + futureTimeSlots.toString());
     
         List<Map<String, Object>> slideshowStatusList = new ArrayList<>();
-
         for (Integer slideshowId : allSlideshowIds) {
             Map<String, Object> slideshowStatus = new HashMap<>();
             slideshowStatus.put("slideshowId", slideshowId);
@@ -214,7 +209,6 @@ public class SlideshowServiceImpl implements SlideshowService {
             }
             slideshowStatusList.add(slideshowStatus);
         }
-        System.out.println("result: " + slideshowStatusList);
         return slideshowStatusList;
     }
     
