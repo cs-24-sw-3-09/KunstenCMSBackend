@@ -23,4 +23,6 @@ public interface SlideshowService {
     void delete(Long id);
 
     SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId);
+
+    Optional<SlideshowEntity> duplicate(Long id, String name); 
 }
