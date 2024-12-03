@@ -61,7 +61,7 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatCreateVisualMediaInclusionWithVisualMediaIdReturnsHttpStatus201Created() throws Exception {
         VisualMediaEntity vm = TestDataUtil.createVisualMediaEntity();
-        visualMediaService.save(vm);
+        VisualMediaEntity visualMediaToCompare = visualMediaService.save(vm);
 
         assertTrue(visualMediaService.isExists(1l));
         
@@ -74,8 +74,12 @@ public class VisualMediaInclusionControllerIntegrationTests {
                 MockMvcRequestBuilders.post("/api/visual_media_inclusions") // Use multipart request
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(visualMediaInclusionJson)                                  // Attach the file
-        ).andExpect(MockMvcResultMatchers.status().isCreated());
-
+        ).andExpect(MockMvcResultMatchers.status().isCreated()
+		).andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.slideshowPosition").value(visualMediaInclusion.getSlideshowPosition()))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.slideDuration").value(visualMediaInclusion.getSlideDuration()))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMedia.id").value(visualMediaToCompare.getId()))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMedia.name").value(visualMediaToCompare.getName()));
 
         assertTrue(visualMediaInclusionService.isExists(1l));
 		assertEquals(
