@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.utils;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,9 +14,6 @@ import static com.google.common.io.Files.getFileExtension;
 @Component
 public class FileUtils {
     public static File createVisualMediaFile(MultipartFile file, String newFileName) throws IOException {
-
-        System.out.println(newFileName);
-        System.out.println(file.getContentType());
 
         File newFile = createFileFromRoot("files/visual_media", newFileName + mimeToType(file.getContentType()));
         file.transferTo(newFile);
@@ -35,6 +33,8 @@ public class FileUtils {
         String absPath = String.format("%s/%s/%s", System.getProperty("user.dir"), path, file);
         return new File(absPath);
     }
+
+
 
 
     public static String mimeToType(String mime) {
@@ -57,6 +57,26 @@ public class FileUtils {
                 return ".mp4";
             default:
                 return ".unknown"; // Default for unrecognized MIME types
+        }
+    }
+
+    public static void removeVisualMediaFile(VisualMediaEntity visualMediaEntity) {
+        // Create the file object for the file to be deleted
+        File fileToDelete = createFileFromRoot(
+                "files/visual_media",
+                visualMediaEntity.getId() + mimeToType(visualMediaEntity.getFileType())
+        );
+
+        // Attempt to delete the file
+        if (fileToDelete.exists()) {
+            boolean deleted = fileToDelete.delete();
+            if (!deleted) {
+                System.err.println("Failed to delete file: " + fileToDelete.getAbsolutePath());
+            } else {
+                System.out.println("File deleted successfully: " + fileToDelete.getAbsolutePath());
+            }
+        } else {
+            System.err.println("File does not exist: " + fileToDelete.getAbsolutePath());
         }
     }
 }

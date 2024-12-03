@@ -1,14 +1,19 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
+import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
@@ -20,6 +25,7 @@ import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import java.util.Set;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class VisualMediaServiceImpl implements VisualMediaService {
@@ -140,5 +146,23 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public List<TimeSlotEntity> findTimeslotsVisualMediaIsPartOf(Long id) {
         return visualMediaRepository.getTimeslotsPartOfVisualMedia(id);
+    }
+
+    @Override
+    public HttpStatus replaceFileById(Long id, MultipartFile file) throws IOException {
+
+        VisualMediaEntity visualMediaEntity = findOne(id).orElseThrow();
+
+        //Starts by deleting existing file from folder.
+        FileUtils.removeVisualMediaFile(visualMediaEntity);
+
+        //Updates the vm in database to be the new filetype
+        visualMediaEntity.setFileType(file.getContentType());
+        visualMediaRepository.save(visualMediaEntity);
+
+        //Created the new file.
+        FileUtils.createVisualMediaFile(file, String.valueOf(id));
+        return HttpStatus.OK;
+
     }
 }

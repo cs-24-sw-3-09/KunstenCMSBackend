@@ -168,6 +168,20 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
+    @PostMapping(path = "/{id}/file")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<HttpStatus> replaceFile(@PathVariable("id") Long id,
+                                                  @RequestParam("file") MultipartFile file) throws IOException {
+
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        HttpStatus response = visualMediaService.replaceFileById(id, file);
+        return new ResponseEntity<>(response);
+    }
+
+
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> deleteVisualMedia(@PathVariable("id") Long id) {
@@ -216,8 +230,8 @@ public class VisualMediaController {
         }
 
         if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)
-        //Checks if there is an association between the visual media and the tag
-        || !visualMediaService.findOne(visualMediaId).get().getTags().contains(tagService.findOne(tagId).get())) {
+                //Checks if there is an association between the visual media and the tag
+                || !visualMediaService.findOne(visualMediaId).get().getTags().contains(tagService.findOne(tagId).get())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
