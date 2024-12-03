@@ -32,7 +32,7 @@ public interface VisualMediaService {
 
     void delete(Long id);
 
-    Optional<VisualMediaEntity> addTag(Long id, Long tagId);
+    Optional<VisualMediaEntity> addTag(Long id, String text);
 
     void deleteRelation(Long visualMediaId, Long tagId);
 

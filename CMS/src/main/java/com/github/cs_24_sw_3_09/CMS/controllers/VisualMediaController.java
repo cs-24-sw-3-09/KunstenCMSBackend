@@ -197,13 +197,13 @@ public class VisualMediaController {
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> addTag(@PathVariable("id") Long id,
                                                  @RequestBody Map<String, Object> requestBody) {
-        Long tagId = ((Integer) requestBody.get("tagId")).longValue();
+        String tagText = requestBody.get("tagText").toString();
 
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Optional<VisualMediaEntity> updatedVisualMedia = visualMediaService.addTag(id, tagId);
+        Optional<VisualMediaEntity> updatedVisualMedia = visualMediaService.addTag(id, tagText);
 
         // If tag was not found, updatedVisualMedia will be null.
         if (updatedVisualMedia.isEmpty())

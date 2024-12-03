@@ -298,7 +298,7 @@ public class VisualMediaControllerIntegrationTests {
         assertTrue(visualMediaService.isExists((long) 1));
 
 
-        String requestBodyJson = "{\"tagId\": " + savedTagEntity.getId() + "}";
+        String requestBodyJson = "{\"tagText\": \"" + savedTagEntity.getText() + "\"}";
 
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
@@ -314,19 +314,22 @@ public class VisualMediaControllerIntegrationTests {
 
     @Test
     @WithMockUser(roles = "PLANNER")
-    public void testThatAddTagToVisualMediaWhenTagDoesntExistAndReturns404() throws Exception {
+    public void testThatAddTagToVisualMediaWhenTagDoesntExistAndReturnsVisualMediaWithTag() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
 
 
-        String requestBodyJson = "{\"tagId\": 1}";
+        String requestBodyJson = "{\"tagText\": \"" + "IDontExistAlready" + "\"}";
+
 
         mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBodyJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isNotFound());
+                        MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBodyJson)
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.tags[0].text").value("IDontExistAlready"));
     }
 
     @Test
@@ -336,7 +339,7 @@ public class VisualMediaControllerIntegrationTests {
         tagService.save(tag);
         assertTrue(tagService.isExists((long) 1));
 
-        String requestBodyJson = "{\"tagId\": 1}";
+        String requestBodyJson = "{\"tagText\": \"" + "IDontExistAlready" + "\"}";
 
         mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/visual_medias/1/tags")

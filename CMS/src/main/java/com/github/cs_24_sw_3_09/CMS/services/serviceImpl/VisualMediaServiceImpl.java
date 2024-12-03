@@ -104,18 +104,22 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public Optional<VisualMediaEntity> addTag(Long id, Long tagId) {
+    public Optional<VisualMediaEntity> addTag(Long id, String text) {
         //Have already checked that it exists in the controller
         VisualMediaEntity foundVisualMedia = visualMediaRepository.findById(Math.toIntExact(id)).get();
 
-        TagEntity foundTag = tagRepository.findById(tagId).orElse(null);
+        TagEntity foundTag = tagRepository.findByText(text);
 
-        if (foundTag == null) return Optional.empty();
+        //If tag is not found, we create a new tag with the text.
+        if (foundTag == null) {
+
+            TagEntity newTag = TagEntity.builder().text(text).build();
+            foundTag = tagRepository.save(newTag);
+        }
 
         foundVisualMedia.addTag(foundTag);
         foundVisualMedia.setId(Math.toIntExact(id));
         visualMediaRepository.save(foundVisualMedia);
-
         return Optional.of(foundVisualMedia);
     }
 
