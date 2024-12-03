@@ -215,7 +215,6 @@ public class TestDataUtil {
     public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
         return VisualMediaInclusionDto.builder()
                 .visualMedia(new VisualMediaEntity())
-                .id(1)
                 .slideDuration(5)
                 .slideshowPosition(1)
                 .build();
