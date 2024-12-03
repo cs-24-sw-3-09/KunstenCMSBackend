@@ -3,10 +3,17 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +37,17 @@ public class VisualMediaInclusionControllerIntegrationTests {
     private ObjectMapper objectMapper;
     private VisualMediaInclusionService visualMediaInclusionService;
     private VisualMediaService visualMediaService;
+	private SlideshowService slideshowService; 
 
     @Autowired
-    public VisualMediaInclusionControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, VisualMediaInclusionService visualMediaInclusionService, VisualMediaService visualMediaService) {
+    public VisualMediaInclusionControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, 
+	VisualMediaInclusionService visualMediaInclusionService, VisualMediaService visualMediaService,
+	SlideshowService slideshowService) {
         this.mockMvc = mockMvc;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.objectMapper = objectMapper;
         this.visualMediaService = visualMediaService;
+		this.slideshowService = slideshowService;
     }
 
     @Test
@@ -233,5 +244,193 @@ public class VisualMediaInclusionControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.visualMedia.name").value(savedVisualMediaEntity.getName()));
     }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatUpdatesVisualMediaInclusionsPositionsInASlideshowAndReturns200() throws Exception {
+		SlideshowEntity slideshowEntityToSave = TestDataUtil.createSlideshowWithMultipleVisualMediaEntities();
+		SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntityToSave);
+
+		savedSlideshowEntity.getVisualMediaInclusionCollection().stream().forEach(vmi -> {
+			vmi.setSlideshowPosition(vmi.getId());
+			visualMediaInclusionService.partialUpdate((long) vmi.getId(), vmi);
+		});
+
+		slideshowService.save(savedSlideshowEntity);
+
+		assertTrue(visualMediaInclusionService.isExists(1l));
+		assertTrue(visualMediaInclusionService.isExists(2l));
+		assertTrue(visualMediaInclusionService.isExists(3l));
+		
+		String requestBodyJson = 
+		"{"
+		+	"\"visualMediaInclusion\":"
+		+	"["
+		+		"{"
+		+			"\"id\":1,\"slideshowPosition\":3"
+		+		"},"
+		+		"{"
+		+			"\"id\":2,\"slideshowPosition\":1"
+		+		"},"
+		+		"{"
+		+			"\"id\":3,\"slideshowPosition\":2"
+		+		"}"
+		+	"]"
+		+"}";
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/visual_media_inclusions/positions")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(requestBodyJson))
+		.andExpect(
+			MockMvcResultMatchers.status().isOk()
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[0].id")
+			.value(visualMediaInclusionService.findOne(1l).get().getId())
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[0].slideshowPosition")
+			.value(visualMediaInclusionService.findOne(1l).get().getSlideshowPosition())
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[1].id")
+			.value(visualMediaInclusionService.findOne(2l).get().getId())
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[1].slideshowPosition")
+			.value(visualMediaInclusionService.findOne(2l).get().getSlideshowPosition())
+		);
+
+		assertTrue(visualMediaInclusionService.isExists(1l));
+		assertTrue(visualMediaInclusionService.isExists(2l));
+		assertTrue(visualMediaInclusionService.isExists(3l));
+
+		assertEquals(
+			3,
+			visualMediaInclusionService.findOne(1l).get().getSlideshowPosition()
+		);
+		assertEquals(
+			1,
+			visualMediaInclusionService.findOne(2l).get().getSlideshowPosition()
+		);
+		assertEquals(
+			2,
+			visualMediaInclusionService.findOne(3l).get().getSlideshowPosition()
+		);
+	}
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatTriesUpdatesVisualMediaInclusionsPositionsButNotAllAndReturns200() throws Exception {
+		SlideshowEntity slideshowEntityToSave = TestDataUtil.createSlideshowWithMultipleVisualMediaEntities();
+		SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntityToSave);
+
+		savedSlideshowEntity.getVisualMediaInclusionCollection().stream().forEach(vmi -> {
+			vmi.setSlideshowPosition(vmi.getId());
+			visualMediaInclusionService.partialUpdate((long) vmi.getId(), vmi);
+		});
+
+		slideshowService.save(savedSlideshowEntity);
+		/*for (VisualMediaInclusionEntity vmi : savedSlideshowEntity.getVisualMediaInclusionCollection()) {
+			System.out.println("Visual Media Id: "+ vmi.getId()+"\nPosition: "+ vmi.getSlideshowPosition());
+		}*/
+		
+		assertTrue(visualMediaInclusionService.isExists(1l));
+		assertTrue(visualMediaInclusionService.isExists(2l));
+		assertTrue(visualMediaInclusionService.isExists(3l));
+		
+		String requestBodyJson = 
+		"{"
+		+	"\"visualMediaInclusion\":"
+		+	"["
+		+		"{"
+		+			"\"id\":1,\"slideshowPosition\":2"
+		+		"},"
+		+		"{"
+		+			"\"id\":2,\"slideshowPosition\":1"
+		+		"}"
+		+	"]"
+		+"}";
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/visual_media_inclusions/positions")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(requestBodyJson))
+		.andExpect(
+			MockMvcResultMatchers.status().isOk()
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[0].id")
+			.value(visualMediaInclusionService.findOne(1l).get().getId())
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[0].slideshowPosition")
+			.value(visualMediaInclusionService.findOne(1l).get().getSlideshowPosition())
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[1].id")
+			.value(visualMediaInclusionService.findOne(2l).get().getId())
+		).andExpect(
+			MockMvcResultMatchers.jsonPath("$[1].slideshowPosition")
+			.value(visualMediaInclusionService.findOne(2l).get().getSlideshowPosition())
+		);
+
+		assertTrue(visualMediaInclusionService.isExists(1l));
+		assertTrue(visualMediaInclusionService.isExists(2l));
+		assertTrue(visualMediaInclusionService.isExists(3l));
+
+		assertEquals(
+			2,
+			visualMediaInclusionService.findOne(1l).get().getSlideshowPosition()
+		);
+		assertEquals(
+			1,
+			visualMediaInclusionService.findOne(2l).get().getSlideshowPosition()
+		);
+		assertEquals(
+			3,
+			visualMediaInclusionService.findOne(3l).get().getSlideshowPosition()
+		);
+    }
+
+	@Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatTriesUpdatesVisualMediaInclusionsPositionsNotInASlideShowReturns404() throws Exception {
+		SlideshowEntity slideshowEntityToSave = TestDataUtil.createSlideshowWithVisualMediaEntity();
+		SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntityToSave);
+
+		savedSlideshowEntity.getVisualMediaInclusionCollection().stream().forEach(vmi -> {
+			vmi.setSlideshowPosition(vmi.getId());
+			visualMediaInclusionService.partialUpdate((long) vmi.getId(), vmi);
+		});
+
+		slideshowService.save(savedSlideshowEntity);
+
+		assertTrue(visualMediaInclusionService.isExists(1l));
+		assertFalse(visualMediaInclusionService.isExists(2l));
+		
+		String requestBodyJson = 
+		"{"
+		+	"\"visualMediaInclusion\":"
+		+	"["
+		+		"{"
+		+			"\"id\":1,\"position\":2"
+		+		"},"
+		+		"{"
+		+			"\"id\":2,\"position\":1"
+		+		"}"
+		+	"]"
+		+"}";
+
+		mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/visual_media_inclusions/positions")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(requestBodyJson))
+		.andExpect(
+			MockMvcResultMatchers.status().isNotFound()
+		);
+
+		assertTrue(visualMediaInclusionService.isExists(1l));
+		assertFalse(visualMediaInclusionService.isExists(2l));
+
+		assertEquals(
+			1,
+			visualMediaInclusionService.findOne(1l).get().getSlideshowPosition()
+		);
+	}
 
 }
