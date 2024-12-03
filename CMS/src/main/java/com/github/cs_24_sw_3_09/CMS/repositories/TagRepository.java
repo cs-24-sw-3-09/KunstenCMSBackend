@@ -9,6 +9,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 @Repository
 public interface TagRepository extends CrudRepository<TagEntity, Long>,
         PagingAndSortingRepository<TagEntity, Long> {
@@ -18,4 +20,8 @@ public interface TagRepository extends CrudRepository<TagEntity, Long>,
     @Modifying
     @Query(value = "DELETE FROM visual_media_tag WHERE tag_id = :tagId", nativeQuery = true)
     void deleteAssociations(@Param("tagId") Long tagId);
+
+    // Method to find a single TagEntity by 'text'
+    @Query("SELECT t FROM TagEntity t WHERE t.text = :text")
+    TagEntity findByText(@Param("text") String text);
 }
