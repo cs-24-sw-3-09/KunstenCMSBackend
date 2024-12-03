@@ -37,6 +37,7 @@ public class SocketIOModule {
         Configuration configuration = new Configuration();
         configuration.setHostname(hostname);
         configuration.setPort(port);
+        configuration.setOrigin("*");
         SocketConfig socketConfiguration = new SocketConfig();
         socketConfiguration.setReuseAddress(true);
         configuration.setSocketConfig(socketConfiguration);
