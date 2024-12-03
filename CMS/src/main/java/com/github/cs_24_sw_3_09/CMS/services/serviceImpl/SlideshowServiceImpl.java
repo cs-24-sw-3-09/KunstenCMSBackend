@@ -1,7 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -104,11 +108,29 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public Optional<SlideshowEntity> duplicate(Long id, String name) {
-        Optional<SlideshowEntity> slideshowToDuplicate = findOne(id);
-        if(slideshowToDuplicate.isEmpty()) return Optional.empty();
-        
+        Optional<SlideshowEntity> checkExistence = findOne(id);
+        if(checkExistence.isEmpty()) return Optional.empty();
+        SlideshowEntity slideshowToDuplicate = checkExistence.get(); 
 
-        return Optional.empty();
+        Set<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
+        if (slideshowToDuplicate.getVisualMediaInclusionCollection() != null) {
+            for (VisualMediaInclusionEntity vmi : slideshowToDuplicate.getVisualMediaInclusionCollection()) {
+                visualMediaInclusionEntities.add(detachVisualMediaInclusion(vmi)); 
+            }
+        }
+
+        SlideshowEntity newSlideshow = SlideshowEntity
+        .builder().name(name != null ? name : slideshowToDuplicate.getName() + " (Copy)")
+        .isArchived(slideshowToDuplicate.getIsArchived())
+        .visualMediaInclusionCollection(visualMediaInclusionEntities).build();
+        slideshowRepository.save(newSlideshow);
+
+        return Optional.of(newSlideshow);
+    }
+
+    private VisualMediaInclusionEntity detachVisualMediaInclusion(VisualMediaInclusionEntity visualMediaInclusion) {
+        //todo: Implement this
+        return new VisualMediaInclusionEntity();
     }
     
 }
