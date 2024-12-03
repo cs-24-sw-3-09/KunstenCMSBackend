@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
+import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +44,15 @@ public class SocketIOModule {
 
         server.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
+        server.addEventListener("changeContent", ScreenStatusMessage.class, new DataListener<ScreenStatusMessage>() {
+
+            @Override
+            public void onData(SocketIOClient client, ScreenStatusMessage data, AckRequest ackSender) throws Exception {
+                BroadcastOperations broadcastOperations = server.getNamespace("/dashboard").getBroadcastOperations();
+                broadcastOperations.sendEvent("changeContent", data);
+            }
+            
+        });
     }
 
     private ConnectListener onConnected() {
