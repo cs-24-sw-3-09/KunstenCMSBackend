@@ -123,14 +123,22 @@ public class SlideshowServiceImpl implements SlideshowService {
         .builder().name(name != null ? name : slideshowToDuplicate.getName() + " (Copy)")
         .isArchived(slideshowToDuplicate.getIsArchived())
         .visualMediaInclusionCollection(visualMediaInclusionEntities).build();
-        slideshowRepository.save(newSlideshow);
+        
+        newSlideshow = slideshowRepository.save(newSlideshow);
 
         return Optional.of(newSlideshow);
     }
 
     private VisualMediaInclusionEntity detachVisualMediaInclusion(VisualMediaInclusionEntity visualMediaInclusion) {
-        //todo: Implement this
-        return new VisualMediaInclusionEntity();
+        VisualMediaInclusionEntity visualMediaInclusionToSave = VisualMediaInclusionEntity.builder()
+        .slideDuration(visualMediaInclusion.getSlideDuration())
+        .slideshowPosition(visualMediaInclusion.getSlideshowPosition())
+        .visualMedia(visualMediaInclusion.getVisualMedia())
+        .build();
+        
+        VisualMediaInclusionEntity visualMediaInclusionToReturn = visualMediaInclusionService.save(visualMediaInclusionToSave);
+
+        return visualMediaInclusionToReturn;
     }
     
 }

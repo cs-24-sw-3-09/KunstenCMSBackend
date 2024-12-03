@@ -130,15 +130,15 @@ public class SlideshowController {
         @RequestBody Map<String, Object> requestBody
     ) {
         // Validate input and extract new name
-        String newName = requestBody.containsKey("name") 
-        ? requestBody.get("name").toString() : null; 
+        Object mapValue = requestBody.containsKey("name") ? requestBody.get("name") : null;
+        String newName = mapValue != null ? mapValue.toString() : null;
 
         // Update the display device and return the response
         Optional<SlideshowEntity> updatedSlideshowEntity = slideshowService.duplicate(id, newName);
         if (updatedSlideshowEntity.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-        return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity.get()));
+        return new ResponseEntity<>(slideshowMapper.mapTo(updatedSlideshowEntity.get()), HttpStatus.CREATED);
     }
 
 }

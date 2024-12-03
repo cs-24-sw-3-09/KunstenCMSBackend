@@ -262,8 +262,7 @@ public class SlideshowControllerIntegrationTests {
 				.content(body)
         ).andExpect(MockMvcResultMatchers.status().isCreated())
 		.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("New name"))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.isArchived").value(false))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMediaCollection").value(null));
+		.andExpect(MockMvcResultMatchers.jsonPath("$.isArchived").value(false));
 		
 		assertTrue(slideshowService.isExists(1l));
 		assertTrue(slideshowService.isExists(2l));
@@ -283,13 +282,12 @@ public class SlideshowControllerIntegrationTests {
         String body = "{\"name\":null}";
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(body)
-        ).andExpect(MockMvcResultMatchers.status().isCreated())
+            MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(body))
+        .andExpect(MockMvcResultMatchers.status().isCreated())
 		.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("testSS (Copy)"))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.isArchived").value(false))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMediaCollection").value(null));
+		.andExpect(MockMvcResultMatchers.jsonPath("$.isArchived").value(false));
 		
 		assertTrue(slideshowService.isExists(1l));
 		assertTrue(slideshowService.isExists(2l));
@@ -332,13 +330,12 @@ public class SlideshowControllerIntegrationTests {
 			visualMediaInclusionService.isExists(3l)
 		);
 
-
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body)
         ).andExpect(MockMvcResultMatchers.status().isCreated())
-		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMediaCollection").isArray());
+		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMediaInclusionCollection").isArray());
 		
 		assertTrue(slideshowService.isExists(1l));
 		assertTrue(slideshowService.isExists(2l));
