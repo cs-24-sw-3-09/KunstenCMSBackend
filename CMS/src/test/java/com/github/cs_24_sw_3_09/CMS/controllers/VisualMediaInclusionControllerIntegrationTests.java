@@ -7,6 +7,10 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +48,42 @@ public class VisualMediaInclusionControllerIntegrationTests {
     public void testThatCreateVisualMediaInclusionReturnsHttpStatus201Created() throws Exception {
         VisualMediaInclusionDto visualMediaInclusion = TestDataUtil.createVisualMediaInclusionDto();
         String visualMediaInclusionJson = objectMapper.writeValueAsString(visualMediaInclusion);
+
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/visual_media_inclusions") // Use multipart request
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(visualMediaInclusionJson)                                  // Attach the file
         ).andExpect(MockMvcResultMatchers.status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatCreateVisualMediaInclusionWithVisualMediaIdReturnsHttpStatus201Created() throws Exception {
+        VisualMediaEntity vm = TestDataUtil.createVisualMediaEntity();
+        visualMediaService.save(vm);
+
+        assertTrue(visualMediaService.isExists(1l));
+        
+        VisualMediaInclusionDto visualMediaInclusion = 
+        TestDataUtil.createVisualMediaInclusionDtoWitVMThaOnlyContainsId(1);
+
+        String visualMediaInclusionJson = objectMapper.writeValueAsString(visualMediaInclusion);
+
+        System.out.println(visualMediaInclusionJson);
+
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/visual_media_inclusions") // Use multipart request
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(visualMediaInclusionJson)                                  // Attach the file
+        ).andExpect(MockMvcResultMatchers.status().isCreated());
+
+
+        assertTrue(visualMediaInclusionService.isExists(1l));
+		assertEquals(
+			1,
+			visualMediaInclusionService.findOne(1l).get().getVisualMedia().getId()
+		);
     }
 
 
