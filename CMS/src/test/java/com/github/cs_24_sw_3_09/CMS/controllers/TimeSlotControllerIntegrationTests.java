@@ -138,7 +138,7 @@ public class TimeSlotControllerIntegrationTests {
                         MockMvcResultMatchers.jsonPath("numberOfElements").value(4))
                 .andExpect(
                         MockMvcResultMatchers.status().isOk());
-                MockMvcResultMatchers.status().isOk());
+                MockMvcResultMatchers.status().isOk();
 
     }
 
@@ -381,12 +381,14 @@ public class TimeSlotControllerIntegrationTests {
             MockMvcResultMatchers.status().isNotFound()
         );
 
+
 		//Where Time Slot Does not exist
 		Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
+        String json = "\"{ddId\":" + ddId + "}";
         mockMvc.perform(
             MockMvcRequestBuilders.delete("/api/time_slots/500/display_devices")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content("{\"ddId\":" + ddId + "}")
+			.content(json)
         ).andExpect(
             MockMvcResultMatchers.status().isNotFound()
         );
