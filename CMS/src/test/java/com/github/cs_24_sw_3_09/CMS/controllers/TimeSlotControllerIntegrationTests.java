@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration.DslContextConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -586,6 +587,11 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity dd4 = TestDataUtil.createDisplayDeviceEntity();
 
+        //DisplayDeviceEntity newDd1 = displayDeviceService.save(dd1).get();
+        //displayDeviceService.save(dd2);
+        //displayDeviceService.save(dd3);
+        //displayDeviceService.save(dd4);
+
         TimeSlotEntity ts1 = TestDataUtil.createTimeSlotEntityFromData(127,
                 "2024-12-01", "2024-12-25", "12:00:00", "17:00:00");
         TimeSlotEntity ts2 = TestDataUtil.createTimeSlotEntityFromData(127,
@@ -595,20 +601,46 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(127,
                 "2024-12-01", "2024-12-25", "10:00:00", "19:00:00");
 
-        timeSlotService.save(ts1);
-        timeSlotService.save(ts2);
-        timeSlotService.save(ts3);
-        timeSlotService.save(ts4);
 
-        //TimeSlotEntity ts1Id = TestDataUtil.createTimeSlotEntity();
-        //TimeSlotEntity ts2Id = TestDataUtil.createTimeSlotEntity();
-        //TimeSlotEntity ts3Id = TestDataUtil.createTimeSlotEntity();
-        //TimeSlotEntity ts4Id = TestDataUtil.createTimeSlotEntity();
+        ts1.getDisplayDevices().add(dd1);
+        ts1.getDisplayDevices().add(dd2);
+        ts1.getDisplayDevices().add(dd3);
+        ts1.getDisplayDevices().add(dd4);
+        timeSlotService.save(ts1);
+
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(displayDeviceService.isExists(3L));
+        assertTrue(displayDeviceService.isExists(4L));
+        
+        
+        
+
+    
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceRepository.findById(1).isPresent());
+        ts1.getDisplayDevices().add(
+            DisplayDeviceEntity.builder().id(1)
+            .build()
+        );
+        assertEquals(ts1.getDisplayDevices().size(), 1);
+
+        System.out.println(ts1);
+
+        timeSlotService.save(ts1);
+        assertTrue(timeSlotService.isExists(1L));
 
 
         dd1.addTimeSlot(ts1);
         dd1.addTimeSlot(ts2);
         dd1.addTimeSlot(ts3);
+
+        ts1.addDisplayDevice(dd1);
+        ts2.addDisplayDevice(dd1);
+        ts3.addDisplayDevice(dd1);
+
+        displayDeviceService.save(dd1);
+        System.out.println("here");
 
         dd2.addTimeSlot(ts1);
         dd2.addTimeSlot(ts3);
@@ -618,13 +650,6 @@ public class TimeSlotControllerIntegrationTests {
 
         dd4.addTimeSlot(ts3);
         dd4.addTimeSlot(ts4);
-
-        //Not gonna work, need to give id's --> Maybe actually
-        displayDeviceService.save(dd1);
-        displayDeviceService.save(dd2);
-        displayDeviceService.save(dd3);
-        displayDeviceService.save(dd4);
-
 
         assertTrue(
                 displayDeviceService.isExists(1L) &&
