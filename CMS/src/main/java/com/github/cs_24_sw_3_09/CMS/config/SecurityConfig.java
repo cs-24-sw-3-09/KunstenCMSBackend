@@ -38,8 +38,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        //Allow files
+                        .requestMatchers(HttpMethod.GET, "/files/visual_media/**").permitAll()
                         //Allow auth request without token
                         .requestMatchers(HttpMethod.POST, "/api/account/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/account/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/account/reset-password/new").permitAll()
                         //Need to be authenticated for all other routes
                         .anyRequest().authenticated()
                 )

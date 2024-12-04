@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -16,7 +17,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.*;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
 
@@ -30,6 +30,7 @@ public class TestDataUtil {
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -40,6 +41,7 @@ public class TestDataUtil {
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -61,6 +63,7 @@ public class TestDataUtil {
                 .location("Esbjerg2")
                 .name("Skærm Esbjerg2")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -89,6 +92,19 @@ public class TestDataUtil {
                 .name("Billede navn")
                 .build();
     }
+
+    public static VisualMediaEntity createVisualMediaEntityWithTags() {
+        return VisualMediaEntity.builder()
+                .description("dkaoidkao test descpt")
+                .fileType("jpg")
+                // .lastDateModified("30/10/2003")
+                .location("/djao/dhau")
+                .name("Billede navn")
+                .tags(createTagEntitySet())
+                .build();
+    }
+
+
 
     public static UserDto createUserDto() {
         return UserDto.builder()
@@ -130,8 +146,8 @@ public class TestDataUtil {
     public static TimeSlotEntity createTimeSlotEntity() {
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")
-                .startDate(java.sql.Date.valueOf("2024-11-20"))
-                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startDate(java.sql.Date.valueOf("2025-11-20"))
+                .endDate(java.sql.Date.valueOf("2026-11-20"))
                 .startTime(java.sql.Time.valueOf("10:20:30"))
                 .endTime(java.sql.Time.valueOf("11:21:31"))
                 .weekdaysChosen(3)
@@ -164,6 +180,7 @@ public class TestDataUtil {
                 .endTime(java.sql.Time.valueOf("11:21:31"))
                 .weekdaysChosen(3)
                 .displayContent(assignedSlideshow())
+                .displayDevices(new HashSet<>())
                 .build();
     }
 
@@ -216,7 +233,17 @@ public class TestDataUtil {
     public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
         return VisualMediaInclusionDto.builder()
                 .visualMedia(new VisualMediaEntity())
-                .id(1)
+                .slideDuration(5)
+                .slideshowPosition(1)
+                .build();
+    }
+
+    public static VisualMediaInclusionDto createVisualMediaInclusionDtoWitVMThaOnlyContainsId(Integer id) {
+        VisualMediaEntity vm = new VisualMediaEntity();
+        vm.setId(id);
+
+        return VisualMediaInclusionDto.builder()
+                .visualMedia(vm)
                 .slideDuration(5)
                 .slideshowPosition(1)
                 .build();
@@ -233,11 +260,16 @@ public class TestDataUtil {
 
     public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
         return VisualMediaInclusionEntity.builder()
-                .visualMedia(null)
-                .id(1)
                 .slideDuration(10)
                 .slideshowPosition(2)
                 .build();
+    }
+
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntityWithPos(Integer pos) {
+        return VisualMediaInclusionEntity.builder()
+        .slideDuration(10)
+        .slideshowPosition(pos)
+        .build();
     }
 
     public static SlideshowDto createSlideshowDto() {
@@ -261,10 +293,39 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static TagEntity createTagEntity2() {
+        return TagEntity.builder()
+                .text("Cool image")
+                .build();
+    }
+
+    public static Set<TagEntity> createTagEntitySet() {
+        Set<TagEntity> tag = new HashSet<>();
+
+        tag.add(createTagEntity());
+        tag.add(createTagEntity2());
+
+        return tag;
+    }
+
     public static SlideshowEntity createSlideshowWithVisualMediaEntity() {
 
         HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
         visualMediaInclusionEntities.add(createVisualMediaInclusionEntity());
+
+        return SlideshowEntity.builder()
+                .name("testSS")
+                .isArchived(false)
+                .visualMediaInclusionCollection(visualMediaInclusionEntities)
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowWithMultipleVisualMediaEntities() {
+
+        HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(1));
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(2));
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(3));
 
         return SlideshowEntity.builder()
                 .name("testSS")
@@ -279,7 +340,7 @@ public class TestDataUtil {
 
         return TimeSlotEntity.builder()
                 .name("Hello Darkness my old friend")
-                
+
                 .displayDevices(new HashSet<>())
                 .weekdaysChosen(weekdaysChosen)
                 .startDate(Date.valueOf(startDate)) // Requires the format yyyy-MM-dd

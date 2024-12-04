@@ -8,7 +8,11 @@ import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -40,6 +44,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @Table(name = "time_slots")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class TimeSlotEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "time_slot_id_seq")
@@ -98,7 +103,7 @@ public class TimeSlotEntity {
         || this.startDate.equals(ts.startDate) && this.endDate.after(ts.endDate)
         || this.startDate.equals(ts.startDate) && this.endDate.before(ts.endDate)
         )) {
-            return false; 
+            return false;
         }*/
 
         //Check if time overlaps
@@ -111,7 +116,7 @@ public class TimeSlotEntity {
         || this.startTime.equals(ts.startTime) && this.endTime.after(ts.endTime)
         || this.startTime.equals(ts.startTime) && this.endTime.before(ts.endTime)
         )) {
-            return false; 
+            return false;
         }*/
 
     }
@@ -147,4 +152,9 @@ public class TimeSlotEntity {
 
         return false;
     }
+
+    public int countDisplayDeviceAssociations() {
+        return this.getDisplayDevices().size();
+    }
+
 }

@@ -1,8 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.sql.Time;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +17,6 @@ import org.springframework.stereotype.Service;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.EmailDetailsEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
-import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.UserRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.EmailService;
@@ -66,11 +69,21 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public String sendDDDisconnectMail(int id) {
+        Time currentTime = Time.valueOf(LocalTime.now());
+        return sendDDDisconnectMail(id, currentTime);
+    }
+
+    @Override
+    public String sendDDDisconnectMail(int id, Time currentTime) {
         // Checks that the ID is in the database. In order to make sure that the id is a valid DD
         if (!displayDeviceService.isExists((long) id)) {
-            return "Did not sent to DD, as it is not found in DB";
+            return "Did not sent mail, as DD is not found in DB";
         }
         DisplayDeviceEntity dd = displayDeviceService.findOne((long) id).get(); // Gets the DD from the DB
+
+        // Making sure that the should be on
+        if (!shallDDSendMailForWeek(dd, currentTime, LocalDate.now().getDayOfWeek()))
+            return "Did not sent mail, as DD should be off";
 
         // Set up the email data
         EmailDetailsEntity email = EmailDetailsEntity.builder()
@@ -110,6 +123,28 @@ public class EmailServiceImpl implements EmailService {
 
         // Check if the current time is outside the pause period
         return currentTime.before(start) || currentTime.after(end);
+    }
+
+    private static boolean shallDDSendMailForWeek(DisplayDeviceEntity dd, Time currentTime, DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> shallDDSendMailForSingleDay(dd.getMonday_start(), dd.getMonday_end(), currentTime);
+            case TUESDAY-> shallDDSendMailForSingleDay(dd.getTuesday_start(), dd.getTuesday_end(), currentTime);
+            case WEDNESDAY -> shallDDSendMailForSingleDay(dd.getWednesday_start(), dd.getWednesday_end(), currentTime);
+            case THURSDAY -> shallDDSendMailForSingleDay(dd.getThursday_start(), dd.getThursday_end(), currentTime);
+            case FRIDAY -> shallDDSendMailForSingleDay(dd.getFriday_start(), dd.getFriday_end(), currentTime);
+            case SATURDAY -> shallDDSendMailForSingleDay(dd.getSaturday_start(), dd.getSaturday_end(), currentTime);
+            case SUNDAY -> shallDDSendMailForSingleDay(dd.getSunday_start(), dd.getSunday_end(), currentTime);
+        };
+    }
+
+    private static boolean shallDDSendMailForSingleDay(Time start, Time end, Time currentTime) {
+        // If either start or end is null, consider it to not send a mail
+        if (start == null || end == null) {
+            return false;
+        }
+
+        // If the current time is after the start and before the end the screen should be on and therefore the system shall send a mail
+        return currentTime.after(start) && currentTime.before(end);
     }
 
 }

@@ -1,18 +1,25 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaInclusionDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
+import org.hibernate.validator.cfg.defs.EANDef;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,11 +52,15 @@ public class VisualMediaInclusionController {
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> createVisualMediaInclusion(
             @RequestBody VisualMediaInclusionDto visualMediaInclusionDto) {
+
         VisualMediaInclusionEntity visualMediaInclusionEntity = visualMediaInclusionMapper
                 .mapFrom(visualMediaInclusionDto);
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionRepository
-                .save(visualMediaInclusionEntity);
-        return new ResponseEntity<>(visualMediaInclusionMapper.mapTo(savedVisualMediaInclusionEntity),
+
+        Optional<VisualMediaInclusionEntity> visualMediaInclusionToReturn = 
+        visualMediaInclusionService.save(visualMediaInclusionEntity);
+
+        if (visualMediaInclusionToReturn.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(visualMediaInclusionMapper.mapTo(visualMediaInclusionToReturn.get()),
                 HttpStatus.CREATED);
     }
 
@@ -76,7 +87,7 @@ public class VisualMediaInclusionController {
         VisualMediaInclusionEntity visualMediaInclusionEntity = visualMediaInclusionMapper
                 .mapFrom(visualMediaInclusionDto);
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService
-                .save(visualMediaInclusionEntity);
+                .save(visualMediaInclusionEntity).get();
         return new ResponseEntity<>(visualMediaInclusionMapper.mapTo(savedVisualMediaInclusionEntity), HttpStatus.OK);
     }
 
@@ -135,6 +146,35 @@ public class VisualMediaInclusionController {
                 visualMediaId);
 
         return ResponseEntity.ok(visualMediaInclusionMapper.mapTo(updatedVisualMediaInclusionEntity));
+    }
+
+    @PatchMapping(path = "/positions")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<List<VisualMediaInclusionDto>> updateSlideshowPositions(
+        @RequestBody Map<String, Object> requestBody) {
+
+        ArrayList<VisualMediaInclusionEntity> visualMediaInclusions = new ArrayList<>();
+        for(Map<String, Object> data : (List<Map<String, Object>>) requestBody.get("visualMediaInclusion")) {        
+            VisualMediaInclusionEntity vmi = new VisualMediaInclusionEntity();
+
+            vmi.setId((Integer) data.get("id"));
+            vmi.setSlideshowPosition((Integer) data.get("slideshowPosition"));
+
+            visualMediaInclusions.add(vmi);
+        }
+
+        Optional<List<VisualMediaInclusionEntity>> updatedVisualMediaInclusions = visualMediaInclusionService.updateSlideshowPosition(visualMediaInclusions);
+        if (updatedVisualMediaInclusions.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        List<VisualMediaInclusionDto> visualMediaInclusionDtos = 
+            updatedVisualMediaInclusions.get()
+            .stream().map(visualMediaInclusionMapper::mapTo)
+            .toList();
+        
+        return new ResponseEntity<>(
+            visualMediaInclusionDtos, 
+            HttpStatus.OK
+        );
     }
 
 

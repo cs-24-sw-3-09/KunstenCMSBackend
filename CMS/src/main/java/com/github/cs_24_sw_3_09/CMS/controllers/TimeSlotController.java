@@ -1,15 +1,25 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
+import com.github.cs_24_sw_3_09.CMS.utils.SetTSContentValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +31,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -37,16 +47,25 @@ public class TimeSlotController {
     private final TimeSlotService timeSlotService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
     private final DisplayDeviceService displayDeviceService;
+    private final SlideshowService slideshowService;
+    private final VisualMediaService visualMediaService;
+    private ContentUtils contentUtils;
 
     @Autowired
     public TimeSlotController(
             TimeSlotService timeSlotService,
             Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
-            DisplayDeviceService displayDeviceService
+            DisplayDeviceService displayDeviceService,
+            VisualMediaService visualMediaService,
+            SlideshowService slideshowService,
+            ContentUtils contentUtils
     ) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
         this.displayDeviceService = displayDeviceService;
+        this.visualMediaService = visualMediaService;
+        this.slideshowService = slideshowService;
+        this.contentUtils = contentUtils;
     }
 
     @PostMapping
@@ -55,22 +74,6 @@ public class TimeSlotController {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
-        
-        
-        /*Optional<DisplayDeviceEntity> optionalDisplayDevice = timeSlotEntity.getDisplayDevices().stream().findFirst();
-        boolean checkIds = timeSlotEntity.getDisplayDevices().stream().allMatch(device -> 
-                    displayDeviceService.isExists(Long.valueOf(device.getId()))
-                );
-
-        TimeSlotEntity savedTimeSlotEntity;
-        if (optionalDisplayDevice.isPresent() && optionalDisplayDevice.get().getId() == null) {
-            savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        } else if(checkIds) {
-            savedTimeSlotEntity = timeSlotService.saveWithOnlyId(timeSlotEntity);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }*/
-
 
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
         if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -79,7 +82,20 @@ public class TimeSlotController {
     }
 
     @GetMapping
-    public Page<TimeSlotDto> getTimeSlots(Pageable pageable) {
+    public Page<TimeSlotDto> getTimeSlots(Pageable pageable,
+            @RequestParam(value = "start", required = false) Date startDate,
+            @RequestParam(value = "end", required = false) Date endDate) {
+
+        // If one want to find based on date
+        if (startDate != null && endDate != null) {
+            List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(startDate, endDate);
+            List<TimeSlotDto> timeSlotDtos = timeSlotEntities.stream()
+                    .map(timeSlotMapper::mapTo)
+                    .collect(Collectors.toList());
+
+            return new PageImpl<>(timeSlotDtos, pageable, timeSlotDtos.size());
+        }
+
         Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
         return timeSlotEntities.map(timeSlotMapper::mapTo);
     }
@@ -158,7 +174,42 @@ public class TimeSlotController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PatchMapping(path = "/{id}/display_content")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<TimeSlotDto> setContent(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody) {
+
+        //validate request body (check if contentType, id, and type of these are correct)
+        SetTSContentValidationResult validationResult = contentUtils.validateRequestBody(requestBody);
+        if (!validationResult.isValid()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Getting the data from the previous result
+        Long displayContentId = validationResult.getDisplayContentId();
+        String displayContentType = validationResult.getDisplayContentType();
+
+        // Validate existence of time slot
+        if (!timeSlotService.isExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Validate existence of the referenced content
+        if (!contentUtils.isDisplayContentValid(displayContentId, displayContentType)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Update the display content
+        TimeSlotEntity updatedTimeSlotEntity = timeSlotService.setDisplayContent(id, displayContentId, displayContentType);
+
+        return ResponseEntity.ok(timeSlotMapper.mapTo(updatedTimeSlotEntity));
+    }
+
+
+
     @PatchMapping(path = "/{id}/display_devices")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<TimeSlotDto> addDisplayDevice(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestBody) {
         if (!requestBody.containsKey("displayDeviceId")) {
             return ResponseEntity.badRequest().build();

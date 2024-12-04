@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.services;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,19 +24,21 @@ public interface VisualMediaService {
 
     List<TagEntity> getVisualMediaTags(Long id);
 
-    Set<SlideshowEntity>findPartOfSlideshows(Long id);
-
     boolean isExists(Long id);
 
     VisualMediaEntity partialUpdate(Long id, VisualMediaEntity visualMediaEntity);
 
+    Set<SlideshowEntity> findPartOfSlideshows(Long id);
+
     void delete(Long id);
 
-    Optional<VisualMediaEntity> addTag(Long id, Long tagId);
+    Optional<VisualMediaEntity> addTag(Long id, String text);
 
     void deleteRelation(Long visualMediaId, Long tagId);
 
     List<DisplayDeviceEntity> findDisplayDevicesVisualMediaIsPartOf(Long id);
 
     List<TimeSlotEntity> findTimeslotsVisualMediaIsPartOf(Long id);
+
+    HttpStatus replaceFileById(Long id, MultipartFile file) throws IOException;
 }
