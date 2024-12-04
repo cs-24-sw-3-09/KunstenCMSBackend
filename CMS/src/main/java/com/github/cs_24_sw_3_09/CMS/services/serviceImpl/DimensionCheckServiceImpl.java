@@ -20,8 +20,6 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
-import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
@@ -36,20 +34,15 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     private VisualMediaService visualMediaService;
     private DisplayDeviceService displayDeviceService;
-    private VisualMediaInclusionRepository visualMediaInclusionRepository;
-    private SlideshowRepository slideshowRepository;
     private VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowService slideshowService;
     private TimeSlotService timeSlotService;
 
     public DimensionCheckServiceImpl(VisualMediaService visualMediaService, DisplayDeviceService displayDeviceService,
-                                        VisualMediaInclusionRepository visualMediaInclusionRepository, 
-                                        SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService,
+                                        VisualMediaInclusionService visualMediaInclusionService,
                                         SlideshowService slideshowService, TimeSlotService timeSlotService){
         this.visualMediaService = visualMediaService;
         this.displayDeviceService = displayDeviceService;
-        this.visualMediaInclusionRepository = visualMediaInclusionRepository;
-        this.slideshowRepository = slideshowRepository;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.slideshowService = slideshowService;
         this.timeSlotService = timeSlotService;
@@ -89,7 +82,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 throw new IllegalArgumentException("Slideshow with ID " + fallbackContent.getId() + " does not exist.");   
             } 
             SlideshowEntity slideshow = optionalSlideshow.get();
-            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshow.getId().longValue());
+            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshow.getId().longValue());
             fallbackOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
 
             if(fallbackOrientation.equals("mixed")){
@@ -103,7 +96,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     @Override
     public Boolean checkDimensionForAssignedVisualMediaToSlideshow(Long addedVisualMediaInclusionId, Long slideshowId){
-        Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshowId);
+        Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshowId);
         //if there is only one Visual Media Inclusion in Slideshow there is nothing to check
         if (visualMediaInclusionsInSlideshow.size() <= 1){
             return true;
@@ -160,7 +153,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 throw new IllegalArgumentException("Slideshow with ID " + displayContent.getId() + " does not exist.");
             }
             SlideshowEntity slideshow = optionalSlideshow.get();
-            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshow.getId().longValue());
+            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshow.getId().longValue());
             displayContentOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
             
             //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
