@@ -388,7 +388,7 @@ public class TimeSlotControllerIntegrationTests {
 
 		//Where Time Slot Does not exist
 		Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
-        String json = "\"{ddId\":" + ddId + "}";
+        String json = "{\"ddId\":" + ddId + "}";
         mockMvc.perform(
             MockMvcRequestBuilders.delete("/api/time_slots/500/display_devices")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -672,48 +672,50 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity();
 
-        DisplayDeviceEntity savedDD1 = displayDeviceService.save(dd1).get();
-        DisplayDeviceEntity savedDD2 = displayDeviceService.save(dd2).get();
-        DisplayDeviceEntity savedDD3 = displayDeviceService.save(dd3).get();
+        displayDeviceService.save(dd1).get();
+        displayDeviceService.save(dd2).get();
+        displayDeviceService.save(dd3).get();
 
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(displayDeviceService.isExists(3L));
 
-        TimeSlotEntity ts1 = TestDataUtil.createTimeSlotEntityFromData(11, "2024-12-02",
-                "2024-12-05", "12:00:00", "14:00:00", new HashSet<>(Arrays.asList(savedDD1, savedDD2, savedDD3)));
+        int[] associations1 = {1,2,3};
+        addTsHelper(11, "2024-12-02",
+        "2024-12-05", "12:00:00", "14:00:00", associations1);
+        assertTrue(timeSlotService.isExists(1L));
 
-        TimeSlotEntity ts2 = TestDataUtil.createTimeSlotEntityFromData(3, "2024-12-02",
-                "2024-12-03", "11:00:00", "13:00:00", new HashSet<>(Arrays.asList(savedDD1)));
+        int[] associations2 = {1};
+        addTsHelper(3, "2024-12-02",
+        "2024-12-03", "11:00:00", "13:00:00", associations2);
 
-        TimeSlotEntity ts3 = TestDataUtil.createTimeSlotEntityFromData(1, "2024-12-02",
-                "2024-12-02", "11:00:00", "15:00:00", new HashSet<>(Arrays.asList(savedDD2)));
-
-        TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(2, "2024-12-03",
-                "2024-12-03", "13:00:00", "15:00:00", new HashSet<>(Arrays.asList(savedDD2)));
-
-        TimeSlotEntity ts5 = TestDataUtil.createTimeSlotEntityFromData(8, "2024-12-05",
-                "2024-12-05", "14:00:00", "15:00:00", new HashSet<>(Arrays.asList(savedDD2)));
-
-        TimeSlotEntity ts6 = TestDataUtil.createTimeSlotEntityFromData(4, "2024-12-04",
-                "2024-12-04", "8:00:00", "15:00:00", new HashSet<>(Arrays.asList(savedDD3)));
-
-        TimeSlotEntity ts7 = TestDataUtil.createTimeSlotEntityFromData(1, "2024-12-02",
-                "2024-12-02", "13:00:00", "13:30:00", new HashSet<>(Arrays.asList(savedDD3)));
-
-        String ts1Json = objectMapper.writeValueAsString(ts1);
-
-        System.out.println(ts1Json);
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/time_slots")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(ts1Json)
-        );
-
-        TimeSlotEntity savedTS2 = timeSlotService.save(ts2).get();
-        TimeSlotEntity savedTS3 = timeSlotService.save(ts3).get();
-        TimeSlotEntity savedTS4 = timeSlotService.save(ts4).get();
-        TimeSlotEntity savedTS5 = timeSlotService.save(ts5).get();
-        TimeSlotEntity savedTS6 = timeSlotService.save(ts6).get();
-        TimeSlotEntity savedTS7 = timeSlotService.save(ts7).get();
-
+        int[] associations3 = {2};
+        addTsHelper(1, "2024-12-02",
+        "2024-12-02", "11:00:00", "15:00:00", associations3);
+        
+        int[] associations4 = {2};
+        addTsHelper(2, "2024-12-03",
+        "2024-12-03", "13:00:00", "15:00:00", associations4);
+        
+        int[] associations5 = {2};
+        addTsHelper(8, "2024-12-05",
+        "2024-12-05", "14:00:00", "15:00:00", associations5);
+        
+        int[] associations6 = {3};
+        addTsHelper(4, "2024-12-04",
+        "2024-12-04", "8:00:00", "15:00:00", associations6);
+        
+        int[] associations7 = {3};
+        addTsHelper(1, "2024-12-02",
+        "2024-12-02", "13:00:00", "13:30:00", associations7);
+        
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(timeSlotService.isExists(2L));
+        assertTrue(timeSlotService.isExists(3L));
+        assertTrue(timeSlotService.isExists(4L));
+        assertTrue(timeSlotService.isExists(5L));
+        assertTrue(timeSlotService.isExists(6L));
+        assertTrue(timeSlotService.isExists(7L));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1/overlapping_time_slots")
@@ -722,7 +724,7 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$").isArray()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.length").value(4)
+                MockMvcResultMatchers.jsonPath("$", org.hamcrest.Matchers.hasSize(4))
         );
     }
 
