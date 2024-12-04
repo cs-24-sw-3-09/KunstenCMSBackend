@@ -479,4 +479,41 @@ public class TimeSlotControllerIntegrationTests {
 
 		assertFalse(timeSlotService.isExists((long) 1));
 	}
+
+    @Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatChecksIfTimeSlotsOverlap() throws Exception {
+
+        //No weekdays overlap
+        TimeSlotEntity ts1 = TimeSlotEntity.builder()
+        .weekdaysChosen(85).startDate()
+        .build();
+        TimeSlotEntity ts2 = TimeSlotEntity.builder()
+        .weekdaysChosen(42).build();
+
+        assertFalse(ts1.overlaps(ts2));
+
+        //PPeriod does not overlap
+        ts1 = TimeSlotEntity.builder().build();
+        ts2 = TimeSlotEntity.builder().build();
+        assertFalse(ts1.overlaps(ts2));
+
+        //No time within a day overlap
+        ts1 = TimeSlotEntity.builder().build();
+        ts2 = TimeSlotEntity.builder().build();
+        assertFalse(ts1.overlaps(ts2));
+
+        //Overlaps
+        ts1 = TimeSlotEntity.builder().build();
+        ts2 = TimeSlotEntity.builder().build();
+        assertTrue(ts1.overlaps(ts2));
+    }
+
+
+    @Test
+    @WithMockUser(roles={"PLANNER"}) 
+    public void testThatGetOverlappingTimeslotsReturnsOverlappingTimeslots
+
+
+
 }

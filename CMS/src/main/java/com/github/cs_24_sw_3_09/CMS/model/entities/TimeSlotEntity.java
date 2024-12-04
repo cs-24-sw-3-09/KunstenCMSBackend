@@ -74,7 +74,47 @@ public class TimeSlotEntity {
         this.displayDevices.add(displayDevice);
     }
 
-    public boolean overlaps(TimeSlotEntity timeSlotEntity) {
+    public boolean overlaps(TimeSlotEntity ts) {
+        //Check if any weekdays overlap
+        if ((this.weekdaysChosen & ts.weekdaysChosen) == 0) return false; 
+        //Check if dates overlaps
+        if (this.endDate.before(ts.startDate) || this.startDate.after(ts.endDate)) return false;
+        //Check if time overlaps
+        if (this.endTime.before(ts.startTime) || this.startTime.after(ts.endTime)) return false;
+        
+        //Time Slots overlap
+        return true;
+
+
+        //Check if dates overlaps
+        /*if (!(this.startDate.before(ts.endDate) && this.endDate.after(ts.startDate)
+        || this.startDate.after(ts.startDate) && this.endDate.before(ts.endDate)
+        || this.startDate.before(ts.startDate) && this.endDate.after(ts.endDate)
+        || this.startDate.equals(ts.startDate) && this.endDate.equals(ts.endDate)
+        || this.startDate.before(ts.startDate) && this.endDate.equals(ts.endDate)
+        || this.startDate.after(ts.startDate) && this.endDate.equals(ts.endDate)
+        || this.startDate.equals(ts.startDate) && this.endDate.after(ts.endDate)
+        || this.startDate.equals(ts.startDate) && this.endDate.before(ts.endDate)
+        )) {
+            return false; 
+        }*/
+
+        //Check if time overlaps
+        /*if (!(this.startTime.before(ts.endTime) && this.endTime.after(ts.startTime)
+        || this.startTime.after(ts.startTime) && this.endTime.before(ts.endTime)
+        || this.startTime.before(ts.startTime) && this.endTime.after(ts.endTime)
+        || this.startTime.equals(ts.startTime) && this.endTime.equals(ts.endTime)
+        || this.startTime.before(ts.startTime) && this.endTime.equals(ts.endTime)
+        || this.startTime.after(ts.startTime) && this.endTime.equals(ts.endTime)
+        || this.startTime.equals(ts.startTime) && this.endTime.after(ts.endTime)
+        || this.startTime.equals(ts.startTime) && this.endTime.before(ts.endTime)
+        )) {
+            return false; 
+        }*/
+        
+    }
+
+    public boolean overlapsWrong(TimeSlotEntity timeSlotEntity) {
 
         if (this.startDate.after(timeSlotEntity.startDate) && this.endDate.before(timeSlotEntity.endDate)) {
             return true;

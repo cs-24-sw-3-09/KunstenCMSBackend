@@ -187,7 +187,5 @@ public class TimeSlotController {
 
         return new ResponseEntity<>(overlappingTimeSlotDtos, HttpStatus.OK);
     }
-
-
 }
 
