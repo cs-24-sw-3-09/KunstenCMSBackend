@@ -11,6 +11,6 @@ public class SocketIOConfig {
 
     @Bean
     public SocketIOModule socketIOModule(MonitorGracePeriodForDisplayDevices monitorGracePeriodForDisplayDevices) {
-        return new SocketIOModule("0.0.0.0", 3051);
+        return new SocketIOModule("0.0.0.0", 3051, "kunsten.stjernholm.cloud");
     }
 }
