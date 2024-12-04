@@ -744,69 +744,32 @@ public class TimeSlotControllerIntegrationTests {
         assertTrue(displayDeviceService.isExists(3L));
         assertTrue(displayDeviceService.isExists(4L));
 
-        TimeSlotEntity ts1 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "12:00:00", "17:00:00");
-        
-        String tsJson = objectMapper.writeValueAsString(ts1); 
-        int[] associations = {1,2,3};
-        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associations);
-        
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/time_slots")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tsJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
+        int[] associations1 = {1,2,3};
+        int[] associations2 = {2,3};
+        int[] associations3 = {1,2,4};
+        int[] associations4 = {4};
+
+        addTsHelper(
+            127, "2024-12-01", "2024-12-25", 
+            "12:00:00", "17:00:00", associations1
         );
+        addTsHelper(
+            127, "2024-12-01", "2024-12-25", 
+            "10:00:00", "12:00:00", associations2
+        );
+        addTsHelper(
+            127, "2024-12-01", "2024-12-25", 
+            "17:00:00", "19:00:00", associations3
+        );
+        addTsHelper(
+            127, "2024-12-01", "2024-12-25", 
+            "10:00:00", "19:00:00", associations4
+        );
+        
         assertTrue(timeSlotService.isExists(1L));
-
-        TimeSlotEntity ts2 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "10:00:00", "12:00:00");
-
-        tsJson = objectMapper.writeValueAsString(ts2); 
-        int[] associationTs2 = {1,3};
-        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associationTs2);
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/time_slots")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tsJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
         assertTrue(timeSlotService.isExists(2L));
-
-
-        TimeSlotEntity ts3 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "17:00:00", "19:00:00");
-        tsJson = objectMapper.writeValueAsString(ts3); 
-        int[] associationTs3 = {2,3};
-        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associationTs3);
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/time_slots")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tsJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
         assertTrue(timeSlotService.isExists(3L));
-        
-        TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(127,
-            "2024-12-01", "2024-12-25", "10:00:00", "19:00:00");
-        tsJson = objectMapper.writeValueAsString(ts4); 
-        int[] associationTs4 = {4};
-        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associationTs4);
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/time_slots")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tsJson)
-        ).andExpect(
-                MockMvcResultMatchers.status().isCreated()
-        );
-        assertTrue(timeSlotService.isExists(4L));
-
+        assertTrue(timeSlotService.isExists(4L));        
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1/overlapping_time_slots")
@@ -817,12 +780,30 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$", org.hamcrest.Matchers.hasSize(0))
         );
+    }
 
+    private void addTsHelper(int weekdaysChosen,
+    String startDate, String endDate, String startTime, String endTime, int[] associations) throws Exception {
+
+        TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(weekdaysChosen,
+            startDate, endDate, startTime, endTime);
+        String json = objectMapper.writeValueAsString(ts4); 
+        //int[] associationTs4 = {4};
+        json = TestDataUtil.createDDJsonWithId(json, associations);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
+        );
     }
 
     @Test
     @WithMockUser(roles = {"PLANNER"})
     public void testThatChecksOverlapWhereTimeSlotDoesntExistAndReturns404() throws Exception {
+        
         assertFalse(timeSlotService.isExists(1L));
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1/overlapping_time_slots")
