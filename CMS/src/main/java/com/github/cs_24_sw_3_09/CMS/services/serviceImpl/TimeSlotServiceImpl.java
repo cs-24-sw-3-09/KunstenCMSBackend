@@ -70,7 +70,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             timeSlotEntity = displayContent.get();
         }
 
-        TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+        TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);        
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return Optional.of(toReturn);
     }
@@ -80,10 +80,8 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
         Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
         for (DisplayDeviceEntity displayDevice : displayDevices) {
-            DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);
-
+            DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);                        
             if (newDisplayDevice == null) return Optional.empty();
-
             newDisplayDevices.add(newDisplayDevice);
         }
         timeSlotEntity.getDisplayDevices().clear();

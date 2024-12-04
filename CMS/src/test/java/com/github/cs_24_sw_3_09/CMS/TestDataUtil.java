@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
@@ -47,6 +48,7 @@ public class TestDataUtil {
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -273,7 +275,10 @@ public class TestDataUtil {
 
     public static TimeSlotEntity createTimeSlotEntityFromData(int weekdaysChosen, String startDate, String endDate, String startTime, String endTime) throws ParseException {
 
-        return TimeSlotEntity.builder().weekdaysChosen(weekdaysChosen)
+        return TimeSlotEntity.builder()
+                .name("Hello Darkness my old friend")
+                
+                .displayDevices(new HashSet<>())
                 .weekdaysChosen(weekdaysChosen)
                 .startDate(Date.valueOf(startDate)) // Requires the format yyyy-MM-dd
                 .endDate(Date.valueOf(endDate))   // Requires the format yyyy-MM-dd
