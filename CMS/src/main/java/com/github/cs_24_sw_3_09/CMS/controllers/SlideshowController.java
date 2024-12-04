@@ -122,4 +122,23 @@ public class SlideshowController {
 
         return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity));
     }
+
+    @PostMapping(path = "/{id}/duplicate")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<SlideshowDto> createDuplicate(
+        @PathVariable("id") Long id,
+        @RequestBody Map<String, Object> requestBody
+    ) {
+        // Validate input and extract new name
+        Object mapValue = requestBody.containsKey("name") ? requestBody.get("name") : null;
+        String newName = mapValue != null ? mapValue.toString() : null;
+
+        // Update the display device and return the response
+        Optional<SlideshowEntity> updatedSlideshowEntity = slideshowService.duplicate(id, newName);
+        if (updatedSlideshowEntity.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return new ResponseEntity<>(slideshowMapper.mapTo(updatedSlideshowEntity.get()), HttpStatus.CREATED);
+    }
+
 }
