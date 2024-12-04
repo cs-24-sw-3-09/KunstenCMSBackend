@@ -1,10 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
@@ -35,18 +40,21 @@ public class DisplayDeviceController {
     private final TimeSlotService timeSlotService;
     private Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
     private ContentUtils contentUtils;
+    private DimensionCheckService dimensionCheckService;
 
     @Autowired
     public DisplayDeviceController(DisplayDeviceService displayDeviceService,
             Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
             VisualMediaService visualMediaService, SlideshowService slideshowService,
-            ContentUtils contentUtils, TimeSlotService timeSlotService) {
+            ContentUtils contentUtils, TimeSlotService timeSlotService, 
+            DimensionCheckService dimensionCheckService) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceMapper = displayDeviceMapper;
         this.visualMediaService = visualMediaService;
         this.contentUtils = contentUtils;
         this.slideshowService = slideshowService;
         this.timeSlotService = timeSlotService;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @PostMapping
@@ -74,6 +82,11 @@ public class DisplayDeviceController {
             DisplayDeviceDto displayDeviceDto = displayDeviceMapper.mapTo(displayDeviceEntity);
             return new ResponseEntity<>(displayDeviceDto, HttpStatus.OK);
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(path =  "/{id}/dimensions") //TODO: add auth
+    public ResponseEntity<Boolean> checkDimensionsOfFallbackAndDisplayDevice(@PathVariable("id") Long id){
+        return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedFallback(id), HttpStatus.OK);
     }
 
     @PutMapping(path = "/{id}")
@@ -196,5 +209,5 @@ public class DisplayDeviceController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(displayDeviceMapper.mapTo(updatedDisplayDevice.get()), HttpStatus.OK);
-    }
+    }    
 }
