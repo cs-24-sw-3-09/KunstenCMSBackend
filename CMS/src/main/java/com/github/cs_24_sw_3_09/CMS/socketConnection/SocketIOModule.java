@@ -42,12 +42,11 @@ public class SocketIOModule {
 
         server.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
-        SocketIONamespace dashboard = server.addNamespace("dashboard");
         server.addEventListener("changeContent", ScreenStatusMessage.class, new DataListener<ScreenStatusMessage>() {
 
             @Override
             public void onData(SocketIOClient client, ScreenStatusMessage data, AckRequest ackSender) throws Exception {
-                dashboard.getBroadcastOperations().sendEvent("changeContent", data);
+                server.getBroadcastOperations().sendEvent("changeContent", data);
             }
             
         });
@@ -55,8 +54,10 @@ public class SocketIOModule {
 
     private ConnectListener onConnected() {
         return (client -> {
-            int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
-            client.joinRoom(String.valueOf(deviceId));
+            try {
+                int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
+                client.joinRoom(String.valueOf(deviceId));
+            } catch (Exception e) {}
         });
     }
 
