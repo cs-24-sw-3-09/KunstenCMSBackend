@@ -80,7 +80,9 @@ public class TimeSlotEntity {
         //Check if dates overlaps
         if (this.endDate.before(ts.startDate) || this.startDate.after(ts.endDate)) return false;
         //Check if time overlaps
-        if (this.endTime.before(ts.startTime) || this.startTime.after(ts.endTime)) return false;
+        if (this.endTime.before(ts.startTime) || this.endTime.equals(ts.startTime)
+        //Check if time slots begin right after each other
+        || this.startTime.equals(ts.endTime) || this.startTime.after(ts.endTime)) return false;
         
         //Time Slots overlap
         return true;

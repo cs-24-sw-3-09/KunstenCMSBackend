@@ -1,10 +1,13 @@
 package com.github.cs_24_sw_3_09.CMS;
 
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.*;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
@@ -13,6 +16,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 public class TestDataUtil {
+
+    static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+    static DateFormat timeFormatter = new SimpleDateFormat("HH:mm");
 
     public static DisplayDeviceDto createDisplayDeviceDto() {
 
@@ -130,10 +136,16 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static TimeSlotEntity createTimeSlotEntityWithOnlyId(Integer id) {
+        return TimeSlotEntity.builder()
+                .id(id)
+                .build();
+    }
+
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
         displayDevices.add(
-            DisplayDeviceEntity.builder().id(1).build()
+                DisplayDeviceEntity.builder().id(1).build()
         );
         return displayDevices;
     }
@@ -256,4 +268,19 @@ public class TestDataUtil {
                 .visualMediaInclusionCollection(visualMediaInclusionEntities)
                 .build();
     }
+
+
+
+    public static TimeSlotEntity createTimeSlotEntityFromData(int weekdaysChosen, String startDate, String endDate, String startTime, String endTime) throws ParseException {
+
+        return TimeSlotEntity.builder().weekdaysChosen(weekdaysChosen)
+                .weekdaysChosen(weekdaysChosen)
+                .startDate(Date.valueOf(startDate)) // Requires the format yyyy-MM-dd
+                .endDate(Date.valueOf(endDate))   // Requires the format yyyy-MM-dd
+                .startTime(Time.valueOf(startTime)) // Requires the format HH:mm:ss
+                .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
+                .build();
+    }
+
+
 }
