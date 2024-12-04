@@ -7,7 +7,9 @@ import java.util.HashSet;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.*;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
@@ -279,6 +281,18 @@ public class TestDataUtil {
                 .endDate(Date.valueOf(endDate))   // Requires the format yyyy-MM-dd
                 .startTime(Time.valueOf(startTime)) // Requires the format HH:mm:ss
                 .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
+                .build();
+    }
+
+    public static TimeSlotEntity createTimeSlotEntityFromData(int weekdaysChosen, String startDate, String endDate, String startTime, String endTime, Set<DisplayDeviceEntity> displayDeviceEntities) throws ParseException {
+
+        return TimeSlotEntity.builder().weekdaysChosen(weekdaysChosen)
+                .weekdaysChosen(weekdaysChosen)
+                .startDate(Date.valueOf(startDate)) // Requires the format yyyy-MM-dd
+                .endDate(Date.valueOf(endDate))   // Requires the format yyyy-MM-dd
+                .startTime(Time.valueOf(startTime)) // Requires the format HH:mm:ss
+                .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
+                .displayDevices(displayDeviceEntities)
                 .build();
     }
 
