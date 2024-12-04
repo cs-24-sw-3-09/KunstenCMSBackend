@@ -32,12 +32,11 @@ public class SocketIOModule {
 
     // Constructor with parameters for hostname and port
     @Autowired
-    public SocketIOModule(String hostname,
-            int port, String origin) {
+    public SocketIOModule(String hostname, int port, String socketOrigin) {
         Configuration configuration = new Configuration();
         configuration.setHostname(hostname);
         configuration.setPort(port);
-        configuration.setOrigin(origin);
+        configuration.setOrigin(socketOrigin);
         SocketConfig socketConfiguration = new SocketConfig();
         socketConfiguration.setReuseAddress(true);
         configuration.setSocketConfig(socketConfiguration);
