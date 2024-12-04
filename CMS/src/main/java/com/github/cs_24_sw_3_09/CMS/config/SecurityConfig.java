@@ -2,7 +2,11 @@ package com.github.cs_24_sw_3_09.CMS.config;
 
 import com.github.cs_24_sw_3_09.CMS.filter.JwtAuthFilter;
 import com.github.cs_24_sw_3_09.CMS.services.UserService;
+
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +21,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableMethodSecurity(
@@ -26,31 +31,48 @@ public class SecurityConfig {
 
     private final JwtAuthFilter authFilter;
     private final UserService userService;
+    private final ArrayList<String> allowedOrigins;
+    
+    @Value("${FRONTEND.URL:localhost}")
+    private String frontendUrl;
 
     @Autowired
     public SecurityConfig(JwtAuthFilter authFilter, UserService userService) {
         this.userService = userService;
         this.authFilter = authFilter;
+        this.allowedOrigins = new ArrayList<>();
+        this.allowedOrigins.add("localhost");
+        this.allowedOrigins.add(frontendUrl);
+
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        //Allow files
-                        .requestMatchers(HttpMethod.GET, "/files/visual_media/**").permitAll()
-                        //Allow auth request without token
-                        .requestMatchers(HttpMethod.POST, "/api/account/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/account/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/account/reset-password/new").permitAll()
-                        //Need to be authenticated for all other routes
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                // Add our security auth filter.
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(httpSecurityCorsConfigurer -> 
+                httpSecurityCorsConfigurer.configurationSource(request -> {
+
+                    CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
+                    corsConfig.setAllowedOrigins(allowedOrigins);
+                    return corsConfig;
+                })
+            )
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                //Allow files
+                .requestMatchers(HttpMethod.GET, "/files/visual_media/**").permitAll()
+                //Allow auth request without token
+                .requestMatchers(HttpMethod.POST, "/api/account/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/account/reset-password").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/account/reset-password/new").permitAll()
+                //Need to be authenticated for all other routes
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider())
+            // Add our security auth filter.
+            .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
