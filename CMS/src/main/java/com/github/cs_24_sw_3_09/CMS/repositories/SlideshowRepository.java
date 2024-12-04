@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,4 +27,5 @@ public interface SlideshowRepository extends CrudRepository<SlideshowEntity, Int
                         "WHERE vm.id = :visualMediaId")
                  Set<SlideshowEntity> findSlideshowsByVisualMediaId(@Param("visualMediaId") Long visualMediaId);
 
+                
         }

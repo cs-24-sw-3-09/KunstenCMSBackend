@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
@@ -34,14 +35,16 @@ public class SlideshowController {
     private final SlideshowService slideshowService;
     private final TimeSlotService timeSlotService;
     private final DisplayDeviceService displayDeviceService;
+    private DimensionCheckService dimensionCheckService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService,
-            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, DisplayDeviceService displayDeviceService) {
+            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, DisplayDeviceService displayDeviceService, DimensionCheckService dimensionCheckService) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.timeSlotService = timeSlotService;
         this.displayDeviceService = displayDeviceService;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @GetMapping(path = "/{id}")
@@ -67,6 +70,11 @@ public class SlideshowController {
         }
 
         return new ResponseEntity<>(timeSlotService.findSetOfTimeSlotsSlideshowIsAPartOf(id), HttpStatus.OK); 
+    }
+
+    @GetMapping(path="/{id}/visual_media_inclusion/{vmiId}")
+    public ResponseEntity<Boolean> checkDimensionSlideshowAndVisualMediaInclusion(@PathVariable("id") long slideshowId, @PathVariable("vmiId") long visualMediaInclusionId){
+        return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(visualMediaInclusionId, slideshowId), HttpStatus.OK);
     }
 
     @GetMapping(path="/{id}/fallbackContent")
