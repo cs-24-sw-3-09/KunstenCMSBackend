@@ -14,12 +14,14 @@ import java.awt.image.BufferedImage;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
@@ -31,35 +33,64 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     private VisualMediaInclusionRepository visualMediaInclusionRepository;
     private SlideshowRepository slideshowRepository;
     private VisualMediaInclusionService visualMediaInclusionService;
+    private SlideshowService slideshowService;
 
     public DimensionCheckServiceImpl(VisualMediaService visualMediaService, DisplayDeviceService displayDeviceService,
                                         VisualMediaInclusionRepository visualMediaInclusionRepository, 
-                                        SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService){
+                                        SlideshowRepository slideshowRepository, VisualMediaInclusionService visualMediaInclusionService,
+                                        SlideshowService slideshowService){
         this.visualMediaService = visualMediaService;
         this.displayDeviceService = displayDeviceService;
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.slideshowRepository = slideshowRepository;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.slideshowService = slideshowService;
     }
 
     @Override
     public Boolean checkDimensionForAssignedFallback(Long displayDeviceId){
         DisplayDeviceEntity displayDevice = displayDeviceService.findOne(displayDeviceId).get();
         String displayOrientation = displayDevice.getDisplayOrientation();
-
         ContentEntity fallbackContent = displayDevice.getFallbackContent();
+        String fallbackOrientation;
         //TODO: handle video!
         if (fallbackContent instanceof VisualMediaEntity) {
             VisualMediaEntity visualMedia = visualMediaService.findOne(fallbackContent.getId().longValue()).get();
-
-            String fallbackOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
+            fallbackOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
                 
             if(!fallbackOrientation.equals(displayOrientation)){
                     return false;
             }
             
-        } //TODO: handle slideshow   
+        } else{
+            SlideshowEntity slideshow = slideshowService.findOne(fallbackContent.getId().longValue()).get();
+            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshow.getId().longValue());
+            fallbackOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
+        
+            if(fallbackOrientation.equals("mixed")){
+                return true; //If slideshow already has mixed orientation then pass check
+            } else if (!fallbackOrientation.equals(displayOrientation)) {
+                return false;
+            }      
+        }
+        
         return true;      
+    }
+
+    private String getSlideshowOrientation(Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow){    
+        //add check to see if anything is a video!
+        Set<String> visualMediasInSlideshowOrientation = new HashSet();
+        for(VisualMediaInclusionEntity vmi : visualMediaInclusionsInSlideshow){
+            VisualMediaEntity visualMediaPartOfSlideshow = vmi.getVisualMedia();
+            visualMediasInSlideshowOrientation.add(getVisualMediaImageOrientation(visualMediaPartOfSlideshow.getLocation()));
+        }
+        if (visualMediasInSlideshowOrientation.size() > 1) {
+            return "mixed";
+        } else if (visualMediasInSlideshowOrientation.contains("horizontal")){
+            return "horizontal";
+        } else {
+            return "vertical";
+        }
     }
 
     @Override
@@ -70,26 +101,22 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             return true;
         }
 
-        //add check to see if anything is a video!
-
-        Set<String> visualMediasInSlideshowOrientation = new HashSet();
-        for(VisualMediaInclusionEntity vmi : visualMediaInclusionsInSlideshow){
-            VisualMediaEntity visualMediaPartOfSlideshow = vmi.getVisualMedia();
-            visualMediasInSlideshowOrientation.add(getVisualMediaImageOrientation(visualMediaPartOfSlideshow.getLocation()));
-        System.out.println("ran for loop "+ visualMediasInSlideshowOrientation);
+        String slideshowOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
+        System.out.println("orientaion: "+slideshowOrientation);
+        //If there are both vertical and horizontal images in slideshow then pass check.
+        if (slideshowOrientation.equals("mixed")) {
+            return true;
         }
-        //if Set.size > 2 = mixed ->?
+
         //find sent vmi dimension
         VisualMediaInclusionEntity addedVisualMediaInclusion = visualMediaInclusionService.findOne(addedVisualMediaInclusionId).get();        
         VisualMediaEntity addedvisualMedia = addedVisualMediaInclusion.getVisualMedia();
-        System.out.println("before call");
         String addedVisualMediaOrientation = getVisualMediaImageOrientation(addedvisualMedia.getLocation());
        
-        for (String orientation : visualMediasInSlideshowOrientation){
-            if(!addedVisualMediaOrientation.equals(orientation)){
-                return false;
-            }
+        if(!addedVisualMediaOrientation.equals(slideshowOrientation)){
+            return false;
         }
+        
         return true;
     }
 
@@ -98,13 +125,13 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         String rootPath = System.getProperty("user.dir"); 
             String relativePath = visualMediaPath;
             String absolutePath = Paths.get(rootPath, relativePath).toString();
-            System.out.println("abs: "+absolutePath);
+           
             try{
                 File file = new File(absolutePath);
                 if (!file.exists()) {
                     System.err.println("File does not exist at path: " + absolutePath);
                 }
-            System.out.println("file: "+file);
+            
                 BufferedImage image = ImageIO.read(file);
                 int width = image.getWidth();
                 int height = image.getHeight();
