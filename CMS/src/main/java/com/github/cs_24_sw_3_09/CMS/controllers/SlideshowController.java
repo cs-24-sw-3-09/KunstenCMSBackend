@@ -77,7 +77,7 @@ public class SlideshowController {
         return new ResponseEntity<>(displayDeviceService.findDisplayDevicesWhoUsesSlideshowAsFallback(id), HttpStatus.OK);
     }
 
-    @GetMapping(path="/state")
+    @GetMapping(path="/states")
     public ResponseEntity<List<Map<String, Object>>> getStateOfAllSlideshows(){
         return new ResponseEntity<>(slideshowService.findStateOfEverySlideshow(), HttpStatus.OK);
     }
