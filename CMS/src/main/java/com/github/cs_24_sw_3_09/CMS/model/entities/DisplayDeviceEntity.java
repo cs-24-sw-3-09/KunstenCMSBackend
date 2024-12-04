@@ -81,31 +81,4 @@ public class DisplayDeviceEntity {
         return sb.toString()/*.trim()*/;
     }
 
-    @Override
-    public String toString() {
-    return "ClassName{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", location='" + location + '\'' +
-            ", displayOrientation='" + displayOrientation + '\'' +
-            ", resolution='" + resolution + '\'' +
-            ", fallbackContent=" + (fallbackContent != null ? fallbackContent.getId() : null) + 
-            ", timeSlots=" + (timeSlots != null ? timeSlots.size() : 0) + 
-            ", monday_start=" + monday_start +
-            ", monday_end=" + monday_end +
-            ", tuesday_start=" + tuesday_start +
-            ", tuesday_end=" + tuesday_end +
-            ", wednesday_start=" + wednesday_start +
-            ", wednesday_end=" + wednesday_end +
-            ", thursday_start=" + thursday_start +
-            ", thursday_end=" + thursday_end +
-            ", friday_start=" + friday_start +
-            ", friday_end=" + friday_end +
-            ", saturday_start=" + saturday_start +
-            ", saturday_end=" + saturday_end +
-            ", sunday_start=" + sunday_start +
-            ", sunday_end=" + sunday_end +
-            '}';
-}
-
 }
