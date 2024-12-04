@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -66,7 +67,7 @@ public class VisualMediaControllerIntegrationTests {
         MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.multipart("/api/visual_medias") // Use multipart request
+                multipart("/api/visual_medias") // Use multipart request
                         .file(file)                                   // Attach the file
         ).andExpect(MockMvcResultMatchers.status().isCreated());
     }
@@ -78,7 +79,7 @@ public class VisualMediaControllerIntegrationTests {
         MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/visual_medias")
+                        multipart("/api/visual_medias")
                                 .file(file)
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
@@ -143,7 +144,7 @@ public class VisualMediaControllerIntegrationTests {
         SlideshowEntity savedSlideshow = slideshowService.save(testSlideshowEntity);
 
         VisualMediaInclusionEntity testVisualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(testVisualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(testVisualMediaInclusionEntity).get();
 
 
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
@@ -294,9 +295,9 @@ public class VisualMediaControllerIntegrationTests {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
         assertTrue(visualMediaService.isExists((long) 1));
-        
 
-        String requestBodyJson = "{\"tagId\": " + savedTagEntity.getId() + "}";
+
+        String requestBodyJson = "{\"tagText\": \"" + savedTagEntity.getText() + "\"}";
 
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
@@ -312,19 +313,22 @@ public class VisualMediaControllerIntegrationTests {
 
     @Test
     @WithMockUser(roles = "PLANNER")
-    public void testThatAddTagToVisualMediaWhenTagDoesntExistAndReturns404() throws Exception {
+    public void testThatAddTagToVisualMediaWhenTagDoesntExistAndReturnsVisualMediaWithTag() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
-        
 
-        String requestBodyJson = "{\"tagId\": 1}";
+
+        String requestBodyJson = "{\"tagText\": \"" + "IDontExistAlready" + "\"}";
+
 
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/visual_medias/" + savedVisualMediaEntity.getId() + "/tags")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestBodyJson)
                 ).andExpect(
-                        MockMvcResultMatchers.status().isNotFound());
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.tags[0].text").value("IDontExistAlready"));
     }
 
     @Test
@@ -333,15 +337,15 @@ public class VisualMediaControllerIntegrationTests {
         TagEntity tag = TestDataUtil.createTagEntity();
         tagService.save(tag);
         assertTrue(tagService.isExists((long) 1));
-        
-        String requestBodyJson = "{\"tagId\": 1}";
+
+        String requestBodyJson = "{\"tagText\": \"" + "IDontExistAlready" + "\"}";
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.patch("/api/visual_medias/1/tags")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(requestBodyJson)
-                ).andExpect(
-                        MockMvcResultMatchers.status().isNotFound());
+                MockMvcRequestBuilders.patch("/api/visual_medias/1/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
@@ -377,111 +381,142 @@ public class VisualMediaControllerIntegrationTests {
         ));
         assertTrue(tagService.isExists((long) 1));
         assertTrue(tagService.isExists((long) 2));
-        
+
         String body = "{\"tagId\": 1 }";
 
         mockMvc.perform(
-			MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(body)
-					
-		).andExpect(
-				MockMvcResultMatchers.status().isNoContent()
-		); 
+                MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+
+        ).andExpect(
+                MockMvcResultMatchers.status().isNoContent()
+        );
 
 
-		assertTrue(visualMediaService.isExists((long) 1));
-		assertTrue(visualMediaService.findOne((long) 1).get().getTags().stream().noneMatch(
+        assertTrue(visualMediaService.isExists((long) 1));
+        assertTrue(visualMediaService.findOne((long) 1).get().getTags().stream().noneMatch(
                 tag -> tag.getId() == 1
         ));
-		assertTrue(tagService.isExists((long) 1));
+        assertTrue(tagService.isExists((long) 1));
     }
 
-	@Test
+    @Test
     @WithMockUser(roles = "PLANNER")
     public void testThatDeletesAssociationBetweenVisualMediaAndTagWhenTagDoesntExist() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(visualMediaEntity);
 
         assertTrue(visualMediaService.isExists((long) 1));
-		assertFalse(tagService.isExists((long) 1));
-		assertEquals(
-			0,
-			visualMediaService.findOne((long) 1).get().getTags().size()
-		);
-        
+        assertFalse(tagService.isExists((long) 1));
+        assertEquals(
+                0,
+                visualMediaService.findOne((long) 1).get().getTags().size()
+        );
+
         String body = "{\"tagId\": 1 }";
 
         mockMvc.perform(
-			MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(body)
-					
-		).andExpect(
-				MockMvcResultMatchers.status().isNotFound()
-		); 
+                MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
 
-		assertTrue(visualMediaService.isExists((long) 1));
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        );
+
+        assertTrue(visualMediaService.isExists((long) 1));
     }
 
-	@Test
+    @Test
     @WithMockUser(roles = "PLANNER")
     public void testThatDeletesAssociationBetweenVisualMediaAndTagWhenAssociationDoesntExist() throws Exception {
         VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(visualMediaEntity);
 
-		TagEntity tagToSave = TestDataUtil.createTagEntity();
-		tagService.save(tagToSave);
+        TagEntity tagToSave = TestDataUtil.createTagEntity();
+        tagService.save(tagToSave);
 
         assertTrue(visualMediaService.isExists((long) 1));
-		assertTrue(tagService.isExists((long) 1));
-		assertEquals(
-			0,
-			visualMediaService.findOne((long) 1).get().getTags().size()
-		);
-        
+        assertTrue(tagService.isExists((long) 1));
+        assertEquals(
+                0,
+                visualMediaService.findOne((long) 1).get().getTags().size()
+        );
+
         String body = "{\"tagId\": 1 }";
 
         mockMvc.perform(
-			MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(body)
-					
-		).andExpect(
-				MockMvcResultMatchers.status().isNotFound()
-		); 
+                MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
 
-		assertTrue(visualMediaService.isExists((long) 1));
-		assertTrue(tagService.isExists((long) 1));
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        );
+
+        assertTrue(visualMediaService.isExists((long) 1));
+        assertTrue(tagService.isExists((long) 1));
     }
 
-	@Test
+    @Test
     @WithMockUser(roles = "PLANNER")
     public void testThatDeletesAssociationBetweenVisualMediaAndTagWhenVisualMediaDoesntExist() throws Exception {
-    	TagEntity tagToSave = TestDataUtil.createTagEntity();
-		tagService.save(tagToSave);
+        TagEntity tagToSave = TestDataUtil.createTagEntity();
+        tagService.save(tagToSave);
 
         assertFalse(visualMediaService.isExists((long) 1));
-		assertTrue(tagService.isExists((long) 1));
-		assertEquals(
-			0,
-			tagService.findOne((long) 1).get().getVisualMedias().size()
-		);
-        
+        assertTrue(tagService.isExists((long) 1));
+        assertEquals(
+                0,
+                tagService.findOne((long) 1).get().getVisualMedias().size()
+        );
+
         String body = "{\"tagId\": 1 }";
 
         mockMvc.perform(
-			MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(body)
-					
-		).andExpect(
-				MockMvcResultMatchers.status().isNotFound()
-		); 
+                MockMvcRequestBuilders.delete("/api/visual_medias/1/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
 
-		assertFalse(visualMediaService.isExists((long) 1));
-		assertTrue(tagService.isExists((long) 1));
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        );
+
+        assertFalse(visualMediaService.isExists((long) 1));
+        assertTrue(tagService.isExists((long) 1));
     }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatReplaceFileReplacesFileIfFileExists() throws Exception {
+
+        MockMultipartFile newFile1 = new MockMultipartFile(
+                "file1",
+                "new-file1.jpg",
+                "image/jpeg",
+                "test content".getBytes()
+        );
+
+        MockMultipartFile newFile2 = new MockMultipartFile(
+                "file2",
+                "new-file2.jpg",
+                "image/jpeg",
+                "test content".getBytes()
+        );
+
+
+        //Post image to db and folder
+        // Step 1: Upload the first file (simulate storing the original file)
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias")
+                        .file("file", newFile1.getBytes()))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+        // Step 2: Replace the file
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias/1/file")
+                        .file("file", newFile2.getBytes()))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
 
 }
 

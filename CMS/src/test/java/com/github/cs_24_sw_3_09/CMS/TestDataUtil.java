@@ -218,7 +218,17 @@ public class TestDataUtil {
     public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
         return VisualMediaInclusionDto.builder()
                 .visualMedia(new VisualMediaEntity())
-                .id(1)
+                .slideDuration(5)
+                .slideshowPosition(1)
+                .build();
+    }
+
+    public static VisualMediaInclusionDto createVisualMediaInclusionDtoWitVMThaOnlyContainsId(Integer id) {
+        VisualMediaEntity vm = new VisualMediaEntity();
+        vm.setId(id);
+
+        return VisualMediaInclusionDto.builder()
+                .visualMedia(vm)
                 .slideDuration(5)
                 .slideshowPosition(1)
                 .build();
@@ -235,11 +245,16 @@ public class TestDataUtil {
 
     public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
         return VisualMediaInclusionEntity.builder()
-                .visualMedia(null)
-                .id(1)
                 .slideDuration(10)
                 .slideshowPosition(2)
                 .build();
+    }
+
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntityWithPos(Integer pos) {
+        return VisualMediaInclusionEntity.builder()
+        .slideDuration(10)
+        .slideshowPosition(pos)
+        .build();
     }
 
     public static SlideshowDto createSlideshowDto() {
@@ -290,4 +305,17 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static SlideshowEntity createSlideshowWithMultipleVisualMediaEntities() {
+
+        HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(1));
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(2));
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(3));
+
+        return SlideshowEntity.builder()
+                .name("testSS")
+                .isArchived(false)
+                .visualMediaInclusionCollection(visualMediaInclusionEntities)
+                .build();
+    }
 }

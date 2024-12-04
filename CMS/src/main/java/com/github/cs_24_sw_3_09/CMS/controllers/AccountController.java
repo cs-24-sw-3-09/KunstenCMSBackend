@@ -14,6 +14,7 @@ import com.github.cs_24_sw_3_09.CMS.services.serviceImpl.JwtServiceImpl.TOKEN_TY
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -38,14 +39,16 @@ public class AccountController {
     private final Mapper<UserEntity, UserDto> userMapper;
     private final UserService userService;
     private final EmailService emailService;
-    
-        @Autowired
-        public AccountController(AuthenticationManager authenticationManager, JwtService jwtService, UserService userService, Mapper<UserEntity, UserDto> userMapper, EmailService emailService) {
-            this.authenticationManager = authenticationManager;
-            this.jwtService = jwtService;
-            this.userService = userService;
-            this.userMapper = userMapper;
-            this.emailService = emailService;
+    @Value("${FRONTEND.URL:example.com}")
+    private String frontendUrl;
+
+    @Autowired
+    public AccountController(AuthenticationManager authenticationManager, JwtService jwtService, UserService userService, Mapper<UserEntity, UserDto> userMapper, EmailService emailService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.userService = userService;
+        this.userMapper = userMapper;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -89,14 +92,14 @@ public class AccountController {
     @PostMapping("/reset-password")
     public ResponseEntity<HttpStatus> resetPasswordForUser(@Valid @RequestBody AuthResetDto resetPasswordDto) {
         Optional<UserEntity> user = userService.findByEmail(resetPasswordDto.getEmail());
-        if(!user.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (!user.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         String resetToken = jwtService.generateToken(resetPasswordDto.getEmail(), TOKEN_TYPE.RESET_TOKEN);
         EmailDetailsEntity resetEmail = EmailDetailsEntity.builder()
-        .recipient(resetPasswordDto.getEmail())
-        .msgBody("Reset your password using the following link (valid for 5 minutes):<br>http://example.com/reset-password?token=" + resetToken)
-        .subject("Password reset request - " + resetPasswordDto.getEmail())
-        .build();
+                .recipient(resetPasswordDto.getEmail())
+                .msgBody("Reset your password using the following link (valid for 5 minutes):<br>http://http://"+ frontendUrl +"//reset-password?token=" + resetToken + "&email=" + resetPasswordDto.getEmail())
+                .subject("Password reset request - " + resetPasswordDto.getEmail())
+                .build();
         emailService.sendSimpleMail(resetEmail);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -104,8 +107,9 @@ public class AccountController {
     @PostMapping("/reset-password/new")
     public ResponseEntity<HttpStatus> resetPasswordForUserWithtToken(@Valid @RequestBody AuthResetNewDto resetPasswordNewDto) {
         Optional<UserEntity> optionalUser = userService.findByEmail(resetPasswordNewDto.getEmail());
-        if(!optionalUser.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(!jwtService.validateResetToken(resetPasswordNewDto.getToken(), resetPasswordNewDto.getEmail())) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!optionalUser.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!jwtService.validateResetToken(resetPasswordNewDto.getToken(), resetPasswordNewDto.getEmail()))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         UserEntity user = optionalUser.get();
         user.setPassword(new BCryptPasswordEncoder().encode(resetPasswordNewDto.getPassword()));
         userService.save(user);

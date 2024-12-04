@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VisualMediaInclusionService {
-    VisualMediaInclusionEntity save(VisualMediaInclusionEntity visualMediaInclusionEntity);
+   Optional<VisualMediaInclusionEntity> save(VisualMediaInclusionEntity visualMediaInclusionEntity);
 
     List<VisualMediaInclusionEntity> findAll();
 
@@ -23,4 +23,6 @@ public interface VisualMediaInclusionService {
     void delete(Long id);
 
     VisualMediaInclusionEntity setVisualMedia(Long id, Long visualMediaId);
+
+    Optional<List<VisualMediaInclusionEntity>> updateSlideshowPosition(List<VisualMediaInclusionEntity> visualMediaInclusions);
 }

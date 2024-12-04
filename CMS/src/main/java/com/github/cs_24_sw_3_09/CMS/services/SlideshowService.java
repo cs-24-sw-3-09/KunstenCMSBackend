@@ -33,4 +33,6 @@ public interface SlideshowService {
     SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId);
 
     List<Map<String, Object>> findStateOfEverySlideshow();
+
+    Optional<SlideshowEntity> duplicate(Long id, String name); 
 }
