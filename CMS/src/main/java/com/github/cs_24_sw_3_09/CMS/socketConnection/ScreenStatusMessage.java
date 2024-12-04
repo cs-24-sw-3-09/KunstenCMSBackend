@@ -1,30 +1,33 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
 public class ScreenStatusMessage {
-    private int deviceId;
-    private String current_url;
+    private int deviceid;
+    private String currenturl;
     private String type;
 
-    public ScreenStatusMessage(int deviceId, String current_url, String type) {
-        this.deviceId = deviceId;
-        this.current_url = current_url;
+    public ScreenStatusMessage() {}
+
+    public ScreenStatusMessage(int deviceid, String currenturl, String type) {
+        super();
+        this.deviceid = deviceid;
+        this.currenturl = currenturl;
         this.type = type;
     }
 
-    public int getDeviceId() {
-        return deviceId;
+    public int getDeviceid() {
+        return deviceid;
     }
 
-    public void setDeviceId(int deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceid(int deviceid) {
+        this.deviceid = deviceid;
     }
 
-    public String getCurrentUrl() {
-        return current_url;
+    public String getCurrenturl() {
+        return currenturl;
     }
 
-    public void setCurrentUrl(String current_url) {
-        this.current_url = current_url;
+    public void setCurrenturl(String currenturl) {
+        this.currenturl = currenturl;
     }
 
     public String getType() {
