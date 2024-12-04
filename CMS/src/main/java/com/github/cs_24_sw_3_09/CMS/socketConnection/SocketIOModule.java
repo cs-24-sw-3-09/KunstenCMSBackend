@@ -63,10 +63,11 @@ public class SocketIOModule {
 
     private DisconnectListener onDisconnected() {
         return (client -> {
-
-            // Extract device ID (assume it's available as part of the client or context)
-            int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
-            monitorGracePeriodForDisplayDevices.sendDisconnectMailWithGrace(deviceId);
+            try { 
+                // Extract device ID (assume it's available as part of the client or context)
+                int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
+                monitorGracePeriodForDisplayDevices.sendDisconnectMailWithGrace(deviceId);
+            } catch (Exception e) {}
         });
     }
 
