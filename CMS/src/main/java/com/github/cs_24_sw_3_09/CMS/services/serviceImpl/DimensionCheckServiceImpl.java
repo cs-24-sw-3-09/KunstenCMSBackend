@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.classfile.ClassFile.Option;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Optional;
@@ -56,29 +57,47 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     @Override
     public Boolean checkDimensionForAssignedFallback(Long displayDeviceId){
-        DisplayDeviceEntity displayDevice = displayDeviceService.findOne(displayDeviceId).get();
+        Optional<DisplayDeviceEntity> optionalDisplayDevice = displayDeviceService.findOne(displayDeviceId);
+        if(optionalDisplayDevice.isEmpty()){
+            throw new IllegalArgumentException("DisplayDevice with ID " + displayDeviceId + " does not exist.");
+        }
+        DisplayDeviceEntity displayDevice = optionalDisplayDevice.get();
+
         String displayDeviceOrientation = displayDevice.getDisplayOrientation();
         ContentEntity fallbackContent = displayDevice.getFallbackContent();
+        if (fallbackContent == null) {
+            throw new IllegalArgumentException("Fallback content is not set for DisplayDevice with ID " + displayDeviceId);
+        }
+
         String fallbackOrientation;
         //TODO: handle video!
         if (fallbackContent instanceof VisualMediaEntity) {
-            VisualMediaEntity visualMedia = visualMediaService.findOne(fallbackContent.getId().longValue()).get();
-            fallbackOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
-                
-            if(!fallbackOrientation.equals(displayDeviceOrientation)){
-                    return false;
+            Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(fallbackContent.getId().longValue());
+            if(optionalVisualMedia.isEmpty()){
+                throw new IllegalArgumentException("Visual Media with ID " + fallbackContent.getId() + " does not exist.");   
             }
+            VisualMediaEntity visualMedia = optionalVisualMedia.get();
             
-        } else{
-            SlideshowEntity slideshow = slideshowService.findOne(fallbackContent.getId().longValue()).get();
+            fallbackOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
+            if(!fallbackOrientation.equals(displayDeviceOrientation)){
+                return false;
+            }
+
+        } else if (fallbackContent instanceof SlideshowEntity){
+            Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(fallbackContent.getId().longValue());
+            if(optionalSlideshow.isEmpty()){
+                throw new IllegalArgumentException("Slideshow with ID " + fallbackContent.getId() + " does not exist.");   
+            } 
+            SlideshowEntity slideshow = optionalSlideshow.get();
             Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshow.getId().longValue());
             fallbackOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
-        }
+
             if(fallbackOrientation.equals("mixed")){
                 return true; //If slideshow already has mixed orientation then pass check
             } else if (!fallbackOrientation.equals(displayDeviceOrientation)) {
                 return false;
-            }      
+            }  
+        } 
         return true;      
     }
 
@@ -97,14 +116,17 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         }
 
         //find sent vmi dimension
-        VisualMediaInclusionEntity addedVisualMediaInclusion = visualMediaInclusionService.findOne(addedVisualMediaInclusionId).get();        
+        Optional<VisualMediaInclusionEntity> optionalVisualMediaInclusion = visualMediaInclusionService.findOne(addedVisualMediaInclusionId);
+        if(optionalVisualMediaInclusion.isEmpty()){
+            throw new IllegalArgumentException("Visual Media Inclusion with ID " + addedVisualMediaInclusionId + " does not exist.");   
+        }
+        VisualMediaInclusionEntity addedVisualMediaInclusion = optionalVisualMediaInclusion.get();        
         VisualMediaEntity addedvisualMedia = addedVisualMediaInclusion.getVisualMedia();
         String addedVisualMediaOrientation = getVisualMediaImageOrientation(addedvisualMedia.getLocation());
        
         if(!addedVisualMediaOrientation.equals(slideshowOrientation)){
             return false;
         }
-        
         return true;
     }
 
@@ -119,41 +141,54 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         Set<String> displayDeviceOrientation = new HashSet<>();
         for (DisplayDeviceEntity device : displayDevices){
             String orientation = device.getDisplayOrientation();
-            if(orientation != null){
-                displayDeviceOrientation.add(orientation);
-            }
+            displayDeviceOrientation.add(orientation);
         }
 
         ContentEntity displayContent = timeslot.getDisplayContent();
-        String displayContentOrientation = null;
-
+        String displayContentOrientation;
         if (displayContent instanceof VisualMediaEntity) {
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(displayContent.getId().longValue());
-            if(optionalVisualMedia.isPresent()){
-                VisualMediaEntity visualMedia = optionalVisualMedia.get();
-                displayContentOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
+            if(optionalVisualMedia.isEmpty()){
+                throw new IllegalArgumentException("Visual Media with ID " + displayContent.getId() + " does not exist.");
             }
+            VisualMediaEntity visualMedia = optionalVisualMedia.get();
+            displayContentOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
+
         } else if(displayContent instanceof SlideshowEntity) {
             Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(displayContent.getId().longValue());
-            if(optionalSlideshow.isPresent()){
-                SlideshowEntity slideshow = optionalSlideshow.get();
-                Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshow.getId().longValue());
-                displayContentOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
+            if(optionalSlideshow.isEmpty()){
+                throw new IllegalArgumentException("Slideshow with ID " + displayContent.getId() + " does not exist.");
+            }
+            SlideshowEntity slideshow = optionalSlideshow.get();
+            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshow.getId().longValue());
+            displayContentOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
+            
+            //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
+            if(displayContentOrientation.equals("mixed") || displayDeviceOrientation.size() > 1){
+                return true;
+            }
+            if (!displayDeviceOrientation.contains(displayContentOrientation)) {
+                return false;
             }
         }
 
-        if (displayContentOrientation == null) {
-            throw new IllegalArgumentException("Could not determine orientation for display content.");
-        }
-        //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
-        if(displayContentOrientation.equals("mixed") || displayDeviceOrientation.size() > 1){
-            return true;
-        }
-        
-        if (!displayDeviceOrientation.contains(displayContentOrientation)) {
-            return false;
-        }
         return true;
+    }
+
+    private String getSlideshowOrientation(Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow){    
+        //add check to see if anything is a video!
+        Set<String> visualMediasInSlideshowOrientation = new HashSet<>();
+        for(VisualMediaInclusionEntity vmi : visualMediaInclusionsInSlideshow){
+            VisualMediaEntity visualMediaPartOfSlideshow = vmi.getVisualMedia();
+            visualMediasInSlideshowOrientation.add(getVisualMediaImageOrientation(visualMediaPartOfSlideshow.getLocation()));
+        }
+        if (visualMediasInSlideshowOrientation.size() > 1) {
+            return "mixed";
+        } else if (visualMediasInSlideshowOrientation.contains("horizontal")){
+            return "horizontal";
+        } else {
+            return "vertical";
+        }
     }
 
     private String getVisualMediaImageOrientation(String visualMediaPath){
@@ -176,21 +211,5 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 e.printStackTrace();
                 return "error"; // not the best
             } 
-    }
-
-    private String getSlideshowOrientation(Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow){    
-        //add check to see if anything is a video!
-        Set<String> visualMediasInSlideshowOrientation = new HashSet<>();
-        for(VisualMediaInclusionEntity vmi : visualMediaInclusionsInSlideshow){
-            VisualMediaEntity visualMediaPartOfSlideshow = vmi.getVisualMedia();
-            visualMediasInSlideshowOrientation.add(getVisualMediaImageOrientation(visualMediaPartOfSlideshow.getLocation()));
-        }
-        if (visualMediasInSlideshowOrientation.size() > 1) {
-            return "mixed";
-        } else if (visualMediasInSlideshowOrientation.contains("horizontal")){
-            return "horizontal";
-        } else {
-            return "vertical";
-        }
     }
 }
