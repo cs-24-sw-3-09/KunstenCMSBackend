@@ -23,13 +23,12 @@ public class MonitorGracePeriodForDisplayDevices {
             long lastSentTime = lastEmailSentMap.get(ddId);
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastSentTime < GRACE_PERIOD_MS) {
-                System.out.println("Email not sent due to grace period.");
                 return;
             }
         }
 
         // Proceed with sending the email
-        System.out.println(emailService.sendDDDisconnectMail(ddId));
+        emailService.sendDDDisconnectMail(ddId);
 
         // Update the last sent time in the map
         lastEmailSentMap.put(ddId, System.currentTimeMillis());

@@ -4,10 +4,24 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +33,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
@@ -32,14 +47,16 @@ public class SlideshowControllerIntegrationTests {
     private ObjectMapper objectMapper;
     private SlideshowService slideshowService;
     private VisualMediaInclusionService visualMediaInclusionService;
+    private TimeSlotService timeSlotService;
 
     @Autowired
     public SlideshowControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, SlideshowService slideshowService,
-                                               VisualMediaInclusionService visualMediaInclusionService) {
+                                               VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.timeSlotService = timeSlotService;
 
     }
 
@@ -87,15 +104,16 @@ public class SlideshowControllerIntegrationTests {
     @WithMockUser
     public void testThatGetSlideshowsSuccessfullyReturnsListOfSlideshows() throws Exception {
         SlideshowEntity testSlideshowEntity = TestDataUtil.createSlideshowEntity();
-        slideshowService.save(testSlideshowEntity);
+        System.out.println(slideshowService.save(testSlideshowEntity));
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/slideshows")).andExpect(
-                        MockMvcResultMatchers.jsonPath("content.[0].id").isNumber())
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("content.[0].name").value(testSlideshowEntity.getName()))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("content.[0].isArchived")
+                        MockMvcRequestBuilders.get("/api/slideshows"))
+                        .andExpect(
+                                        MockMvcResultMatchers.jsonPath("[0].id").isNumber())
+                        .andExpect(
+                                        MockMvcResultMatchers.jsonPath("[0].name").value(testSlideshowEntity.getName()))
+                        .andExpect(
+                                        MockMvcResultMatchers.jsonPath("[0].isArchived")
                                 .value(testSlideshowEntity.getIsArchived()));
     }
 
@@ -223,7 +241,7 @@ public class SlideshowControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatAddVisualMediaInclusionToSlideShowReturnsSlideshowWithVisualMediaInclusionAdded() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshow = slideshowService.save(slideshowEntity);
@@ -239,8 +257,108 @@ public class SlideshowControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.visualMediaInclusionCollection[0].slideDuration").value(savedVisualMediaInclusion.getSlideDuration()));
 
-
     }
 
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowWithName() throws Exception {
+        SlideshowEntity ssToCompare = TestDataUtil.createSlideshowEntity();
+        ssToCompare = slideshowService.save(ssToCompare);
+
+        String body = "{\"name\":\"New name\"}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body)
+        ).andExpect(MockMvcResultMatchers.status().isCreated())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("New name"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.isArchived").value(false));
+		
+		assertTrue(slideshowService.isExists(1l));
+		assertTrue(slideshowService.isExists(2l));
+		assertEquals(
+			"New name",	
+			slideshowService.findOne(2l).get().getName()
+		);
+    }
+
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowWithNoNameGiven() throws Exception {
+		SlideshowEntity ssToCompare = TestDataUtil.createSlideshowEntity();
+        ssToCompare = slideshowService.save(ssToCompare);
+		assertTrue(slideshowService.isExists(1l));
+
+        String body = "{\"name\":null}";
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(body))
+        .andExpect(MockMvcResultMatchers.status().isCreated())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("testSS (Copy)"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.isArchived").value(false));
+		
+		assertTrue(slideshowService.isExists(1l));
+		assertTrue(slideshowService.isExists(2l));
+		assertEquals(
+			"testSS (Copy)",	
+			slideshowService.findOne(2l).get().getName()
+		);
+    }
+
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowThatDoesNotExist() throws Exception {
+        String body = "{\"name\":\"New name\"}";
+		assertFalse(slideshowService.isExists(1l));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body)
+        ).andExpect(MockMvcResultMatchers.status().isNotFound());
+
+		assertFalse(slideshowService.isExists(2l));
+    }
+
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatDuplicatesSlideshowWithVisualMediaInclusions() throws Exception {
+		SlideshowEntity ssToCompare = TestDataUtil.createSlideshowWithMultipleVisualMediaEntities();
+        ssToCompare = slideshowService.save(ssToCompare);
+        String body = "{\"name\":\"New name\"}";
+
+		assertTrue(slideshowService.isExists(1l));
+		assertEquals(
+			3,
+			slideshowService.findOne(1l).get().getVisualMediaInclusionCollection().size()
+		);
+		assertTrue(
+			visualMediaInclusionService.isExists(1l) &&
+			visualMediaInclusionService.isExists(2l) &&
+			visualMediaInclusionService.isExists(3l)
+		);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/slideshows/1/duplicate")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body)
+        ).andExpect(MockMvcResultMatchers.status().isCreated())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.visualMediaInclusionCollection").isArray());
+		
+		assertTrue(slideshowService.isExists(1l));
+		assertTrue(slideshowService.isExists(2l));
+		assertEquals(
+			3,
+			slideshowService.findOne(2l).get().getVisualMediaInclusionCollection().size()
+		);
+		assertTrue(
+			visualMediaInclusionService.isExists(4l) &&
+			visualMediaInclusionService.isExists(5l) &&
+			visualMediaInclusionService.isExists(6l)
+		);
+    }
 
 }

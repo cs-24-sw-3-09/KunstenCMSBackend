@@ -120,11 +120,9 @@ public class PushTSServiceImpl implements PushTSService {
             TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(timeSlots,
                     displayDeviceMapper.mapTo(dd));
             if (timeSlotToBeDisplayed == null) {
-                System.out.println("PRIO for " + dd.getId() + ": null");
                 if (sendToDisplayDevices)
                     sendTimeSlotToDisplayDevice(dd.getFallbackContent(), dd);
             } else {
-                System.out.println("PRIO for ddId " + dd.getId() + ": " + timeSlotToBeDisplayed.getName());
                 if (sendToDisplayDevices)
                     sendTimeSlotToDisplayDevice(timeSlotToBeDisplayed, dd);
                 timeSlotsInUse.add(timeSlotToBeDisplayed.getId());
@@ -133,3 +131,4 @@ public class PushTSServiceImpl implements PushTSService {
         return timeSlotsInUse;
     }
 }
+

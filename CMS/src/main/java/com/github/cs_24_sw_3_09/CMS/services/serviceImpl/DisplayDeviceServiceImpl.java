@@ -1,5 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
@@ -12,8 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -25,14 +32,17 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     private VisualMediaRepository visualMediaRepository;
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
+    private final Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
 
-    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
-                                   PushTSService pushTSService) {
+    public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, 
+                                    SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
+                                    PushTSService pushTSService, Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.timeSlotService = timeSlotService;
+        this.displayDeviceMapper = displayDeviceMapper;
     }
 
     @Override
@@ -90,6 +100,20 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
+    public Set<DisplayDeviceDto> findDisplayDevicesWhoUsesSlideshowAsFallback(Long id){
+        Set<DisplayDeviceEntity> setOfDisplayDeviceEntities = displayDeviceRepository.findDisplayDevicesUsingSlideshowAsFallbackBySlideshowId(id);
+        if (setOfDisplayDeviceEntities == null) {
+            return Collections.emptySet();
+        }
+        Set <DisplayDeviceDto> setOfDisplayDeviceDtos = new HashSet<>();
+        for (DisplayDeviceEntity entity : setOfDisplayDeviceEntities) {
+            DisplayDeviceDto displayDeviceDto = displayDeviceMapper.mapTo(entity);
+            setOfDisplayDeviceDtos.add(displayDeviceDto);
+        }  
+        return setOfDisplayDeviceDtos;      
+    }
+
+    @Override
     public DisplayDeviceEntity partialUpdate(Long id, DisplayDeviceEntity displayDeviceEntity) {
         displayDeviceEntity.setId(Math.toIntExact(id));
         return displayDeviceRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
@@ -125,14 +149,30 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
     @Override
     public void delete(Long id) {
+        DisplayDeviceEntity displayDevice = displayDeviceRepository.findById(Math.toIntExact(id)).orElse(null);
 
-        DisplayDeviceEntity displayDevice = displayDeviceRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("DisplayDeviceEntity with id " + id + " not found"));
-
+        //All Time Slots that should be deleted (has zero associations) are saved in this array and cleans up after display device is deleted.
+        //Happens because of the need to delete the time Slot which conflicts with the persistence context somehow. 
+        List<TimeSlotEntity> TsToDelete = new ArrayList<>(); 
+        for (TimeSlotEntity timeSlot : displayDevice.getTimeSlots()) {
+            //Remove Relation between Display Device and Time Slot
+            timeSlot.getDisplayDevices().remove(displayDevice);
+            if (timeSlot.countDisplayDeviceAssociations() == 0) {
+                TsToDelete.add(timeSlot);
+            }
+            
+        }
+        
         displayDevice.getTimeSlots().clear();
         displayDevice.setFallbackContent(null);
         displayDeviceRepository.save(displayDevice);
-        //TODO: Gør så den faktisk sletter samt sletter relations korrekt.
+
+        displayDeviceRepository.delete(displayDevice);
+
+
+        for(TimeSlotEntity ts : TsToDelete) {
+            timeSlotService.delete((long) ts.getId());
+        }
     }
 
     @Override
@@ -151,7 +191,6 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
             return displayDeviceRepository.save(existingDisplayDevice);
         }).orElseThrow(() -> new RuntimeException("Display Device does not exist"));
-
     }
 
     @Override

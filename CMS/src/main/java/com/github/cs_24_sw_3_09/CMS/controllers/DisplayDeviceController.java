@@ -52,9 +52,6 @@ public class DisplayDeviceController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<DisplayDeviceDto> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
-
-        // Done to decouple the persistence layer from the presentation and service
-        // layer.
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
         Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         
@@ -182,7 +179,7 @@ public class DisplayDeviceController {
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
 
-     @PatchMapping(path = "/{id}/fallback")
+    @PatchMapping(path = "/{id}/fallback")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<DisplayDeviceDto> addFallback(@PathVariable("id") Long id,
                                                  @RequestBody Map<String, Object> requestBody) {

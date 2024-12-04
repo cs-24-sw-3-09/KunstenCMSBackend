@@ -3,11 +3,15 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.services.TagService;
 import com.github.cs_24_sw_3_09.CMS.services.FileStorageService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,18 +37,21 @@ public class VisualMediaController {
     private final TagService tagService;
     private FileStorageService fileStorageService;
     private Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
+    private final SlideshowService slideshowService;
 
     public VisualMediaController(
             Mapper<VisualMediaEntity, VisualMediaDto> visualMediaMapper,
             VisualMediaService visualMediaService,
             TagService tagService,
             FileStorageService fileStorageService,
+                                 SlideshowService slideshowService,
             Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
             Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper) {
         this.visualMediaMapper = visualMediaMapper;
         this.visualMediaService = visualMediaService;
         this.tagService = tagService;
         this.fileStorageService = fileStorageService;
+        this.slideshowService = slideshowService;
         this.displayDeviceMapper = displayDeviceMapper;
         this.timeSlotMapper = timeSlotMapper;
     }
@@ -66,7 +73,7 @@ public class VisualMediaController {
         VisualMediaEntity savedEntity = visualMediaService.save(visualMediaEntity);
 
         //Update the location field using the ID
-        String location = "/visual_media/" + savedEntity.getId();
+        String location = "/files/visual_media/" + savedEntity.getId() + FileUtils.mimeToType(savedEntity.getFileType());
         savedEntity.setLocation(location);
         fileStorageService.saveVisualMediaFile(file, String.valueOf(savedEntity.getId()));
 
@@ -101,13 +108,13 @@ public class VisualMediaController {
         }
         return new ResponseEntity<>(visualMediaService.getVisualMediaTags(id), HttpStatus.OK);
     }
-
-    @GetMapping(path = "/{id}/risk")
-    public ResponseEntity<Set<SlideshowEntity>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id) {
+    
+    @GetMapping(path = "/{id}/slideshows")
+    public ResponseEntity<Set<SlideshowDto>> getVisualMediaPartOfSlideshowsList(@PathVariable("id") Long id){
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(visualMediaService.findPartOfSlideshows(id), HttpStatus.OK);
+        return new ResponseEntity<>(slideshowService.findPartOfSlideshows(id), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}/display_devices")
@@ -168,6 +175,20 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
+    @PostMapping(path = "/{id}/file")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<HttpStatus> replaceFile(@PathVariable("id") Long id,
+                                                  @RequestParam("file") MultipartFile file) throws IOException {
+
+        if (!visualMediaService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        HttpStatus response = visualMediaService.replaceFileById(id, file);
+        return new ResponseEntity<>(response);
+    }
+
+
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> deleteVisualMedia(@PathVariable("id") Long id) {
@@ -183,13 +204,13 @@ public class VisualMediaController {
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaDto> addTag(@PathVariable("id") Long id,
                                                  @RequestBody Map<String, Object> requestBody) {
-        Long tagId = ((Integer) requestBody.get("tagId")).longValue();
+        String tagText = requestBody.get("tagText").toString();
 
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Optional<VisualMediaEntity> updatedVisualMedia = visualMediaService.addTag(id, tagId);
+        Optional<VisualMediaEntity> updatedVisualMedia = visualMediaService.addTag(id, tagText);
 
         // If tag was not found, updatedVisualMedia will be null.
         if (updatedVisualMedia.isEmpty())
@@ -215,9 +236,12 @@ public class VisualMediaController {
             return ResponseEntity.badRequest().build();
         }
 
-        if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)) {
+        if (!visualMediaService.isExists(visualMediaId) || !tagService.isExists(tagId)
+                //Checks if there is an association between the visual media and the tag
+                || !visualMediaService.findOne(visualMediaId).get().getTags().contains(tagService.findOne(tagId).get())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         visualMediaService.deleteRelation(visualMediaId, tagId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
