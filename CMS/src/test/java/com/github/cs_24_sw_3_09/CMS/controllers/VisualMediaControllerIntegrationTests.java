@@ -160,7 +160,7 @@ public class VisualMediaControllerIntegrationTests {
         long visualMediaId = inclusionList.get(0).getVisualMedia().getId();
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/visual_medias/" + visualMediaId + "/risk")
+                        MockMvcRequestBuilders.get("/api/visual_medias/" + visualMediaId + "/slideshows")
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk()
                 )
@@ -176,7 +176,7 @@ public class VisualMediaControllerIntegrationTests {
         visualMediaService.save(visualMediaEntity);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/visual_medias/" + visualMediaEntity.getId() + "/risk")
+                        MockMvcRequestBuilders.get("/api/visual_medias/" + visualMediaEntity.getId() + "/slideshows")
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk()
                 )

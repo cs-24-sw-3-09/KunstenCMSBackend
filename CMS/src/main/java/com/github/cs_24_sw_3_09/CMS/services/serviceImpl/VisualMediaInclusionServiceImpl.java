@@ -25,11 +25,10 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     private PushTSService pushTSService;
 
     public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository,
-            VisualMediaService visualMediaService, PushTSService pushTSService) {
+            VisualMediaService visualMediaService ,PushTSService pushTSService) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.visualMediaService = visualMediaService;
         this.pushTSService = pushTSService;
-
     }
 
     @Override

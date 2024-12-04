@@ -4,8 +4,11 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 import java.util.Set;
 import java.sql.Date;
 import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -16,8 +19,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.mappers.impl.TimeSlotMapperImpl;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
@@ -34,8 +46,9 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private VisualMediaRepository visualMediaRepository;
     private VisualMediaService visualMediaService;
     private SlideshowService slideshowService;
+    private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
 
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, DisplayDeviceRepository displayDeviceRepository,
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
                                SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService slideshowService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
@@ -44,6 +57,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         this.visualMediaRepository = visualMediaRepository;
         this.visualMediaService = visualMediaService;
         this.slideshowService = slideshowService;
+        this. timeSlotMapper = timeSlotMapper;
     }
 
     @Override
@@ -141,6 +155,20 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     @Override
     public boolean isExists(Long id) {
         return timeSlotRepository.existsById(Math.toIntExact(id));
+    }
+
+    @Override
+    public Set<TimeSlotDto> findSetOfTimeSlotsSlideshowIsAPartOf(Long id){
+        Set<TimeSlotEntity> setOfTimeSlotEntities = timeSlotRepository.findSetOfTimeSlotsBySlideshowId(id);
+        if (setOfTimeSlotEntities == null) {
+            return Collections.emptySet();
+        }
+        Set <TimeSlotDto> setOfTimeSlotDtos = new HashSet<>();
+        for (TimeSlotEntity entity : setOfTimeSlotEntities) {
+            TimeSlotDto timeSlotDto = timeSlotMapper.mapTo(entity);
+            setOfTimeSlotDtos.add(timeSlotDto);
+        }        
+        return setOfTimeSlotDtos;
     }
 
     @Override

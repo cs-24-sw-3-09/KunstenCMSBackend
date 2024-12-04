@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -79,4 +80,5 @@ public class DisplayDeviceEntity {
 
         return sb.toString()/*.trim()*/;
     }
+
 }

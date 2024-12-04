@@ -71,7 +71,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@Test
 	@WithMockUser(roles = "ADMIN")
 	public void testThatCreateDisplayDeviceSuccessfullyReturnsSavedDisplayDevice() throws Exception {
-		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
+		DisplayDeviceDto displayDeviceEntity = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceJson = objectMapper.writeValueAsString(displayDeviceEntity);
 
 		mockMvc.perform(
@@ -81,9 +81,11 @@ public class DisplayDeviceControllerIntegrationTests {
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.id").isNumber())
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.name").value("Skærm Esbjerg"))
+						MockMvcResultMatchers.jsonPath("$.name").value("Skærm Esbjerg1"))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.location").value("Esbjerg"));
+						MockMvcResultMatchers.jsonPath("$.location").value("Aalborg"));
+
+		assertTrue(displayDeviceService.isExists(1l));
 	}
 
 	@Test
@@ -493,7 +495,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		+ 	"\"resolution\": \"1920x1080\","
 		+ 	"\"fallbackContent\":" 
 		+ 	fallbackId
-        +"}";
+        + 	"}";
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/display_devices")
