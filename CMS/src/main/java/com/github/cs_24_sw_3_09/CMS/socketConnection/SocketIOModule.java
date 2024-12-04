@@ -1,9 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.corundumstudio.socketio.AckRequest;
@@ -11,6 +8,7 @@ import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -44,12 +42,12 @@ public class SocketIOModule {
 
         server.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
+        SocketIONamespace dashboard = server.addNamespace("dashboard");
         server.addEventListener("changeContent", ScreenStatusMessage.class, new DataListener<ScreenStatusMessage>() {
 
             @Override
             public void onData(SocketIOClient client, ScreenStatusMessage data, AckRequest ackSender) throws Exception {
-                BroadcastOperations broadcastOperations = server.getNamespace("/dashboard").getBroadcastOperations();
-                broadcastOperations.sendEvent("changeContent", data);
+                dashboard.getBroadcastOperations().sendEvent("changeContent", data);
             }
             
         });
