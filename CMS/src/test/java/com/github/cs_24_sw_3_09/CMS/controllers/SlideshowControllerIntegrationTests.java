@@ -229,7 +229,7 @@ public class SlideshowControllerIntegrationTests {
     @WithMockUser(roles="PLANNER")
     public void testThatAddVisualMediaInclusionToSlideShowReturnsSlideshowWithVisualMediaInclusionAdded() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity);
+        VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshow = slideshowService.save(slideshowEntity);

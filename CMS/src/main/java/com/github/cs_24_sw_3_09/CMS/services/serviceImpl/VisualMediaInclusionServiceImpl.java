@@ -33,10 +33,24 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     }
 
     @Override
-    public VisualMediaInclusionEntity save(VisualMediaInclusionEntity visualMediaInclusionEntity) {
+    public Optional<VisualMediaInclusionEntity> save(VisualMediaInclusionEntity visualMediaInclusionEntity) {
+        if (visualMediaInclusionEntity.getVisualMedia() != null && 
+        visualMediaInclusionEntity.getVisualMedia().getId() != null) {
+            Optional<VisualMediaInclusionEntity> toCheck = getVisualMedia(visualMediaInclusionEntity); 
+            if (toCheck.isEmpty()) return Optional.empty();
+            visualMediaInclusionEntity = toCheck.get();
+        }
+
         VisualMediaInclusionEntity toReturn = visualMediaInclusionRepository.save(visualMediaInclusionEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
+        return Optional.of(toReturn);
+    }
+
+    private Optional<VisualMediaInclusionEntity> getVisualMedia(VisualMediaInclusionEntity visualMediaInclusionEntity) {
+        Optional<VisualMediaEntity> visualMedia = visualMediaService.findOne((long) visualMediaInclusionEntity.getVisualMedia().getId());
+        if (visualMedia.isEmpty()) return Optional.empty();
+        visualMediaInclusionEntity.setVisualMedia(visualMedia.get());
+        return Optional.of(visualMediaInclusionEntity);
     }
 
     @Override
