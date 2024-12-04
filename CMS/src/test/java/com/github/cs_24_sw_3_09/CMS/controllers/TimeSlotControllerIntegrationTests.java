@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opentest4j.TestAbortedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration.DslContextConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -733,101 +734,79 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity("c");
         DisplayDeviceEntity dd4 = TestDataUtil.createDisplayDeviceEntity("d");
 
-        //DisplayDeviceEntity newDd1 = displayDeviceService.save(dd1).get();
-        //displayDeviceService.save(dd2);
-        //displayDeviceService.save(dd3);
-        //displayDeviceService.save(dd4);
+        displayDeviceService.save(dd1);
+        displayDeviceService.save(dd2);
+        displayDeviceService.save(dd3);
+        displayDeviceService.save(dd4);
 
-        TimeSlotEntity ts1 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "12:00:00", "17:00:00");
-        TimeSlotEntity ts2 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "10:00:00", "12:00:00");
-        TimeSlotEntity ts3 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "17:00:00", "19:00:00");
-        TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(127,
-                "2024-12-01", "2024-12-25", "10:00:00", "19:00:00");
-
-
-        ts1.getDisplayDevices().add(dd1);
-        ts1.getDisplayDevices().add(dd2);
-        ts1.getDisplayDevices().add(dd3);
-        //ts1.getDisplayDevices().add(dd4);
-        TimeSlotEntity newTs = timeSlotService.save(ts1).get();
-
-        /*ts1.getDisplayDevices().forEach(dd -> {
-            System.out.println(dd.getId());
-        });
-        newTs.getDisplayDevices().forEach(dd -> {
-            System.out.println(dd.getId());
-        });*/
-
-        assertTrue(timeSlotService.isExists(1L));
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
         assertTrue(displayDeviceService.isExists(3L));
-
-        //assertTrue(displayDeviceService.isExists(4L));
-        
-        assertEquals(3, ts1.getDisplayDevices().size());
-
-        ts2.getDisplayDevices().add(TestDataUtil.createDisplayDeviceWithOnlyId(1));
-        ts2.getDisplayDevices().add(TestDataUtil.createDisplayDeviceWithOnlyId(2));
-        ts2.getDisplayDevices().add(TestDataUtil.createDisplayDeviceWithOnlyId(3));
-
         assertTrue(displayDeviceService.isExists(4L));
 
-
-
-
-
-        assertTrue(displayDeviceService.isExists(1L));
-        assertTrue(displayDeviceRepository.findById(1).isPresent());
-        ts1.getDisplayDevices().add(
-            DisplayDeviceEntity.builder().id(1)
-            .build()
+        TimeSlotEntity ts1 = TestDataUtil.createTimeSlotEntityFromData(127,
+                "2024-12-01", "2024-12-25", "12:00:00", "17:00:00");
+        
+        String tsJson = objectMapper.writeValueAsString(ts1); 
+        int[] associations = {1,2,3};
+        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associations);
+        
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tsJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
         );
-        assertEquals(ts1.getDisplayDevices().size(), 1);
+        assertTrue(timeSlotService.isExists(1L));
 
-        ts2.getDisplayDevices().forEach(dd -> {
-            System.out.println(dd.getId());
-        });
+        TimeSlotEntity ts2 = TestDataUtil.createTimeSlotEntityFromData(127,
+                "2024-12-01", "2024-12-25", "10:00:00", "12:00:00");
 
-        System.out.println("ts2 " + ts2.getName() + "\nTS2: "+ ts2.getWeekdaysChosen());
+        tsJson = objectMapper.writeValueAsString(ts2); 
+        int[] associationTs2 = {1,3};
+        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associationTs2);
 
-        //.save(ts2);
-
-
-        dd1.addTimeSlot(ts1);
-        dd1.addTimeSlot(ts2);
-        dd1.addTimeSlot(ts3);
-
-        ts1.addDisplayDevice(dd1);
-        ts2.addDisplayDevice(dd1);
-        ts3.addDisplayDevice(dd1);
-
-        displayDeviceService.save(dd1);
-
-        dd2.addTimeSlot(ts1);
-        dd2.addTimeSlot(ts3);
-
-        dd3.addTimeSlot(ts1);
-        dd3.addTimeSlot(ts2);
-
-        dd4.addTimeSlot(ts3);
-        dd4.addTimeSlot(ts4);
-
-        assertTrue(
-                displayDeviceService.isExists(1L) &&
-                        displayDeviceService.isExists(2L) &&
-                        displayDeviceService.isExists(3L) &&
-                        displayDeviceService.isExists(4L)
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tsJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
         );
-        assertTrue(
-                timeSlotService.isExists(1L) &&
-                        timeSlotService.isExists(2L) &&
-                        timeSlotService.isExists(3L) &&
-                        timeSlotService.isExists(4L)
+        assertTrue(timeSlotService.isExists(2L));
+
+
+        TimeSlotEntity ts3 = TestDataUtil.createTimeSlotEntityFromData(127,
+                "2024-12-01", "2024-12-25", "17:00:00", "19:00:00");
+        tsJson = objectMapper.writeValueAsString(ts3); 
+        int[] associationTs3 = {2,3};
+        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associationTs3);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tsJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
         );
+        assertTrue(timeSlotService.isExists(3L));
+        
+        TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(127,
+            "2024-12-01", "2024-12-25", "10:00:00", "19:00:00");
+        tsJson = objectMapper.writeValueAsString(ts4); 
+        int[] associationTs4 = {4};
+        tsJson = TestDataUtil.createDDJsonWithId(tsJson, associationTs4);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/time_slots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tsJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
+        );
+        assertTrue(timeSlotService.isExists(4L));
+
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1/overlapping_time_slots")
@@ -836,7 +815,7 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$").isArray()
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.length").value(0)
+                MockMvcResultMatchers.jsonPath("$", org.hamcrest.Matchers.hasSize(0))
         );
 
     }

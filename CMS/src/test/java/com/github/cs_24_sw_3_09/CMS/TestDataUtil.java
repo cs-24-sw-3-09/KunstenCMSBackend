@@ -376,5 +376,19 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static String createDDJsonWithId(String json, int[] ids) {
+        String res = "\"displayDevices\":[";
+        for (int i = 0; i < ids.length; i++) {
+            res += "{\"id\":"+ids[i]+"}";
+            
+            if (i != ids.length - 1) {
+                res += ",";
+            }
+        }
+        res += "]";
+
+        json = json.replace("\"displayDevices\":[]", res);
+        return json;
+    }
 
 }
