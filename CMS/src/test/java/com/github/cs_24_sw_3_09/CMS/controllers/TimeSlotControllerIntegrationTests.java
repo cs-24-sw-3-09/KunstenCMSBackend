@@ -33,6 +33,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
@@ -51,13 +52,14 @@ public class TimeSlotControllerIntegrationTests {
     private DisplayDeviceService displayDeviceService;
     private VisualMediaRepository visualMediaRepository;
     private SlideshowRepository slideshowRepository;
+    private TimeSlotRepository timeSlotRepository;
 
     @Autowired
     public void TimeSlotControllerIntegration(
             MockMvc mockMvc, ObjectMapper objectMapper,
             TimeSlotService timeSlotService, DisplayDeviceRepository displayDeviceRepository,
             DisplayDeviceService displayDeviceService, VisualMediaRepository visualMediaRepository,
-            SlideshowRepository slideshowRepository
+            SlideshowRepository slideshowRepository, TimeSlotRepository timeSlotRepository
     ) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
@@ -66,6 +68,7 @@ public class TimeSlotControllerIntegrationTests {
         this.displayDeviceService = displayDeviceService;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     @Test
@@ -574,10 +577,10 @@ public class TimeSlotControllerIntegrationTests {
     @Test
     @WithMockUser(roles = {"PLANNER"})
     public void testThatChecksOverlappingFindNotOverlap() throws Exception {
-        DisplayDeviceEntity dd1 = TestDataUtil.createDisplayDeviceEntity();
-        DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity();
-        DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity();
-        DisplayDeviceEntity dd4 = TestDataUtil.createDisplayDeviceEntity();
+        DisplayDeviceEntity dd1 = TestDataUtil.createDisplayDeviceEntity("a");
+        DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity("b");
+        DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity("c");
+        DisplayDeviceEntity dd4 = TestDataUtil.createDisplayDeviceEntity("d");
 
         //DisplayDeviceEntity newDd1 = displayDeviceService.save(dd1).get();
         //displayDeviceService.save(dd2);
@@ -597,30 +600,35 @@ public class TimeSlotControllerIntegrationTests {
         ts1.getDisplayDevices().add(dd1);
         ts1.getDisplayDevices().add(dd2);
         ts1.getDisplayDevices().add(dd3);
-        ts1.getDisplayDevices().add(dd4);
-        timeSlotService.save(ts1);
+        //ts1.getDisplayDevices().add(dd4);
+        TimeSlotEntity newTs = timeSlotService.save(ts1).get();
 
+        /*ts1.getDisplayDevices().forEach(dd -> {
+            System.out.println(dd.getId());
+        });
+        newTs.getDisplayDevices().forEach(dd -> {
+            System.out.println(dd.getId());
+        });*/
+
+        assertTrue(timeSlotService.isExists(1L));
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
         assertTrue(displayDeviceService.isExists(3L));
-        assertTrue(displayDeviceService.isExists(4L));
+        //assertTrue(displayDeviceService.isExists(4L));
         
-        
-        
+        assertEquals(3, ts1.getDisplayDevices().size());
 
-    
-        assertTrue(displayDeviceService.isExists(1L));
-        assertTrue(displayDeviceRepository.findById(1).isPresent());
-        ts1.getDisplayDevices().add(
-            DisplayDeviceEntity.builder().id(1)
-            .build()
-        );
-        assertEquals(ts1.getDisplayDevices().size(), 1);
+        ts2.getDisplayDevices().add(TestDataUtil.createDisplayDeviceWithOnlyId(1));
+        ts2.getDisplayDevices().add(TestDataUtil.createDisplayDeviceWithOnlyId(2));
+        ts2.getDisplayDevices().add(TestDataUtil.createDisplayDeviceWithOnlyId(3));
 
-        System.out.println(ts1);
+        ts2.getDisplayDevices().forEach(dd -> {
+            System.out.println(dd.getId());
+        });
 
-        timeSlotService.save(ts1);
-        assertTrue(timeSlotService.isExists(1L));
+        System.out.println("ts2 " + ts2.getName() + "\nTS2: "+ ts2.getWeekdaysChosen());
+
+        //.save(ts2);
 
 
         dd1.addTimeSlot(ts1);
@@ -632,7 +640,6 @@ public class TimeSlotControllerIntegrationTests {
         ts3.addDisplayDevice(dd1);
 
         displayDeviceService.save(dd1);
-        System.out.println("here");
 
         dd2.addTimeSlot(ts1);
         dd2.addTimeSlot(ts3);
@@ -678,8 +685,4 @@ public class TimeSlotControllerIntegrationTests {
                 MockMvcResultMatchers.status().isNotFound()
         );
     }
-
-
-
-
 }

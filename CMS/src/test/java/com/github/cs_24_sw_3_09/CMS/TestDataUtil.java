@@ -42,11 +42,21 @@ public class TestDataUtil {
     }
 
     public static DisplayDeviceEntity createDisplayDeviceEntity() {
-
         return DisplayDeviceEntity.builder()
                 .displayOrientation("horizontal")
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
+                .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
+                .build();
+    }
+
+
+    public static DisplayDeviceEntity createDisplayDeviceEntity(String name) {
+        return DisplayDeviceEntity.builder()
+                .displayOrientation("horizontal")
+                .location("Esbjerg")
+                .name(name)
                 .resolution("1920x1080")
                 .timeSlots(new ArrayList<>())
                 .build();
@@ -150,6 +160,10 @@ public class TestDataUtil {
                 DisplayDeviceEntity.builder().id(1).build()
         );
         return displayDevices;
+    }
+
+    public static DisplayDeviceEntity createDisplayDeviceWithOnlyId(Integer id) {
+        return DisplayDeviceEntity.builder().id(id).build();
     }
 
 
