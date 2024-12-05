@@ -96,24 +96,33 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     @Override
     public void delete(Long id) {
 
-        postVisualMediaInclusionDeletionCleanup(id);
         VisualMediaInclusionEntity visualMediaInclusion = visualMediaInclusionRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media Inclusion with id " + id + " not found"));
-        visualMediaInclusion.setVisualMedia(null);
 
+        Integer deletedSlideshowPosition = visualMediaInclusion.getSlideshowPosition();
+
+        SlideshowEntity slideshowContainingDeletedVisualMediaInclusion = visualMediaInclusionRepository
+                .findSlideshowByVisualMediaInclusionId(id).orElseThrow(
+                        () -> new RuntimeException("Visual Media Inclusion does not exist"));
+
+        postVisualMediaInclusionDeletePositionCleanUp(slideshowContainingDeletedVisualMediaInclusion, deletedSlideshowPosition);
+        visualMediaInclusion.setVisualMedia(null);
         visualMediaInclusionRepository.save(visualMediaInclusion);
         visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
-
 
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
     @Override
-    public void postVisualMediaInclusionDeletionCleanup(Long visualMediaId) {
+    public void postVisualMediaInclusionDeletePositionCleanUp(SlideshowEntity slideshow, Integer deletedPosition) {
 
         //Updates the slideshow positions on each VMI following the deleted VMI.
-
-
+        slideshow.getVisualMediaInclusionCollection().forEach(vmi -> {
+            if (!(vmi.getSlideshowPosition() < deletedPosition)) {
+                System.out.print(vmi.getId());
+                partialUpdate(Long.valueOf(vmi.getId()), new VisualMediaInclusionEntity(null, null, vmi.getSlideshowPosition() - 1, null));
+            }
+        });
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,5 +27,5 @@ public interface VisualMediaInclusionService {
 
     Optional<List<VisualMediaInclusionEntity>> updateSlideshowPosition(List<VisualMediaInclusionEntity> visualMediaInclusions);
 
-    void postVisualMediaInclusionDeletionCleanup(Long visualMediaId);
+    void postVisualMediaInclusionDeletePositionCleanUp(SlideshowEntity slideshow, Integer deletedPosition);
 }
