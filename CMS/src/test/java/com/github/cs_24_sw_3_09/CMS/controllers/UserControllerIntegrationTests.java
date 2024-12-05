@@ -188,27 +188,6 @@ public class UserControllerIntegrationTests {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void testThatPatchPasswordEncryptsPassword() throws Exception {
-        UserEntity userEntity = TestDataUtil.createUserEntity();
-        UserEntity savedUserEntity = userService.save(userEntity);
-
-        UserDto userDto = TestDataUtil.createUserDto();
-        String userDtoJson = objectMapper.writeValueAsString(userDto);
-        //String userDtoJson = "{\"firstName\": \"FirstTestName\", \"lastName\":\"LastTestName\", \"email\":\"test@test.com\", \"password\":\"testtest1234\"}";
-
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders.patch("/api/users/" + savedUserEntity.getId())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(userDtoJson)
-                ).andDo(print())
-                .andExpect(
-                        MockMvcResultMatchers.status().isOk()
-                )
-    }
-
-    @Test
-    @WithMockUser(roles = "ADMIN")
     public void testThatPatchUpdateUserReturnsStatus404() throws Exception {
         UserDto userDto = TestDataUtil.createUserDto();
         String userDtoJson = objectMapper.writeValueAsString(userDto);
