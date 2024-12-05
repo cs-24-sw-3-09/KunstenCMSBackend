@@ -379,7 +379,7 @@ public class TimeSlotControllerIntegrationTests {
         mockMvc.perform(
             MockMvcRequestBuilders.delete("/api/time_slots/500/display_devices")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content("{\"ddId\":" + ddId + "}")
+                    .content("{\"ddId\":" + ddId + "}")
         ).andExpect(
             MockMvcResultMatchers.status().isNotFound()
         );

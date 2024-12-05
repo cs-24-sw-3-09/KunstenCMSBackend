@@ -34,7 +34,7 @@ public interface VisualMediaService {
 
     Optional<VisualMediaEntity> addTag(Long id, String text);
 
-    void deleteRelation(Long visualMediaId, Long tagId);
+    VisualMediaEntity deleteRelation(Long visualMediaId, Long tagId);
 
     List<DisplayDeviceEntity> findDisplayDevicesVisualMediaIsPartOf(Long id);
 

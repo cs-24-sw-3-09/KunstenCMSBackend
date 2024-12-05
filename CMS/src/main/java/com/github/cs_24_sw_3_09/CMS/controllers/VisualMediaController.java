@@ -235,7 +235,7 @@ public class VisualMediaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        visualMediaService.deleteRelation(visualMediaId, tagId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        VisualMediaEntity updatedVisualMedia = visualMediaService.deleteRelation(visualMediaId, tagId);
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia),HttpStatus.NO_CONTENT);
     }
 }
