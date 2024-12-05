@@ -7,7 +7,9 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
@@ -48,16 +50,18 @@ public class SlideshowControllerIntegrationTests {
     private SlideshowService slideshowService;
     private VisualMediaInclusionService visualMediaInclusionService;
     private TimeSlotService timeSlotService;
+    private VisualMediaRepository visualMediaRepository;
 
     @Autowired
     public SlideshowControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, SlideshowService slideshowService,
-                                               VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService) {
+                                               VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService,
+                                               VisualMediaRepository visualMediaRepository) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.timeSlotService = timeSlotService;
-
+        this.visualMediaRepository = visualMediaRepository;
     }
 
 
@@ -240,9 +244,22 @@ public class SlideshowControllerIntegrationTests {
     @Test
     @WithMockUser(roles="PLANNER")
     public void testThatAddVisualMediaInclusionToSlideShowReturnsSlideshowWithVisualMediaInclusionAdded() throws Exception {
-        VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
+        VisualMediaEntity vm = TestDataUtil.createVisualMediaEntity();
+        visualMediaRepository.save(vm);
+
+        assertTrue(visualMediaRepository.findById(1).isPresent());
+        
+        VisualMediaInclusionEntity visualMediaInclusionEntity = //TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
+        TestDataUtil.createVisualMediaInclusionEntity();
+
         VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
+        visualMediaInclusionService.setVisualMedia((long) savedVisualMediaInclusion.getId(), 1L);
+        assertEquals(
+            1,    
+            visualMediaInclusionService.findOne(1L).get().getVisualMedia().getId()
+        );
+        
         SlideshowEntity slideshowEntity = TestDataUtil.createSlideshowEntity();
         SlideshowEntity savedSlideshow = slideshowService.save(slideshowEntity);
 

@@ -33,9 +33,9 @@ public class VisualMediaEntity extends ContentEntity {
 
     @NotNull
     private String name;
-    //@NotNull
+    @NotNull
     private String location;
-    //@NotNull
+    @NotNull
     private String fileType;
     private String description;
     private LocalDateTime lastDateModified;

@@ -79,8 +79,8 @@ public class TestDataUtil {
                 .description("dkaoidkao test descpt")
                 .fileType("jpg")
                 //.lastDateModified("30/10/2003")
-                //.location("/djao/dhau.jpg")
-                .name("Billede navn")
+                .location("/djao/dhau.jpg")
+                .name("Test_name")
                 .build();
     }
 
