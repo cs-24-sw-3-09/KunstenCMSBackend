@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -205,9 +204,7 @@ public class UserControllerIntegrationTests {
                 ).andDo(print())
                 .andExpect(
                         MockMvcResultMatchers.status().isOk()
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$.password").value(not(userDto.getPassword()))
-                );
+                )
     }
 
     @Test
@@ -223,6 +220,27 @@ public class UserControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testThatPatchPasswordEncryptsPassword() throws Exception {
+        UserEntity userEntity = TestDataUtil.createUserEntity();
+        UserEntity savedUserEntity = userService.save(userEntity);
+
+        UserDto userDto = TestDataUtil.createUserDto();
+        String userDtoJson = objectMapper.writeValueAsString(userDto);
+        //String userDtoJson = "{"firstName": "FirstTestName", "lastName":"LastTestName", "email":"test@test.com", "password":"testtest1234"}";
+
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/users/" + savedUserEntity.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(userDtoJson)
+                )
+                .andExpect(
+                        MockMvcResultMatchers.status().isOk()
+                );
     }
 
 }

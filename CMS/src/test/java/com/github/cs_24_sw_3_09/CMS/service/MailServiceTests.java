@@ -89,7 +89,6 @@ class MailServiceTests {
         verify(javaMailSender, times(1)).send(mockMimeMessage);
 
         // Assert
-        System.out.println("result: " + result);
         assertEquals("Mail Sent Successfully To " + mockReceiver, result);
     }
 
@@ -226,7 +225,6 @@ class MailServiceTests {
         Time currentTime = Time.valueOf("12:00:00");
         String result = mailService.sendDDDisconnectMail(1, currentTime);
 
-        System.out.println(result);
         // Assert the result
         assertEquals(result.contains("Result from senting disconnect mail on id: 1 (Error while Sending Mail..."),
                 true);

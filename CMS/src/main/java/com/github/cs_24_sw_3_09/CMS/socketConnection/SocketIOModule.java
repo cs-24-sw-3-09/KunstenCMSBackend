@@ -1,15 +1,21 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
+import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.tasks.MonitorGracePeriodForDisplayDevices;
 
@@ -24,11 +30,11 @@ public class SocketIOModule {
 
     // Constructor with parameters for hostname and port
     @Autowired
-    public SocketIOModule(@Value("${socketio.hostname:0.0.0.0}") String hostname,
-            @Value("${socketio.port:3051}") int port) {
+    public SocketIOModule(String hostname, int port, String socketOrigin) {
         Configuration configuration = new Configuration();
         configuration.setHostname(hostname);
         configuration.setPort(port);
+        configuration.setOrigin(socketOrigin);
         SocketConfig socketConfiguration = new SocketConfig();
         socketConfiguration.setReuseAddress(true);
         configuration.setSocketConfig(socketConfiguration);
@@ -36,29 +42,43 @@ public class SocketIOModule {
 
         server.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
+        server.addEventListener("changeContent", ScreenStatusMessage.class, new DataListener<ScreenStatusMessage>() {
+
+            @Override
+            public void onData(SocketIOClient client, ScreenStatusMessage data, AckRequest ackSender) throws Exception {
+                server.getBroadcastOperations().sendEvent("changeContent", data);
+            }
+            
+        });
     }
 
     private ConnectListener onConnected() {
         return (client -> {
-            int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
-            client.joinRoom(String.valueOf(deviceId));
-            System.out.println("Device " + deviceId + " connected: " + client.getRemoteAddress());
+            try {
+                int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
+                client.joinRoom(String.valueOf(deviceId));
+            } catch (Exception e) {}
         });
     }
 
     private DisconnectListener onDisconnected() {
         return (client -> {
-            System.out.println("Device disconnected: " + client.getRemoteAddress());
-
-            // Extract device ID (assume it's available as part of the client or context)
-            int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
-            monitorGracePeriodForDisplayDevices.sendDisconnectMailWithGrace(deviceId);
+            try { 
+                // Extract device ID (assume it's available as part of the client or context)
+                int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
+                monitorGracePeriodForDisplayDevices.sendDisconnectMailWithGrace(deviceId);
+            } catch (Exception e) {}
         });
     }
 
     public void sendContent(int screenId, ContentEntity contentEntity) {
         BroadcastOperations roomOperations = server.getRoomOperations(String.valueOf(screenId));
-        roomOperations.sendEvent("content", contentEntity);
+        try {
+            String contentJson = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(contentEntity);
+            roomOperations.sendEvent("content", contentJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isConnected(int screenId) {

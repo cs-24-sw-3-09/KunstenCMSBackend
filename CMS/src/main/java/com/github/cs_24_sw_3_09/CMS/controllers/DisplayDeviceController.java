@@ -52,9 +52,6 @@ public class DisplayDeviceController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<DisplayDeviceDto> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
-
-        // Done to decouple the persistence layer from the presentation and service
-        // layer.
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
         Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         

@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
             Optional.ofNullable(userEntity.getFirstName()).ifPresent(existingUserEntity::setFirstName);
             Optional.ofNullable(userEntity.getLastName()).ifPresent(existingUserEntity::setLastName);
             Optional.ofNullable(userEntity.getEmail()).ifPresent(existingUserEntity::setEmail);
-            Optional.ofNullable(userEntity.getPassword()).map(encoder::encode).ifPresent(existingUserEntity::setPassword);
+            Optional.ofNullable(userEntity.getPassword()).ifPresent(password -> existingUserEntity.setPassword(encoder.encode(password)));
             Optional.ofNullable(userEntity.getPauseNotificationStart())
                     .ifPresent(existingUserEntity::setPauseNotificationStart);
             Optional.ofNullable(userEntity.getPauseNotificationEnd())
@@ -89,6 +89,10 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserEntity> user = userRepository.findByEmail(username);
         return user.map(UserEntityDetails::new).orElseThrow(() -> new UsernameNotFoundException("Email not found: " + username));
+    }
+
+    public Optional<UserEntity> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public boolean existsByAdmin() {

@@ -21,6 +21,7 @@ public class TestDataUtil {
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -31,6 +32,7 @@ public class TestDataUtil {
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -52,6 +54,7 @@ public class TestDataUtil {
                 .location("Esbjerg2")
                 .name("Skærm Esbjerg2")
                 .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
                 .build();
     }
 
@@ -134,8 +137,8 @@ public class TestDataUtil {
     public static TimeSlotEntity createTimeSlotEntity() {
         return TimeSlotEntity.builder()
                 .name("Test2 TimeSlot")
-                .startDate(java.sql.Date.valueOf("2024-11-20"))
-                .endDate(java.sql.Date.valueOf("2024-11-20"))
+                .startDate(java.sql.Date.valueOf("2025-11-20"))
+                .endDate(java.sql.Date.valueOf("2026-11-20"))
                 .startTime(java.sql.Time.valueOf("10:20:30"))
                 .endTime(java.sql.Time.valueOf("11:21:31"))
                 .weekdaysChosen(3)
@@ -215,7 +218,17 @@ public class TestDataUtil {
     public static VisualMediaInclusionDto createVisualMediaInclusionDto() {
         return VisualMediaInclusionDto.builder()
                 .visualMedia(new VisualMediaEntity())
-                .id(1)
+                .slideDuration(5)
+                .slideshowPosition(1)
+                .build();
+    }
+
+    public static VisualMediaInclusionDto createVisualMediaInclusionDtoWitVMThaOnlyContainsId(Integer id) {
+        VisualMediaEntity vm = new VisualMediaEntity();
+        vm.setId(id);
+
+        return VisualMediaInclusionDto.builder()
+                .visualMedia(vm)
                 .slideDuration(5)
                 .slideshowPosition(1)
                 .build();
@@ -232,11 +245,16 @@ public class TestDataUtil {
 
     public static VisualMediaInclusionEntity createVisualMediaInclusionEntity() {
         return VisualMediaInclusionEntity.builder()
-                .visualMedia(null)
-                .id(1)
                 .slideDuration(10)
                 .slideshowPosition(2)
                 .build();
+    }
+
+    public static VisualMediaInclusionEntity createVisualMediaInclusionEntityWithPos(Integer pos) {
+        return VisualMediaInclusionEntity.builder()
+        .slideDuration(10)
+        .slideshowPosition(pos)
+        .build();
     }
 
     public static SlideshowDto createSlideshowDto() {
@@ -279,6 +297,20 @@ public class TestDataUtil {
 
         HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
         visualMediaInclusionEntities.add(createVisualMediaInclusionEntity());
+
+        return SlideshowEntity.builder()
+                .name("testSS")
+                .isArchived(false)
+                .visualMediaInclusionCollection(visualMediaInclusionEntities)
+                .build();
+    }
+
+    public static SlideshowEntity createSlideshowWithMultipleVisualMediaEntities() {
+
+        HashSet<VisualMediaInclusionEntity> visualMediaInclusionEntities = new HashSet<>();
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(1));
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(2));
+        visualMediaInclusionEntities.add(createVisualMediaInclusionEntityWithPos(3));
 
         return SlideshowEntity.builder()
                 .name("testSS")

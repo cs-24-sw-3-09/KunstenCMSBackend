@@ -1,10 +1,18 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.github.cs_24_sw_3_09.CMS.mappers.impl.SlideshowMapperImpl;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+
+import org.json.JSONArray;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -12,8 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/slideshows")
@@ -22,12 +32,16 @@ public class SlideshowController {
     private final VisualMediaInclusionService visualMediaInclusionService;
     private final SlideshowMapperImpl slideshowMapper;
     private final SlideshowService slideshowService;
+    private final TimeSlotService timeSlotService;
+    private final DisplayDeviceService displayDeviceService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService,
-            VisualMediaInclusionService visualMediaInclusionService) {
+            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, DisplayDeviceService displayDeviceService) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
+        this.timeSlotService = timeSlotService;
+        this.displayDeviceService = displayDeviceService;
     }
 
     @GetMapping(path = "/{id}")
@@ -41,9 +55,31 @@ public class SlideshowController {
     }
 
     @GetMapping
-    public Page<SlideshowDto> getSlideshows(Pageable pageable) {
-        Page<SlideshowEntity> slideshowEntities = slideshowService.findAll(pageable);
-        return slideshowEntities.map(slideshowMapper::mapTo);
+    public Iterable<SlideshowEntity> getSlideshows() {
+        Iterable<SlideshowEntity> slideshowEntities = slideshowService.findAll();
+        return slideshowEntities;
+    }
+
+    @GetMapping(path="/{id}/time_slots") 
+    public ResponseEntity<Set<TimeSlotDto>> getSetOfTimeSlotsSlideshowIsAPartOf(@PathVariable("id") long id){
+        if (!slideshowService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(timeSlotService.findSetOfTimeSlotsSlideshowIsAPartOf(id), HttpStatus.OK); 
+    }
+
+    @GetMapping(path="/{id}/fallbackContent")
+    public ResponseEntity<Set<DisplayDeviceDto>> getSetOfDisplayDevicesWhoUsesSlideshowAsFallback(@PathVariable("id") long id){
+        if (!slideshowService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(displayDeviceService.findDisplayDevicesWhoUsesSlideshowAsFallback(id), HttpStatus.OK);
+    }
+
+    @GetMapping(path="/states")
+    public ResponseEntity<List<Map<String, Object>>> getStateOfAllSlideshows(){
+        return new ResponseEntity<>(slideshowService.findStateOfEverySlideshow(), HttpStatus.OK);
     }
 
     @PostMapping
@@ -122,4 +158,23 @@ public class SlideshowController {
 
         return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity));
     }
+
+    @PostMapping(path = "/{id}/duplicate")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<SlideshowDto> createDuplicate(
+        @PathVariable("id") Long id,
+        @RequestBody Map<String, Object> requestBody
+    ) {
+        // Validate input and extract new name
+        Object mapValue = requestBody.containsKey("name") ? requestBody.get("name") : null;
+        String newName = mapValue != null ? mapValue.toString() : null;
+
+        // Update the display device and return the response
+        Optional<SlideshowEntity> updatedSlideshowEntity = slideshowService.duplicate(id, newName);
+        if (updatedSlideshowEntity.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return new ResponseEntity<>(slideshowMapper.mapTo(updatedSlideshowEntity.get()), HttpStatus.CREATED);
+    }
+
 }
