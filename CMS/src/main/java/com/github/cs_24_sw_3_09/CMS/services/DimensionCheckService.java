@@ -7,4 +7,6 @@ public interface DimensionCheckService {
     Boolean checkDimensionForAssignedFallback(Long displayDeviceId);
 
     Boolean checkDimensionForAssignedVisualMediaToSlideshow(Long visualMediaInclusionId, Long slideshowId);
+    
+    Boolean checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(long timeSlotId);
 }

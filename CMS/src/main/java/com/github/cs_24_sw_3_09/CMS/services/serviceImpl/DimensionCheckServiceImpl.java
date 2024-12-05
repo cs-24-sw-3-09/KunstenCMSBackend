@@ -123,6 +123,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         return true;
     }
 
+    @Override
     public Boolean checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(long timeSlotId){
         Optional<TimeSlotEntity> optionalTimeSlot = timeSlotService.findOne(timeSlotId);
         if (optionalTimeSlot.isEmpty()) {
