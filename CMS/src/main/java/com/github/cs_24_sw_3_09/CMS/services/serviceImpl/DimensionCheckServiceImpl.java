@@ -2,7 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.classfile.ClassFile.Option;
+//import java.lang.classfile.ClassFile.Option;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     }
 
     @Override
-    public Boolean checkDimensionForAssignedFallback(Long displayDeviceId){
+    public String checkDimensionForAssignedFallback(Long displayDeviceId){
         Optional<DisplayDeviceEntity> optionalDisplayDevice = displayDeviceService.findOne(displayDeviceId);
         if(optionalDisplayDevice.isEmpty()){
             throw new IllegalArgumentException("DisplayDevice with ID " + displayDeviceId + " does not exist.");
@@ -73,8 +73,11 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             
             fallbackOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
             if(!fallbackOrientation.equals(displayDeviceOrientation)){
-                return false;
+                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
+                "\nFallback Visual Media orientation: "+ fallbackOrientation;
             }
+
+            return "The dimensions match: " + displayDeviceOrientation;
 
         } else if (fallbackContent instanceof SlideshowEntity){
             Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(fallbackContent.getId().longValue());
@@ -86,26 +89,29 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             fallbackOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
 
             if(fallbackOrientation.equals("mixed")){
-                return true; //If slideshow already has mixed orientation then pass check
+                return "The fallback orientation is mixed"; //If slideshow already has mixed orientation then pass check
             } else if (!fallbackOrientation.equals(displayDeviceOrientation)) {
-                return false;
-            }  
+                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
+                "\nFallback Slide show orientation: "+ fallbackOrientation;
+            } 
+
+            return "The dimensions match: " + displayDeviceOrientation;
         } 
-        return true;      
+        return "Fallback content not set";      
     }
 
     @Override
-    public Boolean checkDimensionForAssignedVisualMediaToSlideshow(Long addedVisualMediaInclusionId, Long slideshowId){
+    public String checkDimensionForAssignedVisualMediaToSlideshow(Long addedVisualMediaInclusionId, Long slideshowId){
         Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshowId);
         //if there is only one Visual Media Inclusion in Slideshow there is nothing to check
         if (visualMediaInclusionsInSlideshow.size() <= 1){
-            return true;
+            return "Only one visual media present";
         }
 
         String slideshowOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
         //If there are both vertical and horizontal images in slideshow then pass check.
         if (slideshowOrientation.equals("mixed")) {
-            return true;
+            return "The dimensions are mixed";
         }
 
         //find sent vmi dimension
@@ -118,13 +124,14 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         String addedVisualMediaOrientation = getVisualMediaImageOrientation(addedvisualMedia.getLocation());
        
         if(!addedVisualMediaOrientation.equals(slideshowOrientation)){
-            return false;
+            return "The dimension do not match:\nSlideshow orientation: " + slideshowOrientation + 
+            "\nVisual Media orientation: "+ addedVisualMediaOrientation;
         }
-        return true;
+        return "The dimensions match: "+ slideshowOrientation;
     }
 
     @Override
-    public Boolean checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(long timeSlotId){
+    public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(long timeSlotId){
         Optional<TimeSlotEntity> optionalTimeSlot = timeSlotService.findOne(timeSlotId);
         if (optionalTimeSlot.isEmpty()) {
             throw new IllegalArgumentException("TimeSlot with ID " + timeSlotId + " does not exist.");
@@ -147,6 +154,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             }
             VisualMediaEntity visualMedia = optionalVisualMedia.get();
             displayContentOrientation = getVisualMediaImageOrientation(visualMedia.getLocation());
+            
+            return displayContentOrientation;
 
         } else if(displayContent instanceof SlideshowEntity) {
             Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(displayContent.getId().longValue());
@@ -158,15 +167,18 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             displayContentOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
             
             //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
-            if(displayContentOrientation.equals("mixed") || displayDeviceOrientation.size() > 1){
-                return true;
+            if(displayContentOrientation.equals("mixed") || displayDeviceOrientation.size() > 1) {
+                return "The dimensions are mixed";
             }
+        
             if (!displayDeviceOrientation.contains(displayContentOrientation)) {
-                return false;
+                return "The dimensions do not match";
             }
+
+            return displayContentOrientation;
         }
 
-        return true;
+        return "Display content not set";
     }
 
     private String getSlideshowOrientation(Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow){    

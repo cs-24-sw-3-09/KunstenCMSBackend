@@ -85,7 +85,7 @@ public class DisplayDeviceController {
     }
 
     @GetMapping(path =  "/{id}/dimensions") //TODO: add auth
-    public ResponseEntity<Boolean> checkDimensionsOfFallbackAndDisplayDevice(@PathVariable("id") Long id){
+    public ResponseEntity<String> checkDimensionsOfFallbackAndDisplayDevice(@PathVariable("id") Long id){
         return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedFallback(id), HttpStatus.OK);
     }
 
