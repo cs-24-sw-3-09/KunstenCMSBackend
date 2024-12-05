@@ -180,7 +180,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
                           
             if(!displayDeviceOrientation.contains(displayContentOrientation)){
-                return "The dimensions do not match";
+                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
+                "\nthe visual media orientation: "+ displayContentOrientation;
             }
             return "1";
 
@@ -199,7 +200,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             }
         
             if (!displayDeviceOrientation.contains(displayContentOrientation)) {
-                return "The dimensions do not match";
+                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
+                "\nthe visual media orientation: "+ displayContentOrientation;
             }
 
             return "1";
@@ -248,8 +250,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 getVisualMediaOrientation(
                     visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()
                 )
-            );
+            ); System.out.println("round found orientation: " + getVisualMediaOrientation(visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()));
         }
+        System.out.println("set size: "+visualMediasInSlideshowOrientation.size());
         if (visualMediasInSlideshowOrientation.size() > 1) {
             return "mixed";
         } else if (visualMediasInSlideshowOrientation.contains("horizontal")){

@@ -140,6 +140,18 @@ public class TestDataUtil {
         .build();
     }
 
+    public static TimeSlotEntity createTimeSlotEntityWithoutContent(){
+        return TimeSlotEntity.builder()
+        .name("Test2 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2025-11-20"))
+        .endDate(java.sql.Date.valueOf("2026-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayDevices(assignDisplayDevice())
+        .build();
+    }
+
     public static TimeSlotEntity createTimeSlotEntity() {
         return TimeSlotEntity.builder()
         .name("Test2 TimeSlot")

@@ -72,11 +72,6 @@ public class SlideshowController {
         return new ResponseEntity<>(timeSlotService.findSetOfTimeSlotsSlideshowIsAPartOf(id), HttpStatus.OK); 
     }
 
-    @GetMapping(path="/{id}/visual_media_inclusion/{vmiId}")
-    public ResponseEntity<String> checkDimensionSlideshowAndVisualMediaInclusion(@PathVariable("id") long slideshowId, @PathVariable("vmiId") long visualMediaInclusionId){
-        return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(visualMediaInclusionId, slideshowId), HttpStatus.OK);
-    }
-
     @GetMapping(path="/{id}/fallbackContent")
     public ResponseEntity<Set<DisplayDeviceDto>> getSetOfDisplayDevicesWhoUsesSlideshowAsFallback(@PathVariable("id") long id){
         if (!slideshowService.isExists(id)) {
