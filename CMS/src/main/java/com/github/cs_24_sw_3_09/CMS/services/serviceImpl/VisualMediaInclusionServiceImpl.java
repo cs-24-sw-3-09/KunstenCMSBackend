@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     private PushTSService pushTSService;
 
     public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository,
-            VisualMediaService visualMediaService ,PushTSService pushTSService) {
+                                           VisualMediaService visualMediaService, PushTSService pushTSService) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.visualMediaService = visualMediaService;
         this.pushTSService = pushTSService;
@@ -33,9 +34,9 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     @Override
     public Optional<VisualMediaInclusionEntity> save(VisualMediaInclusionEntity visualMediaInclusionEntity) {
-        if (visualMediaInclusionEntity.getVisualMedia() != null && 
-        visualMediaInclusionEntity.getVisualMedia().getId() != null) {
-            Optional<VisualMediaInclusionEntity> toCheck = getVisualMedia(visualMediaInclusionEntity); 
+        if (visualMediaInclusionEntity.getVisualMedia() != null &&
+                visualMediaInclusionEntity.getVisualMedia().getId() != null) {
+            Optional<VisualMediaInclusionEntity> toCheck = getVisualMedia(visualMediaInclusionEntity);
             if (toCheck.isEmpty()) return Optional.empty();
             visualMediaInclusionEntity = toCheck.get();
         }
@@ -94,12 +95,25 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     @Override
     public void delete(Long id) {
+
+        postVisualMediaInclusionDeletionCleanup(id);
         VisualMediaInclusionEntity visualMediaInclusion = visualMediaInclusionRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media Inclusion with id " + id + " not found"));
         visualMediaInclusion.setVisualMedia(null);
+
         visualMediaInclusionRepository.save(visualMediaInclusion);
         visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
+
+
         pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }
+
+    @Override
+    public void postVisualMediaInclusionDeletionCleanup(Long visualMediaId) {
+
+        //Updates the slideshow positions on each VMI following the deleted VMI.
+
+
     }
 
     @Override
@@ -122,16 +136,16 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         List<VisualMediaInclusionEntity> visualMediaInclusionsToReturn = new ArrayList<>();
         for (VisualMediaInclusionEntity visualMediaInclusion : visualMediaInclusions) {
             VisualMediaInclusionEntity visualMediaInclusionEntityToUpdate = findOne((long) visualMediaInclusion.getId()).orElse(null);
-            
-            if(visualMediaInclusionEntityToUpdate == null) return Optional.empty();
+
+            if (visualMediaInclusionEntityToUpdate == null) return Optional.empty();
             visualMediaInclusionEntityToUpdate.setSlideshowPosition(visualMediaInclusion.getSlideshowPosition());
 
             visualMediaInclusionsToReturn.add(visualMediaInclusionEntityToUpdate);
         }
         visualMediaInclusionRepository.saveAll(visualMediaInclusionsToReturn);
-        
+
         return Optional.of(visualMediaInclusionsToReturn);
     }
 
-    
+
 }

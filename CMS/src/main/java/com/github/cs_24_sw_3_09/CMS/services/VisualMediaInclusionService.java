@@ -25,4 +25,6 @@ public interface VisualMediaInclusionService {
     VisualMediaInclusionEntity setVisualMedia(Long id, Long visualMediaId);
 
     Optional<List<VisualMediaInclusionEntity>> updateSlideshowPosition(List<VisualMediaInclusionEntity> visualMediaInclusions);
+
+    void postVisualMediaInclusionDeletionCleanup(Long visualMediaId);
 }
