@@ -1,6 +1,5 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 import org.springframework.data.domain.Page;
