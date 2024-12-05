@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,8 +31,11 @@ import lombok.Setter;
 @Builder
 public class VisualMediaEntity extends ContentEntity {
 
+    @NotNull
     private String name;
+    @NotNull
     private String location;
+    @NotNull
     private String fileType;
     private String description;
     private LocalDateTime lastDateModified;

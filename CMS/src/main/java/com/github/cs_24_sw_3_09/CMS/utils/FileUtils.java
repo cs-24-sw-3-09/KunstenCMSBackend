@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static com.google.common.io.Files.getFileExtension;
 
 @Component
 public class FileUtils {

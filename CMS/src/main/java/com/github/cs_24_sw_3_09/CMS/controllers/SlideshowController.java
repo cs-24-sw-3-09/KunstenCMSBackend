@@ -73,7 +73,7 @@ public class SlideshowController {
     }
 
     @GetMapping(path="/{id}/visual_media_inclusion/{vmiId}")
-    public ResponseEntity<Boolean> checkDimensionSlideshowAndVisualMediaInclusion(@PathVariable("id") long slideshowId, @PathVariable("vmiId") long visualMediaInclusionId){
+    public ResponseEntity<String> checkDimensionSlideshowAndVisualMediaInclusion(@PathVariable("id") long slideshowId, @PathVariable("vmiId") long visualMediaInclusionId){
         return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(visualMediaInclusionId, slideshowId), HttpStatus.OK);
     }
 
@@ -100,7 +100,7 @@ public class SlideshowController {
 
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity deleteSlideshow(@PathVariable("id") long id) {
+    public ResponseEntity<Object> deleteSlideshow(@PathVariable("id") long id) {
         if (!slideshowService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
