@@ -12,6 +12,12 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+
 public class TestDataUtil {
 
     public static DisplayDeviceDto createDisplayDeviceDto() {
@@ -123,28 +129,28 @@ public class TestDataUtil {
 
     public static TimeSlotDto createTimeSlotDto() {
         return TimeSlotDto.builder()
-                .name("Test1 TimeSlot")
-                .startDate(java.sql.Date.valueOf("2024-11-20"))
-                .endDate(java.sql.Date.valueOf("2024-11-20"))
-                .startTime(java.sql.Time.valueOf("10:20:30"))
-                .endTime(java.sql.Time.valueOf("11:21:31"))
-                .weekdaysChosen(3)
-                .displayContent(new SlideshowEntity())
-                .displayDevices(new HashSet<DisplayDeviceEntity>())
-                .build();
+        .name("Test1 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2024-11-20"))
+        .endDate(java.sql.Date.valueOf("2024-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayContent(assignedSlideshow())
+        .displayDevices(assignDisplayDevice())
+        .build();
     }
 
     public static TimeSlotEntity createTimeSlotEntity() {
         return TimeSlotEntity.builder()
-                .name("Test2 TimeSlot")
-                .startDate(java.sql.Date.valueOf("2025-11-20"))
-                .endDate(java.sql.Date.valueOf("2026-11-20"))
-                .startTime(java.sql.Time.valueOf("10:20:30"))
-                .endTime(java.sql.Time.valueOf("11:21:31"))
-                .weekdaysChosen(3)
-                .displayContent(assignedSlideshow())
-                .displayDevices(assignDisplayDevice())
-                .build();
+        .name("Test2 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2025-11-20"))
+        .endDate(java.sql.Date.valueOf("2026-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayContent(createSlideshowEntity())
+        .displayDevices(assignDisplayDevice())
+        .build();
     }
 
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
@@ -317,5 +323,44 @@ public class TestDataUtil {
                 .isArchived(false)
                 .visualMediaInclusionCollection(visualMediaInclusionEntities)
                 .build();
+    }
+
+
+    public static MockMultipartFile createHorizontalImage() throws IOException {
+        int width = 200;
+        int height = 100;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Write the image to a byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+
+        // Create a MockMultipartFile using the image bytes
+        MockMultipartFile mockImageFile = new MockMultipartFile(
+                "file",                 // Form field name
+                "test-image.jpg",       // File name
+                "image/jpeg",           // MIME type
+                baos.toByteArray()      // File content
+        );
+        return mockImageFile;
+    }
+
+    public static MockMultipartFile createVerticalImage() throws IOException {
+        int width = 100;
+        int height = 200;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Write the image to a byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+
+        // Create a MockMultipartFile using the image bytes
+        MockMultipartFile mockImageFile = new MockMultipartFile(
+                "file",                 // Form field name
+                "test-image.jpg",       // File name
+                "image/jpeg",           // MIME type
+                baos.toByteArray()      // File content
+        );
+        return mockImageFile;
     }
 }

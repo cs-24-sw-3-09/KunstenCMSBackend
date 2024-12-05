@@ -4,7 +4,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 
 public interface DimensionCheckService {
 
-    String checkDimensionForAssignedFallback(Long displayDeviceId);
+    String checkDimensionForAssignedFallback(long displayDeviceId, ContentEntity fallbackContent);
 
     String checkDimensionForAssignedVisualMediaToSlideshow(Long visualMediaInclusionId, Long slideshowId);
     

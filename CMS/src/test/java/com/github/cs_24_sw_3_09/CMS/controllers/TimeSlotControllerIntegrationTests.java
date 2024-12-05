@@ -246,16 +246,21 @@ public class TimeSlotControllerIntegrationTests {
     public void testThatFullUpdateTimeSlotReturnsStatus200WhenTimeSlotExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        assertTrue(timeSlotService.isExists(1L));
 
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
+
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
 
+        System.out.println(timeSlotDtoToJson);
+
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/time_slots/" + savedTimeSlotEntitiy.getId())
+                MockMvcRequestBuilders.put("/api/time_slots/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(timeSlotDtoToJson)
         ).andExpect(
-                MockMvcResultMatchers.status().isOk());
+                MockMvcResultMatchers.status().isOk()
+        );
     }
 
     @Test

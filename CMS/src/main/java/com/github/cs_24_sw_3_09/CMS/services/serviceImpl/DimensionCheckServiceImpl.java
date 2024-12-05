@@ -53,18 +53,13 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     }
 
     @Override
-    public String checkDimensionForAssignedFallback(Long displayDeviceId){
+    public String checkDimensionForAssignedFallback(long displayDeviceId, ContentEntity fallbackContent){
         Optional<DisplayDeviceEntity> optionalDisplayDevice = displayDeviceService.findOne(displayDeviceId);
         if(optionalDisplayDevice.isEmpty()){
             throw new IllegalArgumentException("DisplayDevice with ID " + displayDeviceId + " does not exist.");
         }
         DisplayDeviceEntity displayDevice = optionalDisplayDevice.get();
-
         String displayDeviceOrientation = displayDevice.getDisplayOrientation();
-        ContentEntity fallbackContent = displayDevice.getFallbackContent();
-        if (fallbackContent == null) {
-            throw new IllegalArgumentException("Fallback content is not set for DisplayDevice with ID " + displayDeviceId);
-        }
 
         String fallbackOrientation;
         if (fallbackContent instanceof VisualMediaEntity) {

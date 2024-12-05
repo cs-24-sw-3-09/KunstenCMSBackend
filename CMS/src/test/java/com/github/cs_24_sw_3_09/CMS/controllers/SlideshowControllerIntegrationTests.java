@@ -246,14 +246,10 @@ public class SlideshowControllerIntegrationTests {
     public void testThatAddVisualMediaInclusionToSlideShowReturnsSlideshowWithVisualMediaInclusionAdded() throws Exception {
         VisualMediaEntity vm = TestDataUtil.createVisualMediaEntity();
         visualMediaRepository.save(vm);
-
         assertTrue(visualMediaRepository.findById(1).isPresent());
         
-        VisualMediaInclusionEntity visualMediaInclusionEntity = //TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        TestDataUtil.createVisualMediaInclusionEntity();
-
+        VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionEntity();
         VisualMediaInclusionEntity savedVisualMediaInclusion = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
-
         visualMediaInclusionService.setVisualMedia((long) savedVisualMediaInclusion.getId(), 1L);
         assertEquals(
             1,    
