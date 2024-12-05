@@ -31,11 +31,8 @@ import lombok.Setter;
 @Builder
 public class VisualMediaEntity extends ContentEntity {
 
-    //@NotNull
     private String name;
-    //@NotNull
     private String location;
-    //@NotNull
     private String fileType;
     private String description;
     private LocalDateTime lastDateModified;

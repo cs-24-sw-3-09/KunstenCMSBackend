@@ -148,7 +148,7 @@ public class TestDataUtil {
         .startTime(java.sql.Time.valueOf("10:20:30"))
         .endTime(java.sql.Time.valueOf("11:21:31"))
         .weekdaysChosen(3)
-        .displayContent(createSlideshowEntity())
+        .displayContent(assignedSlideshow())
         .displayDevices(assignDisplayDevice())
         .build();
     }
@@ -214,7 +214,7 @@ public class TestDataUtil {
     public static MockMultipartFile createVisualMediaFile() {
         return new MockMultipartFile(
                 "file",
-                "test-image.jpg",
+                "test-image.jpeg",
                 MediaType.IMAGE_JPEG_VALUE,
                 "Fake JPEG file content".getBytes()
         );
@@ -338,8 +338,8 @@ public class TestDataUtil {
         // Create a MockMultipartFile using the image bytes
         MockMultipartFile mockImageFile = new MockMultipartFile(
                 "file",                 // Form field name
-                "test-image.jpg",       // File name
-                "image/jpeg",           // MIME type
+                "test-image.jpeg",       // File name
+                "image/jpg",           // MIME type
                 baos.toByteArray()      // File content
         );
         return mockImageFile;

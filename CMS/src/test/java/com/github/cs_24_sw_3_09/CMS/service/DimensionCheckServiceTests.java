@@ -1,5 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.service;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
+import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
@@ -30,7 +34,7 @@ import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(SpringExtension.class) 
 @AutoConfigureMockMvc
 public class DimensionCheckServiceTests {
     
@@ -61,18 +65,55 @@ public class DimensionCheckServiceTests {
         this.dimensionCheckService = dimensionCheckService;
     }
 
+    
     @Test
-    public void testThatCheckDimensionForAssignedFallbackReturnsTrueWhenDimensionsDoesNotMatch() throws Exception {
+    @WithMockUser(roles="PLANNER")
+    public void testThatCheckDimensionForAssignedFallbackReturns1WhenDimensionsMatch() throws Exception {
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity savedDisplayDevice = displayDeviceService.save(displayDevice).get();
         
         //Visual Media 
         MockMultipartFile horizontalFile = TestDataUtil.createHorizontalImage();
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias")
-                        .file("file", horizontalFile.getBytes()))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+        mockMvc.perform(
+            MockMvcRequestBuilders.multipart("/api/visual_medias")
+            //.file("content", horizontalFile.getBytes())
+            .file(
+                "file", 
+                horizontalFile.getBytes()
+            ).param("name", "name1")
+        ).andExpect(MockMvcResultMatchers.status().isCreated());
 
         
+
+        MockMultipartFile file = TestDataUtil.createVisualMediaFile(); 
+        System.out.println(file.getOriginalFilename() + " " + file.getContentType());
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias")
+        .file(
+            file
+            )
+        )
+        .andExpect(MockMvcResultMatchers.status().isCreated());
+        
+        assertTrue(visualMediaService.isExists(2L));
+        ContentEntity vm = visualMediaService.findOne(2L).get();
+        System.out.println("IMPORTANT: "+ ((VisualMediaEntity) vm).getName() + " " + ((VisualMediaEntity) vm).getFileType() + " "+((VisualMediaEntity) vm).getLocation());
+        
+        assertTrue(visualMediaService.isExists(1L));
+        //VisualMediaEntity vm = visualMediaService.findOne(1L).get();
+
+        //System.out.println(vm.getName() + " " + vm.getId() + " " + vm.getFileType());
+
+        ContentEntity visualMediaContent = visualMediaService.findOne(1L).get();
+        System.out.println(((VisualMediaEntity) visualMediaContent).getName() + " " + ((VisualMediaEntity) visualMediaContent).getFileType() + " "+((VisualMediaEntity) visualMediaContent).getLocation());
+        /*for (VisualMediaEntity vm : visualMediaService.findAll()) {
+            System.out.println(vm.getFileType() + " "+vm.getLocation());
+        }*/
+    
+        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(savedDisplayDevice.getId(), visualMediaContent);
+
+        System.out.println(returnString);
+        assertTrue(returnString.equals("1"));
     }
     
 }

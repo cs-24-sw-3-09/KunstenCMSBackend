@@ -31,7 +31,7 @@ import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
-import jakarta.validation.constraints.Null;
+//import jakarta.validation.constraints.Null;
 
 @Service
 public class DimensionCheckServiceImpl implements DimensionCheckService{
@@ -69,6 +69,10 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             }
             VisualMediaEntity visualMedia = optionalVisualMedia.get();
             
+            if (visualMedia.getLocation() == null || visualMedia.getFileType() == null) {
+                return "File not correctly configured";
+            }
+
             fallbackOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
             
             if(!fallbackOrientation.equals(displayDeviceOrientation)){
@@ -127,9 +131,14 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         }
         VisualMediaInclusionEntity addedVisualMediaInclusion = optionalVisualMediaInclusion.get();        
         VisualMediaEntity addedvisualMedia = addedVisualMediaInclusion.getVisualMedia();
+
+        if (addedvisualMedia.getLocation() == null || addedvisualMedia.getFileType() == null) {
+            return "File not correctly configured";
+        }
+
         String addedVisualMediaOrientation = getVisualMediaOrientation(addedvisualMedia.getFileType(), addedvisualMedia.getLocation());
        
-        if(!addedVisualMediaOrientation.equals(slideshowOrientation)){
+        if(!addedVisualMediaOrientation.equals(slideshowOrientation)) {
             return "The dimension do not match:\nSlideshow orientation: " + slideshowOrientation + 
             "\nVisual Media orientation: "+ addedVisualMediaOrientation;
         }
@@ -157,13 +166,17 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
         ContentEntity displayContent = timeslot.getDisplayContent();
         String displayContentOrientation;
-        //todo: handle video
         if (displayContent instanceof VisualMediaEntity) {
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(displayContent.getId().longValue());
-            if(optionalVisualMedia.isEmpty()){
+            if(optionalVisualMedia.isEmpty()) {
                 throw new IllegalArgumentException("Visual Media with ID " + displayContent.getId() + " does not exist.");
             }
             VisualMediaEntity visualMedia = optionalVisualMedia.get();
+
+            if (visualMedia.getLocation() == null || visualMedia.getFileType() == null) {
+                return "File not correctly configured";
+            }
+
             displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
                           
             if(!displayDeviceOrientation.contains(displayContentOrientation)){
@@ -225,6 +238,12 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         Set<String> visualMediasInSlideshowOrientation = new HashSet<>();
         for(VisualMediaInclusionEntity vmi : visualMediaInclusionsInSlideshow){
             VisualMediaEntity visualMediaPartOfSlideshow = vmi.getVisualMedia();
+
+            if (visualMediaPartOfSlideshow.getLocation() == null 
+            || visualMediaPartOfSlideshow.getFileType() == null) {
+                return "File not correctly configured";
+            }
+
             visualMediasInSlideshowOrientation.add(
                 getVisualMediaOrientation(
                     visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()
