@@ -84,10 +84,10 @@ public class DisplayDeviceController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping(path =  "/{id}/dimensions") //TODO: add auth
+    /*@GetMapping(path =  "/{id}/dimensions") //TODO: add auth
     public ResponseEntity<String> checkDimensionsOfFallbackAndDisplayDevice(@PathVariable("id") Long id){
         return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedFallback(id), HttpStatus.OK);
-    }
+    }*/
 
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
