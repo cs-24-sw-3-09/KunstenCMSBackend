@@ -361,4 +361,50 @@ public class SlideshowControllerIntegrationTests {
 		);
     }
 
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllSlideshows() throws Exception {
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+		slideshowService.save(TestDataUtil.createSlideshowEntity());
+
+		assertTrue(slideshowService.isExists(1L));
+		assertTrue(slideshowService.isExists(2L));
+		assertTrue(slideshowService.isExists(3L));
+		assertTrue(slideshowService.isExists(4L));
+		assertTrue(slideshowService.isExists(5L));
+		assertTrue(slideshowService.isExists(6L));
+		assertTrue(slideshowService.isExists(7L));
+		assertTrue(slideshowService.isExists(8L));
+		assertTrue(slideshowService.isExists(9L));
+		
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/slideshows")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(9));
+	}
+
+	@Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllVisualMediasWithNoDevicesInDatabase() throws Exception {
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/slideshows")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+	}
+
 }
