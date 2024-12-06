@@ -72,7 +72,6 @@ public class TimeSlotEntity {
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "time_slot_id")}, inverseJoinColumns = {@JoinColumn(name = "display_device_id")})
-//    @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices;
 
     public void addDisplayDevice(DisplayDeviceEntity displayDevice) {
@@ -91,66 +90,6 @@ public class TimeSlotEntity {
 
         //Time Slots overlap
         return true;
-
-
-        //Check if dates overlaps
-        /*if (!(this.startDate.before(ts.endDate) && this.endDate.after(ts.startDate)
-        || this.startDate.after(ts.startDate) && this.endDate.before(ts.endDate)
-        || this.startDate.before(ts.startDate) && this.endDate.after(ts.endDate)
-        || this.startDate.equals(ts.startDate) && this.endDate.equals(ts.endDate)
-        || this.startDate.before(ts.startDate) && this.endDate.equals(ts.endDate)
-        || this.startDate.after(ts.startDate) && this.endDate.equals(ts.endDate)
-        || this.startDate.equals(ts.startDate) && this.endDate.after(ts.endDate)
-        || this.startDate.equals(ts.startDate) && this.endDate.before(ts.endDate)
-        )) {
-            return false;
-        }*/
-
-        //Check if time overlaps
-        /*if (!(this.startTime.before(ts.endTime) && this.endTime.after(ts.startTime)
-        || this.startTime.after(ts.startTime) && this.endTime.before(ts.endTime)
-        || this.startTime.before(ts.startTime) && this.endTime.after(ts.endTime)
-        || this.startTime.equals(ts.startTime) && this.endTime.equals(ts.endTime)
-        || this.startTime.before(ts.startTime) && this.endTime.equals(ts.endTime)
-        || this.startTime.after(ts.startTime) && this.endTime.equals(ts.endTime)
-        || this.startTime.equals(ts.startTime) && this.endTime.after(ts.endTime)
-        || this.startTime.equals(ts.startTime) && this.endTime.before(ts.endTime)
-        )) {
-            return false;
-        }*/
-
-    }
-
-    public boolean overlapsWrong(TimeSlotEntity timeSlotEntity) {
-
-        if (this.startDate.after(timeSlotEntity.startDate) && this.endDate.before(timeSlotEntity.endDate)) {
-            return true;
-        }
-
-        if (this.startDate.before(timeSlotEntity.startDate) && this.endDate.after(timeSlotEntity.endDate)) {
-            return true;
-        }
-
-        if (this.startDate.before(timeSlotEntity.startDate) && this.endDate.equals(timeSlotEntity.endDate)) {
-            return this.endTime.after(timeSlotEntity.endTime);
-        }
-
-        if (this.startDate.after(timeSlotEntity.startDate) && this.endDate.equals(timeSlotEntity.endDate)) {
-            return this.endTime.before(timeSlotEntity.endTime);
-        }
-        if (this.startDate.equals(timeSlotEntity.startDate) && this.endDate.after(timeSlotEntity.endDate)) {
-            return this.startTime.before(timeSlotEntity.endTime);
-        }
-
-        if (this.startDate.equals(timeSlotEntity.startDate) && this.endDate.before(timeSlotEntity.endDate)) {
-            return this.endTime.after(timeSlotEntity.startTime);
-        }
-
-        if (this.startDate.equals(timeSlotEntity.startDate) && this.endDate.equals(timeSlotEntity.endDate)) {
-            return this.startTime.before(timeSlotEntity.endTime) && this.endTime.after(timeSlotEntity.startTime);
-        }
-
-        return false;
     }
 
     public int countDisplayDeviceAssociations() {
