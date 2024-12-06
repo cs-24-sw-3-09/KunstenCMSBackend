@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.controllers;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -75,7 +76,7 @@ public class TimeSlotController {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
-        
+
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
         if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -233,4 +234,17 @@ public class TimeSlotController {
         return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/{id}/overlapping_time_slots")
+    public ResponseEntity<List<TimeSlotDto>> getOverlappingTimeSlots(@PathVariable("id") Long id) {
+        if (!timeSlotService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<TimeSlotEntity> overlappingTimeSlots = timeSlotService.findOverlappingTimeSlots(id);
+        List<TimeSlotDto> overlappingTimeSlotDtos = overlappingTimeSlots.stream()
+                .map(timeSlotMapper::mapTo).toList();
+
+        return new ResponseEntity<>(overlappingTimeSlotDtos, HttpStatus.OK);
+    }
 }
+

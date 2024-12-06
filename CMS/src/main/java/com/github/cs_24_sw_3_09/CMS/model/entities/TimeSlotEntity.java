@@ -72,11 +72,24 @@ public class TimeSlotEntity {
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(name = "time_slot_display_device", joinColumns = {
             @JoinColumn(name = "time_slot_id")}, inverseJoinColumns = {@JoinColumn(name = "display_device_id")})
-    @JsonIgnore
     private Set<DisplayDeviceEntity> displayDevices;
 
     public void addDisplayDevice(DisplayDeviceEntity displayDevice) {
         this.displayDevices.add(displayDevice);
+    }
+
+    public boolean overlaps(TimeSlotEntity ts) {
+        //Check if any weekdays overlap
+        if ((this.weekdaysChosen & ts.weekdaysChosen) == 0) return false;
+        //Check if dates overlaps
+        if (this.endDate.before(ts.startDate) || this.startDate.after(ts.endDate)) return false;
+        //Check if time overlaps
+        if (this.endTime.before(ts.startTime) || this.endTime.equals(ts.startTime)
+        //Check if time slots begin right after each other
+        || this.startTime.equals(ts.endTime) || this.startTime.after(ts.endTime)) return false;
+
+        //Time Slots overlap
+        return true;
     }
 
     public int countDisplayDeviceAssociations() {

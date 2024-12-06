@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 import java.util.List;
@@ -13,6 +14,10 @@ import java.util.List;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +25,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integer>,
-    PagingAndSortingRepository<TimeSlotEntity, Integer>{
+        PagingAndSortingRepository<TimeSlotEntity, Integer> {
+
 
     @Query("SELECT ts FROM TimeSlotEntity ts WHERE ts.displayDevices IS EMPTY")
     List<TimeSlotEntity> findTimeSlotsWithNoDisplayDevices();
@@ -38,9 +44,11 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
        "WHERE ss.id = :slideshowId")
     Set<TimeSlotEntity> findSetOfTimeSlotsBySlideshowId(@Param("slideshowId") Long slideshowId);
 
-    @Query("SELECT DISTINCT ts FROM TimeSlotEntity ts " + 
+    @Query("SELECT DISTINCT ts FROM TimeSlotEntity ts " +
            "JOIN ts.displayContent c " +
             "JOIN SlideshowEntity ss ON c.id = ss.id ")
     List<TimeSlotEntity> getAllTimeSlotsWithSlideshowAsContent();
+
+
 
 }

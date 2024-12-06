@@ -39,4 +39,6 @@ public interface TimeSlotService {
     TimeSlotEntity setDisplayContent(Long tsId, Long dcId, String type);
   
     TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException;
-} 
+
+    List<TimeSlotEntity> findOverlappingTimeSlots(Long id);
+}
