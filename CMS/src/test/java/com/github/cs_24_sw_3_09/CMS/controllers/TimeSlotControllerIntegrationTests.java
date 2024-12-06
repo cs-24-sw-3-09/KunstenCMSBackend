@@ -790,6 +790,7 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(weekdaysChosen,
             startDate, endDate, startTime, endTime);
         String json = objectMapper.writeValueAsString(ts4); 
+        //int[] associationTs4 = {4};
         json = TestDataUtil.createDDJsonWithId(json, associations);
 
         mockMvc.perform(
