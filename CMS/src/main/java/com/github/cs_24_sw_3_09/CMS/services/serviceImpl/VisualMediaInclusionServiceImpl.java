@@ -129,6 +129,7 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
             visualMediaInclusionsToReturn.add(visualMediaInclusionEntityToUpdate);
         }
         visualMediaInclusionRepository.saveAll(visualMediaInclusionsToReturn);
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
         
         return Optional.of(visualMediaInclusionsToReturn);
     }
