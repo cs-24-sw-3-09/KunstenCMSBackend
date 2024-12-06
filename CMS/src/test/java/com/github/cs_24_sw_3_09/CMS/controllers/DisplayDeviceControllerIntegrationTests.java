@@ -700,4 +700,17 @@ public class DisplayDeviceControllerIntegrationTests {
 		.andExpect(
 			MockMvcResultMatchers.jsonPath("$.length()").value(9));
 	}
+
+	@Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllDisplayDevicesWithNoDevicesInDatabase() throws Exception {
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/display_devices/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+	}
 }
