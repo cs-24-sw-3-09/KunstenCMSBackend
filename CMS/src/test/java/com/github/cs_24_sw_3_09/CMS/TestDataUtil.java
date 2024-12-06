@@ -1,11 +1,17 @@
 package com.github.cs_24_sw_3_09.CMS;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.*;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
@@ -19,6 +25,9 @@ import java.io.IOException;
 
 
 public class TestDataUtil {
+
+    static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+    static DateFormat timeFormatter = new SimpleDateFormat("HH:mm");
 
     public static DisplayDeviceDto createDisplayDeviceDto() {
 
@@ -43,11 +52,21 @@ public class TestDataUtil {
     }
 
     public static DisplayDeviceEntity createDisplayDeviceEntity() {
-
         return DisplayDeviceEntity.builder()
                 .displayOrientation("horizontal")
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
+                .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
+                .build();
+    }
+
+
+    public static DisplayDeviceEntity createDisplayDeviceEntity(String name) {
+        return DisplayDeviceEntity.builder()
+                .displayOrientation("horizontal")
+                .location("Esbjerg")
+                .name(name)
                 .resolution("1920x1080")
                 .timeSlots(new ArrayList<>())
                 .build();
@@ -101,7 +120,7 @@ public class TestDataUtil {
                 .build();
     }
 
-    
+
 
     public static UserDto createUserDto() {
         return UserDto.builder()
@@ -178,12 +197,24 @@ public class TestDataUtil {
         .build();
     }
 
+    public static TimeSlotEntity createTimeSlotEntityWithOnlyId(Integer id) {
+        return TimeSlotEntity.builder()
+                .id(id)
+                .build();
+    }
+
+    
+
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
         displayDevices.add(
-            DisplayDeviceEntity.builder().id(1).build()
+                DisplayDeviceEntity.builder().id(1).build()
         );
         return displayDevices;
+    }
+
+    public static DisplayDeviceEntity createDisplayDeviceWithOnlyId(Integer id) {
+        return DisplayDeviceEntity.builder().id(id).build();
     }
 
 
@@ -316,12 +347,12 @@ public class TestDataUtil {
     }
 
     public static Set<TagEntity> createTagEntitySet() {
-        Set<TagEntity> tag = new HashSet<>(); 
+        Set<TagEntity> tag = new HashSet<>();
 
         tag.add(createTagEntity());
         tag.add(createTagEntity2());
 
-        return tag;         
+        return tag;
     }
 
     public static SlideshowEntity createSlideshowWithVisualMediaEntity() {
@@ -349,6 +380,52 @@ public class TestDataUtil {
                 .visualMediaInclusionCollection(visualMediaInclusionEntities)
                 .build();
     }
+
+
+
+    public static TimeSlotEntity createTimeSlotEntityFromData(int weekdaysChosen, String startDate, String endDate, String startTime, String endTime) throws ParseException {
+
+        return TimeSlotEntity.builder()
+                .name("Hello Darkness my old friend")
+
+                .displayDevices(new HashSet<>())
+                .weekdaysChosen(weekdaysChosen)
+                .startDate(Date.valueOf(startDate)) // Requires the format yyyy-MM-dd
+                .endDate(Date.valueOf(endDate))   // Requires the format yyyy-MM-dd
+                .startTime(Time.valueOf(startTime)) // Requires the format HH:mm:ss
+                .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
+                .build();
+    }
+
+    public static TimeSlotEntity createTimeSlotEntityFromData(int weekdaysChosen, String startDate, String endDate, String startTime, String endTime, Set<DisplayDeviceEntity> displayDeviceEntities) throws ParseException {
+
+        return TimeSlotEntity.builder().weekdaysChosen(weekdaysChosen)
+                .weekdaysChosen(weekdaysChosen)
+                .startDate(Date.valueOf(startDate)) // Requires the format yyyy-MM-dd
+                .endDate(Date.valueOf(endDate))   // Requires the format yyyy-MM-dd
+                .startTime(Time.valueOf(startTime)) // Requires the format HH:mm:ss
+                .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
+                .displayDevices(displayDeviceEntities)
+                .build();
+    }
+
+    public static String createDDJsonWithId(String json, int[] ids) {
+        String res = "\"displayDevices\":[";
+        for (int i = 0; i < ids.length; i++) {
+            res += "{\"id\":"+ids[i]+"}";
+            
+            if (i != ids.length - 1) {
+                res += ",";
+            }
+        }
+        res += "]";
+
+        json = json.replace("\"displayDevices\":[]", res);
+        return json;
+    }
+
+    
+
 
 
     public static MockMultipartFile createHorizontalImage() throws IOException {

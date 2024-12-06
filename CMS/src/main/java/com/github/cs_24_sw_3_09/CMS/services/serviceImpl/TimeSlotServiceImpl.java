@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -134,9 +135,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
         for (DisplayDeviceEntity displayDevice : displayDevices) {
             DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);
-
             if (newDisplayDevice == null) return Optional.empty();
-
             newDisplayDevices.add(newDisplayDevice);
         }
         timeSlotEntity.getDisplayDevices().clear();
@@ -197,7 +196,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         for (TimeSlotEntity entity : setOfTimeSlotEntities) {
             TimeSlotDto timeSlotDto = timeSlotMapper.mapTo(entity);
             setOfTimeSlotDtos.add(timeSlotDto);
-        }        
+        }
         return setOfTimeSlotDtos;
     }
 
@@ -226,7 +225,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     public void delete(Long id) {
         TimeSlotEntity timeSlotToDelete = timeSlotRepository.findById(Math.toIntExact(id)).get();
 
-        Set<DisplayDeviceEntity> displayDevices = timeSlotToDelete.getDisplayDevices(); 
+        Set<DisplayDeviceEntity> displayDevices = timeSlotToDelete.getDisplayDevices();
         for(DisplayDeviceEntity displayDevice : displayDevices) {
             displayDevice.getTimeSlots().remove(timeSlotToDelete);
         }
@@ -240,10 +239,10 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
-        //Checked that it already exists, therefore this will never throw an error 
-        if (countDisplayDeviceAssociations(tsId) <= 1) 
+        //Checked that it already exists, therefore this will never throw an error
+        if (countDisplayDeviceAssociations(tsId) <= 1)
             delete(tsId);
-        else 
+        else
             deleteAssociation(tsId, ddId);
     }
 
@@ -253,11 +252,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
         ts.getDisplayDevices().remove(dd);
         dd.getTimeSlots().remove(ts);
-        
+
         timeSlotRepository.save(ts);
     }
 
-    @Override 
+    @Override
     public int countDisplayDeviceAssociations(Long timeSlotId) {
         return timeSlotRepository.findById(Math.toIntExact(timeSlotId)).get().getDisplayDevices().size();
     }
@@ -282,8 +281,8 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
             return timeSlotRepository.save(existingTimeSlot);
          }).orElseThrow(() -> new RuntimeException("Time Slot does not exist"));
-    } 
-    
+    }
+
     @Override
     public TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException {
         return timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
@@ -293,5 +292,27 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             TimeSlotEntity updatedTimeslot = timeSlotRepository.save(existingTimeSlot);
             return timeSlotRepository.save(updatedTimeslot);
         }).orElseThrow();
+    }
+
+    @Override
+    public List<TimeSlotEntity> findOverlappingTimeSlots(Long id) {
+        // Fetch the requested time slot, throw exception if not found
+        TimeSlotEntity timeSlotEntity = timeSlotRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new IllegalArgumentException("TimeSlotEntity not found for id: " + id));
+
+        Set<TimeSlotEntity> overlappingTimeSlots = new HashSet<>();
+
+        // Iterate through associated display devices and their time slots
+        for (DisplayDeviceEntity displayDevice : timeSlotEntity.getDisplayDevices()) {
+            for (TimeSlotEntity deviceTimeSlot : displayDevice.getTimeSlots()) {
+                // Check for overlap and add to the result set
+                if (deviceTimeSlot.overlaps(timeSlotEntity) && !deviceTimeSlot.equals(timeSlotEntity)) {
+                    overlappingTimeSlots.add(deviceTimeSlot);
+                }
+            }
+        }
+
+        // Return the overlapping time slots as a list
+        return new ArrayList<>(overlappingTimeSlots);
     }
 }
