@@ -553,7 +553,7 @@ public class VisualMediaControllerIntegrationTests {
 
 	@Test
 	@WithMockUser(roles = { "PLANNER" })
-	public void getAllDisplayDevicesWithNoDevicesInDatabase() throws Exception {
+	public void getAllVisualMediasWithNoDevicesInDatabase() throws Exception {
 		mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/visual_medias/all")
         ).andExpect(
