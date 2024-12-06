@@ -146,8 +146,8 @@ public class DimensionCheckServiceTests {
         SlideshowEntity slideshow = createHorizontalSlideshow();
         
         createHorizontalVisualMediaWithFile();
-        assertTrue(visualMediaService.isExists(2L)); //the first Visual Media is in the slideshow
-        ContentEntity visualMediaContent2 = visualMediaService.findOne(2L).get();
+        assertTrue(visualMediaService.isExists(3L)); //the first Visual Media is in the slideshow
+        ContentEntity visualMediaContent2 = visualMediaService.findOne(3L).get();
 
         VisualMediaInclusionEntity visualMediaInclusion2 = TestDataUtil.createVisualMediaInclusionEntity();
         visualMediaInclusionService.save(visualMediaInclusion2).get();
@@ -163,10 +163,11 @@ public class DimensionCheckServiceTests {
     public void testThatCheckDimensionForAssignedVMToSSReturnsCorrectStringWhenNoMatch() throws Exception{
         //Case 1: Visual Media and Slideshow have different dimensions
         SlideshowEntity slideshow = createHorizontalSlideshow();
+        assertTrue(visualMediaService.isExists(1L));
         
         creatVerticalVisualMediaWithFile();
-        assertTrue(visualMediaService.isExists(2L));
-        ContentEntity visualMediaContent2 = visualMediaService.findOne(2L).get();
+        assertTrue(visualMediaService.isExists(3L));
+        ContentEntity visualMediaContent2 = visualMediaService.findOne(3L).get();
 
         VisualMediaInclusionEntity visualMediaInclusion2 = TestDataUtil.createVisualMediaInclusionEntity();
         visualMediaInclusionService.save(visualMediaInclusion2).get();
@@ -180,8 +181,8 @@ public class DimensionCheckServiceTests {
         SlideshowEntity slideshow2 = createMixedSlideshow();
         
         createHorizontalVisualMediaWithFile();
-        assertTrue(visualMediaService.isExists(3L));
-        ContentEntity visualMediaContent3 = visualMediaService.findOne(3L).get();
+        assertTrue(visualMediaService.isExists(4L));
+        ContentEntity visualMediaContent3 = visualMediaService.findOne(4L).get();
 
         VisualMediaInclusionEntity visualMediaInclusion3 = TestDataUtil.createVisualMediaInclusionEntity();
         visualMediaInclusionService.save(visualMediaInclusion3).get();
@@ -312,12 +313,6 @@ public class DimensionCheckServiceTests {
 
     private SlideshowEntity createMixedSlideshow() throws Exception{
         creatVerticalVisualMediaWithFile();
-        MockMultipartFile file = TestDataUtil.createVerticalImage();
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/api/visual_medias")
-            .file(file
-            )
-        ).andExpect(MockMvcResultMatchers.status().isCreated());
         assertTrue(visualMediaService.isExists(1L));
         VisualMediaEntity visualMediaContent1 = (VisualMediaEntity) visualMediaService.findOne(1L).get();
         //create visual media inclusion and link it to the ContentEntity
@@ -326,14 +321,8 @@ public class DimensionCheckServiceTests {
         visualMediaInclusionService.setVisualMedia(visualMediaInclusion1.getId().longValue(), visualMediaContent1.getId().longValue());
 
         createHorizontalVisualMediaWithFile();
-        MockMultipartFile file2 = TestDataUtil.createHorizontalImage();
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/api/visual_medias")
-            .file(file2
-            )
-        ).andExpect(MockMvcResultMatchers.status().isCreated());
-        assertTrue(visualMediaService.isExists(2L));
-        VisualMediaEntity visualMediaContent2 = (VisualMediaEntity) visualMediaService.findOne(2L).get();
+        assertTrue(visualMediaService.isExists(4L));
+        VisualMediaEntity visualMediaContent2 = (VisualMediaEntity) visualMediaService.findOne(4L).get();
         
         VisualMediaInclusionEntity visualMediaInclusion2 = TestDataUtil.createVisualMediaInclusionEntity();
         visualMediaInclusionService.save(visualMediaInclusion2).get();

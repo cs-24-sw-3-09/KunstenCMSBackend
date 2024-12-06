@@ -369,8 +369,8 @@ public class TestDataUtil {
         // Create a MockMultipartFile using the image bytes
         MockMultipartFile mockImageFile = new MockMultipartFile(
                 "file",                 // Form field name
-                "test-image.jpg",       // File name
-                "image/jpeg",           // MIME type
+                "test-image.jpeg",       // File name
+                "image/jpg",           // MIME type
                 baos.toByteArray()      // File content
         );
         return mockImageFile;
