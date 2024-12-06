@@ -810,7 +810,7 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );
-    }
+
   
 		assertFalse(timeSlotService.isExists((long) 1));
 	}
