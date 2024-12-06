@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VisualMediaInclusionService {
-   Optional<VisualMediaInclusionEntity> save(VisualMediaInclusionEntity visualMediaInclusionEntity);
+    Optional<VisualMediaInclusionEntity> save(VisualMediaInclusionEntity visualMediaInclusionEntity);
 
     List<VisualMediaInclusionEntity> findAll();
 
@@ -27,5 +27,5 @@ public interface VisualMediaInclusionService {
 
     Optional<List<VisualMediaInclusionEntity>> updateSlideshowPosition(List<VisualMediaInclusionEntity> visualMediaInclusions);
 
-    void postVisualMediaInclusionDeletePositionCleanUp(SlideshowEntity slideshow, Integer deletedPosition);
+    void visualMediaInclusionDeletePositionCleanUp(Long toBeDeletedVmiId, Integer positionToBeDeleted);
 }

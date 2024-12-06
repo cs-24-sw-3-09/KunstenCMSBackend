@@ -109,15 +109,12 @@ public class VisualMediaInclusionController {
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<VisualMediaInclusionDto> deleteVisualMediaInclusion(@PathVariable("id") Long id) {
-        System.out.println("1");
 
         if (!visualMediaInclusionService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        System.out.println("2");
 
         visualMediaInclusionService.delete(id);
-        System.out.println("3");
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

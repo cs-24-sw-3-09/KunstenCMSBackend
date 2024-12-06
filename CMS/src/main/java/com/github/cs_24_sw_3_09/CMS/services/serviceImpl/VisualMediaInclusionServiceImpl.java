@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,15 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final VisualMediaService visualMediaService;
+    private final SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
 
     public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository,
-                                           VisualMediaService visualMediaService, PushTSService pushTSService) {
+                                           VisualMediaService visualMediaService, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.visualMediaService = visualMediaService;
         this.pushTSService = pushTSService;
+        this.slideshowRepository = slideshowRepository;
     }
 
     @Override
@@ -99,31 +102,29 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         VisualMediaInclusionEntity visualMediaInclusion = visualMediaInclusionRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media Inclusion with id " + id + " not found"));
 
-        Integer deletedSlideshowPosition = visualMediaInclusion.getSlideshowPosition();
-
-        SlideshowEntity slideshowContainingDeletedVisualMediaInclusion = visualMediaInclusionRepository
-                .findSlideshowByVisualMediaInclusionId(id).orElseThrow(
-                        () -> new RuntimeException("Visual Media Inclusion does not exist"));
-
-        postVisualMediaInclusionDeletePositionCleanUp(slideshowContainingDeletedVisualMediaInclusion, deletedSlideshowPosition);
-        visualMediaInclusion.setVisualMedia(null);
-        visualMediaInclusionRepository.save(visualMediaInclusion);
-        visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
+        visualMediaInclusionDeletePositionCleanUp(id, visualMediaInclusion.getSlideshowPosition());
 
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
     @Override
-    public void postVisualMediaInclusionDeletePositionCleanUp(SlideshowEntity slideshow, Integer deletedPosition) {
+    public void visualMediaInclusionDeletePositionCleanUp(Long toBeDeletedVmiId, Integer positionToBeDeleted) {
+        SlideshowEntity slideshow = visualMediaInclusionRepository.
+                findSlideshowByVisualMediaInclusionId(toBeDeletedVmiId)
+                .map(existingSlideshow -> {
+                    existingSlideshow.getVisualMediaInclusionCollection().forEach(vmi -> {
+                        if (vmi.getSlideshowPosition() > positionToBeDeleted) {
+                            vmi.setSlideshowPosition(vmi.getSlideshowPosition() - 1);
+                        } else if (vmi.getSlideshowPosition().equals(positionToBeDeleted)) {
+                            existingSlideshow.getVisualMediaInclusionCollection().remove(vmi);
+                        }
+                    });
+                    return existingSlideshow;
+                }).orElseThrow();
 
-        //Updates the slideshow positions on each VMI following the deleted VMI.
-        slideshow.getVisualMediaInclusionCollection().forEach(vmi -> {
-            if (!(vmi.getSlideshowPosition() < deletedPosition)) {
-                System.out.print(vmi.getId());
-                partialUpdate(Long.valueOf(vmi.getId()), new VisualMediaInclusionEntity(null, null, vmi.getSlideshowPosition() - 1, null));
-            }
-        });
+        slideshowRepository.save(slideshow);
     }
+
 
     @Override
     public VisualMediaInclusionEntity setVisualMedia(Long id, Long visualMediaId) {
