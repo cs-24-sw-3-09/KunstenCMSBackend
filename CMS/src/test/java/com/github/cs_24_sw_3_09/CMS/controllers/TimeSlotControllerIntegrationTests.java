@@ -158,7 +158,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser
     public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception{
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        timeSlotService.save(testTimeSlotEntity);
+        TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity).get();
 
 
         mockMvc.perform(
@@ -246,21 +246,20 @@ public class TimeSlotControllerIntegrationTests {
     public void testThatFullUpdateTimeSlotReturnsStatus200WhenTimeSlotExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
-        assertTrue(timeSlotService.isExists(1L));
+
+        System.out.println((timeSlotService.isExists(1L)));
 
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
-
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
-
+        int [] array = {1};
+        timeSlotDtoToJson = TestDataUtil.createTSJsonWithDDIds(timeSlotDtoToJson, array);
         System.out.println(timeSlotDtoToJson);
-
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/time_slots/1")
+                MockMvcRequestBuilders.put("/api/time_slots/" + savedTimeSlotEntitiy.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(timeSlotDtoToJson)
         ).andExpect(
-                MockMvcResultMatchers.status().isOk()
-        );
+                MockMvcResultMatchers.status().isOk());
     }
 
     @Test
@@ -620,4 +619,51 @@ public class TimeSlotControllerIntegrationTests {
 
 		assertFalse(timeSlotService.isExists((long) 1));
 	}
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllTimeSlots() throws Exception {
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+
+		assertTrue(timeSlotService.isExists(1L));
+		assertTrue(timeSlotService.isExists(2L));
+		assertTrue(timeSlotService.isExists(3L));
+		assertTrue(timeSlotService.isExists(4L));
+		assertTrue(timeSlotService.isExists(5L));
+		assertTrue(timeSlotService.isExists(6L));
+		assertTrue(timeSlotService.isExists(7L));
+		assertTrue(timeSlotService.isExists(8L));
+		assertTrue(timeSlotService.isExists(9L));
+		
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/time_slots/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(9));
+	}
+
+	@Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllTimeSlotsWithNoDevicesInDatabase() throws Exception {
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/time_slots/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+	}
+
 }

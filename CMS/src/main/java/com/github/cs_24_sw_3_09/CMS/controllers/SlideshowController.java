@@ -55,9 +55,9 @@ public class SlideshowController {
     }
 
     @GetMapping
-    public Iterable<SlideshowEntity> getSlideshows() {
-        Iterable<SlideshowEntity> slideshowEntities = slideshowService.findAll();
-        return slideshowEntities;
+    public Iterable<SlideshowDto> getSlideshows() {
+        List<SlideshowEntity> slideshowEntities = slideshowService.findAll();
+        return slideshowEntities.stream().map(slideshowMapper::mapTo).toList();
     }
 
     @GetMapping(path="/{id}/time_slots") 

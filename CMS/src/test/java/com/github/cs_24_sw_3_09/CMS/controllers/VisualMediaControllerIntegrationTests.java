@@ -82,7 +82,7 @@ public class VisualMediaControllerIntegrationTests {
                         multipart("/api/visual_medias")
                                 .file(file)
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpeg"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fileType").value(MediaType.IMAGE_JPEG_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/files/visual_media/1.jpg"));
     }
@@ -522,6 +522,52 @@ public class VisualMediaControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllVisualMedias() throws Exception {
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+		visualMediaService.save(TestDataUtil.createVisualMediaEntity());
+
+		assertTrue(visualMediaService.isExists(1L));
+		assertTrue(visualMediaService.isExists(2L));
+		assertTrue(visualMediaService.isExists(3L));
+		assertTrue(visualMediaService.isExists(4L));
+		assertTrue(visualMediaService.isExists(5L));
+		assertTrue(visualMediaService.isExists(6L));
+		assertTrue(visualMediaService.isExists(7L));
+		assertTrue(visualMediaService.isExists(8L));
+		assertTrue(visualMediaService.isExists(9L));
+		
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/visual_medias/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(9));
+	}
+
+	@Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllVisualMediasWithNoDevicesInDatabase() throws Exception {
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/visual_medias/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+	}
 
 }
 

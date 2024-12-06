@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,6 +69,12 @@ public class DisplayDeviceController {
     public Page<DisplayDeviceDto> getDisplayDevices(Pageable pageable) {
         Page<DisplayDeviceEntity> displayDeviceEntities = displayDeviceService.findAll(pageable);
         return displayDeviceEntities.map(displayDeviceMapper::mapTo);
+    }
+
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<DisplayDeviceDto>> getAllDisplayDevices() {
+        List<DisplayDeviceEntity> displayDeviceEntity = displayDeviceService.findAll();
+        return ResponseEntity.ok(displayDeviceEntity.stream().map(displayDeviceMapper::mapTo).toList());
     }
 
     @GetMapping(path = "/{id}")

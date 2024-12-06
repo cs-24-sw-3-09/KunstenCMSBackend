@@ -135,6 +135,19 @@ public class TestDataUtil {
         .startTime(java.sql.Time.valueOf("10:20:30"))
         .endTime(java.sql.Time.valueOf("11:21:31"))
         .weekdaysChosen(3)
+        .displayContent(null)
+        .displayDevices(new HashSet<DisplayDeviceEntity>())
+        .build();
+    }
+
+    public static TimeSlotDto createTimeSlotDtoWithAssignedContentAndDD(){
+        return TimeSlotDto.builder()
+        .name("Test1 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2024-11-20"))
+        .endDate(java.sql.Date.valueOf("2024-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
         .displayContent(assignedSlideshow())
         .displayDevices(assignDisplayDevice())
         .build();
@@ -374,5 +387,20 @@ public class TestDataUtil {
                 baos.toByteArray()      // File content
         );
         return mockImageFile;
+    }
+
+    public static String createTSJsonWithDDIds(String json, int[] ids) {
+        String res = "\"displayDevices\":[";
+        for (int i = 0; i < ids.length; i++) {
+            res += "{\"id\":"+ids[i]+"}";
+
+            if (i != ids.length - 1) {
+                res += ",";
+            }
+        }
+        res += "]";
+
+        json = json.replace("\"displayDevices\":[]", res);
+        return json;
     }
 }
