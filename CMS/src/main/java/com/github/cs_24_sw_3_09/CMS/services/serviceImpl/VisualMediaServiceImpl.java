@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
@@ -31,16 +32,19 @@ import org.springframework.web.multipart.MultipartFile;
 public class VisualMediaServiceImpl implements VisualMediaService {
 
     private final VisualMediaRepository visualMediaRepository;
+    private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final TagRepository tagRepository;
     private PushTSService pushTSService;
     private SlideshowRepository slideshowRepository;
 
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService,
-                                  TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository) {
+            TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository,
+            VisualMediaInclusionRepository visualMediaInclusionRepository) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
+        this.visualMediaInclusionRepository = visualMediaInclusionRepository;
     }
 
     @Override
@@ -125,10 +129,13 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public void delete(Long id) {
-        VisualMediaEntity timeslot = visualMediaRepository.findById(Math.toIntExact(id))
+        VisualMediaEntity VM = visualMediaRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
-        timeslot.getTags().clear();
-        visualMediaRepository.save(timeslot);
+        VM.getTags().clear();
+        List<VisualMediaInclusionEntity> inclusions = visualMediaInclusionRepository.findAllByVisualMedia(VM);
+        inclusions.forEach(visualMediaInclusionRepository::delete);
+
+        visualMediaRepository.save(VM);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
