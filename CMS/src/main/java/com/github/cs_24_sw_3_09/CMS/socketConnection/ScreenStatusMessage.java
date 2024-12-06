@@ -1,19 +1,29 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
+import java.util.List;
+
 public class ScreenStatusMessage {
     private int deviceid;
     private String contentname;
-    private String currenturl;
-    private String type;
+    private List<MediaType> medias;
+    private int current;
+
+    public int getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(int current) {
+        this.current = current;
+    }
 
     public ScreenStatusMessage() {}
 
-    public ScreenStatusMessage(int deviceid, String contentname, String currenturl, String type) {
+    public ScreenStatusMessage(int deviceid, String contentname, List<MediaType> medias, int current) {
         super();
         this.deviceid = deviceid;
         this.contentname = contentname;
-        this.currenturl = currenturl;
-        this.type = type;
+        this.medias = medias;
+        this.current = current;
     }
 
     public int getDeviceid() {
@@ -32,13 +42,28 @@ public class ScreenStatusMessage {
         this.contentname = contentname;
     }
 
-    public String getCurrenturl() {
-        return currenturl;
+    public List<MediaType> getMedias() {
+        return medias;
     }
 
-    public void setCurrenturl(String currenturl) {
-        this.currenturl = currenturl;
+    public void setMedias(List<MediaType> medias) {
+        this.medias = medias;
     }
+
+
+}
+
+class MediaType {
+    private String url;
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    private String type;
 
     public String getType() {
         return type;
@@ -48,5 +73,12 @@ public class ScreenStatusMessage {
         this.type = type;
     }
 
+    public MediaType() {}
+
+    public MediaType(String url, String type) {
+        super();
+        this.url = url;
+        this.type = type;
+    }
 
 }
