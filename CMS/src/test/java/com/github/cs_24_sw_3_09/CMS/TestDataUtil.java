@@ -376,7 +376,7 @@ public class TestDataUtil {
                 .build();
     }
 
-    public static String createDDJsonWithId(String json, int[] ids) {
+    public static String createTSJsonWithDDIds(String json, int[] ids) {
         String res = "\"displayDevices\":[";
         for (int i = 0; i < ids.length; i++) {
             res += "{\"id\":"+ids[i]+"}";
@@ -390,6 +390,8 @@ public class TestDataUtil {
         json = json.replace("\"displayDevices\":[]", res);
         return json;
     }
+
+
 
     
 

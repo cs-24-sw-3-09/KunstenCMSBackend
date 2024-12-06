@@ -516,8 +516,6 @@ public class VisualMediaControllerIntegrationTests {
                         .file("file", newFile2.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-
-
 }
 
 
