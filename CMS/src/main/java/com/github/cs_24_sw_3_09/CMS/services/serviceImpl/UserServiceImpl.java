@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
@@ -24,6 +25,7 @@ import com.github.cs_24_sw_3_09.CMS.services.UserService;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -66,7 +68,7 @@ public class UserServiceImpl implements UserService {
             Optional.ofNullable(userEntity.getFirstName()).ifPresent(existingUserEntity::setFirstName);
             Optional.ofNullable(userEntity.getLastName()).ifPresent(existingUserEntity::setLastName);
             Optional.ofNullable(userEntity.getEmail()).ifPresent(existingUserEntity::setEmail);
-            Optional.ofNullable(userEntity.getPassword()).ifPresent(existingUserEntity::setPassword);
+            Optional.ofNullable(userEntity.getPassword()).ifPresent(password -> existingUserEntity.setPassword(encoder.encode(password)));
             Optional.ofNullable(userEntity.getPauseNotificationStart())
                     .ifPresent(existingUserEntity::setPauseNotificationStart);
             Optional.ofNullable(userEntity.getPauseNotificationEnd())

@@ -3,6 +3,8 @@ package com.github.cs_24_sw_3_09.CMS.config;
 import com.github.cs_24_sw_3_09.CMS.filter.JwtAuthFilter;
 import com.github.cs_24_sw_3_09.CMS.services.UserService;
 
+import java.util.Arrays;
+
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +15,18 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity(
@@ -41,7 +46,7 @@ public class SecurityConfig {
         this.userService = userService;
         this.authFilter = authFilter;
         this.allowedOrigins = new ArrayList<>();
-        this.allowedOrigins.add("localhost");
+        this.allowedOrigins.add("http://localhost:5173");
         this.allowedOrigins.add(frontendUrl);
 
     }
@@ -49,16 +54,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .cors(httpSecurityCorsConfigurer -> 
-                httpSecurityCorsConfigurer.configurationSource(request -> {
-
-                    CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
-                    corsConfig.setAllowedOrigins(allowedOrigins);
-                    return corsConfig;
-                })
-            )
-            .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 //Allow files
                 .requestMatchers(HttpMethod.GET, "/files/visual_media/**").permitAll()
@@ -90,4 +86,15 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+    @Bean
+    UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(allowedOrigins);
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.addAllowedHeader("*");
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+}
 }
