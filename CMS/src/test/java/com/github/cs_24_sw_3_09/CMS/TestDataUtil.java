@@ -396,4 +396,9 @@ public class TestDataUtil {
         return json.replace("\"fallbackContent\":null", res);
     }
 
+    public static String createTSJsonWithDCIds(String json, String id, String type) {
+        String res = "\"displayContent\":{\"id\":"+id+",\"type\":\""+type+"\"}";
+        return json.replace("\"displayContent\":null", res);
+    }
+
 }
