@@ -34,7 +34,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
@@ -97,6 +99,12 @@ public class TimeSlotController {
 
         Page<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll(pageable);
         return timeSlotEntities.map(timeSlotMapper::mapTo);
+    }
+
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<TimeSlotDto>> getAllDisplayDevices() {
+        List<TimeSlotEntity> timeSlotEntities = timeSlotService.findAll();
+        return ResponseEntity.ok(timeSlotEntities.stream().map(timeSlotMapper::mapTo).toList());
     }
 
     @GetMapping(path = "/{id}")
