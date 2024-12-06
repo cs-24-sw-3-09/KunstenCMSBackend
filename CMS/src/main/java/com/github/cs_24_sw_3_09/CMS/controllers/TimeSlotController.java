@@ -71,8 +71,7 @@ public class TimeSlotController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot,
-            @RequestParam(value = "force", required = false) Boolean forceDimensions) {
+    public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);

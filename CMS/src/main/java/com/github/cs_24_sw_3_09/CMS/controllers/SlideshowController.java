@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.Dimension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,14 +36,17 @@ public class SlideshowController {
     private final SlideshowService slideshowService;
     private final TimeSlotService timeSlotService;
     private final DisplayDeviceService displayDeviceService;
+    private final DimensionCheckService dimensionCheckService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService,
-            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, DisplayDeviceService displayDeviceService) {
+            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, 
+            DisplayDeviceService displayDeviceService, DimensionCheckService dimensionCheckService) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.timeSlotService = timeSlotService;
         this.displayDeviceService = displayDeviceService;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @GetMapping(path = "/{id}")
@@ -86,6 +91,7 @@ public class SlideshowController {
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<SlideshowDto> createSlideshow(@RequestBody SlideshowDto slideshowDto) {
         SlideshowEntity slideshowEntity = slideshowMapper.mapFrom(slideshowDto);
+
         SlideshowEntity savedSlideshowEntity = slideshowService.save(slideshowEntity);
         return new ResponseEntity<>(slideshowMapper.mapTo(savedSlideshowEntity), HttpStatus.CREATED);
     }
@@ -131,11 +137,11 @@ public class SlideshowController {
 
     @PatchMapping(path = "/{id}/visual_media_inclusions")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<SlideshowDto> addVisualMediaInclusion(
+    public ResponseEntity<?> addVisualMediaInclusion(
             @PathVariable("id") Long id,
-            @RequestBody Map<String, Object> requestBody) {
+            @RequestBody Map<String, Object> requestBody,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
 
-        // Validate input and extract fallbackId
         if (!requestBody.containsKey("visualMediaInclusionId")) {
             return ResponseEntity.badRequest().build();
         }
@@ -148,12 +154,19 @@ public class SlideshowController {
             return ResponseEntity.badRequest().build();
         }
 
-        // Get content type and validate existence of dd and content
+        // validate existence of slidehsow and visualMediaInclusion
         if (!slideshowService.isExists(id) || !visualMediaInclusionService.isExists(visualMediaInclusionId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        // Update the display device and return the response
+        if(forceDimensions == false){
+            String checkResult = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(
+            visualMediaInclusionId, id);
+            if (!"1".equals(checkResult)) {
+                return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT); 
+            }
+        }
+        // Update the slideshow and return the response
         SlideshowEntity updatedSlideshowEntity = slideshowService.addVisualMediaInclusion(id, visualMediaInclusionId);
 
         return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity));

@@ -112,8 +112,10 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     public String checkDimensionForAssignedVisualMediaToSlideshow(Long visualMediaInclusionId, Long slideshowId){
         Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshowId);
         //if there is only one Visual Media Inclusion in Slideshow there is nothing to check
-        if (visualMediaInclusionsInSlideshow.size() < 1){
+        if (visualMediaInclusionsInSlideshow.size() < 0){
             return "No visual media present";
+        } else if(visualMediaInclusionsInSlideshow.size() == 0){
+            return "1";
         }
 
         String slideshowOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
@@ -242,11 +244,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 getVisualMediaOrientation(
                     visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()
                 )
-            ); System.out.println("round found orientation: " + getVisualMediaOrientation(visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()));
+            ); 
         }
-        System.out.println("set size: "+visualMediasInSlideshowOrientation.size());
-        
-
         if (visualMediasInSlideshowOrientation.size() > 1) {
             return "mixed";
         } else if (visualMediasInSlideshowOrientation.contains("horizontal")){
