@@ -7,7 +7,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
-import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
@@ -35,16 +34,14 @@ public class SlideshowController {
     private final SlideshowService slideshowService;
     private final TimeSlotService timeSlotService;
     private final DisplayDeviceService displayDeviceService;
-    private DimensionCheckService dimensionCheckService;
 
     public SlideshowController(SlideshowMapperImpl slideshowMapper, SlideshowService slideshowService,
-            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, DisplayDeviceService displayDeviceService, DimensionCheckService dimensionCheckService) {
+            VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService, DisplayDeviceService displayDeviceService) {
         this.slideshowMapper = slideshowMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.timeSlotService = timeSlotService;
         this.displayDeviceService = displayDeviceService;
-        this.dimensionCheckService = dimensionCheckService;
     }
 
     @GetMapping(path = "/{id}")

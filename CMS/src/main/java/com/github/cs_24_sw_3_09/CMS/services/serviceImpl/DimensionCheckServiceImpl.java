@@ -27,7 +27,6 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
-import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
@@ -40,16 +39,14 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     private DisplayDeviceService displayDeviceService;
     private VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowService slideshowService;
-    private TimeSlotService timeSlotService;
 
     public DimensionCheckServiceImpl(VisualMediaService visualMediaService, DisplayDeviceService displayDeviceService,
                                         VisualMediaInclusionService visualMediaInclusionService,
-                                        SlideshowService slideshowService, TimeSlotService timeSlotService){
+                                        SlideshowService slideshowService){
         this.visualMediaService = visualMediaService;
         this.displayDeviceService = displayDeviceService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.slideshowService = slideshowService;
-        this.timeSlotService = timeSlotService;
     }
 
     @Override
@@ -147,14 +144,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     }
 
     @Override
-    public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(long timeSlotId){
-        Optional<TimeSlotEntity> optionalTimeSlot = timeSlotService.findOne(timeSlotId);
-        if (optionalTimeSlot.isEmpty()) {
-            throw new IllegalArgumentException("TimeSlot with ID " + timeSlotId + " does not exist.");
-        }
-        TimeSlotEntity timeslot = optionalTimeSlot.get();
-
-        Set<DisplayDeviceEntity> displayDevices = timeslot.getDisplayDevices();
+    public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(TimeSlotEntity timeSlot){
+       
+        Set<DisplayDeviceEntity> displayDevices = timeSlot.getDisplayDevices();
         Set<String> displayDeviceOrientation = new HashSet<>();
         for (DisplayDeviceEntity device : displayDevices){
             String orientation = device.getDisplayOrientation();
@@ -164,7 +156,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             return "The dimensions of display devices are mixed";
         }
 
-        ContentEntity displayContent = timeslot.getDisplayContent();
+        ContentEntity displayContent = timeSlot.getDisplayContent();
         String displayContentOrientation;
         if (displayContent instanceof VisualMediaEntity) {
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(displayContent.getId().longValue());
@@ -253,6 +245,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             ); System.out.println("round found orientation: " + getVisualMediaOrientation(visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()));
         }
         System.out.println("set size: "+visualMediasInSlideshowOrientation.size());
+        
+
         if (visualMediasInSlideshowOrientation.size() > 1) {
             return "mixed";
         } else if (visualMediasInSlideshowOrientation.contains("horizontal")){
@@ -276,8 +270,19 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 BufferedImage image = ImageIO.read(file);
                 int width = image.getWidth();
                 int height = image.getHeight();
-                String visualMediaOrientation = (Math.max(width, height) == width) ? "horizontal" : "vertical";
+
+                int max_length = Math.max(width, height);
+                
+                String visualMediaOrientation;
+                if (max_length == height) {
+                    visualMediaOrientation = "vertical";
+                }  else if (max_length == width) { 
+                    visualMediaOrientation = "horizontal";
+                } else {
+                    visualMediaOrientation = "square";
+                }
                 return visualMediaOrientation;
+                
             } catch (NullPointerException | IOException e){
                 e.printStackTrace();
                 return e.toString();

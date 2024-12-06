@@ -9,7 +9,6 @@ import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
-import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
@@ -40,21 +39,18 @@ public class DisplayDeviceController {
     private final TimeSlotService timeSlotService;
     private Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
     private ContentUtils contentUtils;
-    private DimensionCheckService dimensionCheckService;
 
     @Autowired
     public DisplayDeviceController(DisplayDeviceService displayDeviceService,
             Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
             VisualMediaService visualMediaService, SlideshowService slideshowService,
-            ContentUtils contentUtils, TimeSlotService timeSlotService, 
-            DimensionCheckService dimensionCheckService) {
+            ContentUtils contentUtils, TimeSlotService timeSlotService) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceMapper = displayDeviceMapper;
         this.visualMediaService = visualMediaService;
         this.contentUtils = contentUtils;
         this.slideshowService = slideshowService;
         this.timeSlotService = timeSlotService;
-        this.dimensionCheckService = dimensionCheckService;
     }
 
     @PostMapping
@@ -84,10 +80,6 @@ public class DisplayDeviceController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /*@GetMapping(path =  "/{id}/dimensions") //TODO: add auth
-    public ResponseEntity<String> checkDimensionsOfFallbackAndDisplayDevice(@PathVariable("id") Long id){
-        return new ResponseEntity<>(dimensionCheckService.checkDimensionForAssignedFallback(id), HttpStatus.OK);
-    }*/
 
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

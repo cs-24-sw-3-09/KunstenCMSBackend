@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.Result;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface TimeSlotService {

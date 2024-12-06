@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface DimensionCheckService {
 
@@ -8,5 +9,5 @@ public interface DimensionCheckService {
 
     String checkDimensionForAssignedVisualMediaToSlideshow(Long visualMediaInclusionId, Long slideshowId);
     
-    String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(long timeSlotId);
+    String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(TimeSlotEntity timeSlot);
 }

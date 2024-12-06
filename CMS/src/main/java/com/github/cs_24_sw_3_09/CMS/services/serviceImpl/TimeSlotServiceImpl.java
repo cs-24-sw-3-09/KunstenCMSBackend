@@ -47,9 +47,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private VisualMediaService visualMediaService;
     private SlideshowService slideshowService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
-
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
-                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService slideshowService) {
+    
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
+                            Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
+                            SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, 
+                            VisualMediaService visualMediaService, SlideshowService slideshowService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
@@ -80,7 +82,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
+    public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity){
         //Handle display devices
         Optional<TimeSlotEntity> updatedTimeSlot = addDisplayDevice(timeSlotEntity);
         if (updatedTimeSlot.isEmpty()) return Optional.empty();
@@ -93,13 +95,37 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             timeSlotEntity = updatedTimeSlot.get();
         }
 
-
-        System.out.println(timeSlotEntity);
-
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+
+        //If time slot is active then it notifies display devices
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return Optional.of(toReturn);
     }
+    /*@Override
+    public Result<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
+        //Handle display devices
+        Optional<TimeSlotEntity> updatedTimeSlot = addDisplayDevice(timeSlotEntity);
+        if (updatedTimeSlot.isEmpty()) return new Result<TimeSlotEntity>("Not found");
+        timeSlotEntity = updatedTimeSlot.get();
+
+        //Handle display content
+        if (timeSlotEntity.getDisplayContent() != null) {
+            updatedTimeSlot = addDisplayContent(timeSlotEntity);
+            if (updatedTimeSlot.isEmpty()) return new Result<TimeSlotEntity>("Not found");
+            timeSlotEntity = updatedTimeSlot.get();
+        }
+
+        //Check the dimensions of display devices and display content
+        String dimensions = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity);
+        if (!dimensions.equals("1")) {
+              return new Result<TimeSlotEntity>(dimensions);  
+        }
+        TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+
+        //If time slot is active then it notifies display devices
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
+        return new Result<TimeSlotEntity>(toReturn);
+    }*/
 
     private Optional<TimeSlotEntity> addDisplayDevice(TimeSlotEntity timeSlotEntity) {
         Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
@@ -211,16 +237,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         timeSlotRepository.delete(timeSlotToDelete);
     }
 
-    /*private void deleteRelationWithTS(DisplayDeviceEntity displayDevice, Integer timeSlotId) {
-        List<TimeSlotEntity> timeSlots = displayDevice.getTimeSlots();
-        for(int i = 0; i < timeSlots.size(); i++) {
-            if(timeSlots.get(i).getId() == timeSlotId) {
-                timeSlots.remove(i);
-                break; 
-            }
-        }
-    }*/
-
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
         //Checked that it already exists, therefore this will never throw an error 
@@ -235,8 +251,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         DisplayDeviceEntity dd = displayDeviceRepository.findById(Math.toIntExact(ddId)).get();
 
         ts.getDisplayDevices().remove(dd);
-
-        //TODO: Added this line
         dd.getTimeSlots().remove(ts);
         
         timeSlotRepository.save(ts);
