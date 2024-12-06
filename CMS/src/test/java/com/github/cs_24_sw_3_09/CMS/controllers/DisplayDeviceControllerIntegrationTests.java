@@ -702,6 +702,10 @@ public class DisplayDeviceControllerIntegrationTests {
                         .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(2)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.name").value("testSS")
         );
 
 		assertEquals(
@@ -740,6 +744,10 @@ public class DisplayDeviceControllerIntegrationTests {
                         .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(1)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.name").value("Billede navn")
         );
 
 		assertEquals(
@@ -752,11 +760,11 @@ public class DisplayDeviceControllerIntegrationTests {
 	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceDoesntContainAFallbackId() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
 		displayDeviceService.save(displayDeviceToSave).get();
-		assertTrue(displayDeviceService.isExists((long) 1)); 
+		assertTrue(displayDeviceService.isExists(1L)); 
 
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
 		visualMediaService.save(visualMediaToSave);
-		assertTrue(visualMediaService.isExists((long) 1));
+		assertTrue(visualMediaService.isExists(1L));
 
 		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
 		assertEquals(
@@ -766,7 +774,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
 		slideshowService.save(slideshowToSave);
-		assertTrue(slideshowService.isExists((long) 2)); 
+		assertTrue(slideshowService.isExists(2L)); 
 
 		DisplayDeviceEntity ddEntity = displayDeviceService.findOne(1L).get();
 		ddEntity.setFallbackContent(null);
@@ -779,6 +787,8 @@ public class DisplayDeviceControllerIntegrationTests {
                         .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(3)
         );
 
 		//Should save a new fallback
