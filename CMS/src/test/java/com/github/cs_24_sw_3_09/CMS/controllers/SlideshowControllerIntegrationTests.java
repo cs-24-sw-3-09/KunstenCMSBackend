@@ -262,7 +262,7 @@ public class SlideshowControllerIntegrationTests {
         String requestBodyJson = "{\"visualMediaInclusionId\": " + savedVisualMediaInclusion.getId() + "}";
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.patch("/api/slideshows/" + savedSlideshow.getId() + "/visual_media_inclusions")
+                        MockMvcRequestBuilders.patch("/api/slideshows/" + savedSlideshow.getId() + "/visual_media_inclusions?forceDimensions=true")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestBodyJson)
                 ).andExpect(

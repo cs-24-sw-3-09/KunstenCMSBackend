@@ -62,6 +62,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         if (fallbackContent instanceof VisualMediaEntity) {
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(fallbackContent.getId().longValue());
             if(optionalVisualMedia.isEmpty()){
+                System.out.println("here");
                 throw new IllegalArgumentException("Visual Media with ID " + fallbackContent.getId() + " does not exist.");   
             }
             VisualMediaEntity visualMedia = optionalVisualMedia.get();

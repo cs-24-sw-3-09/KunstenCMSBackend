@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy.Content;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -73,7 +74,21 @@ public class DimensionCheckServiceTests {
         this.timeSlotService = timeSlotService;
     }
 
-    
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatCorrectStringIsReturnedWhenNull() throws Exception{
+        DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
+        displayDeviceService.save(displayDevice).get();
+
+        VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntity();
+        visualMediaService.save(visualMediaWithoutPath);
+        System.out.println("found vm: "+visualMediaService.findAll());
+        assertTrue(visualMediaService.isExists(visualMediaWithoutPath.getId().longValue()));
+        String resultString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), visualMediaWithoutPath);
+        System.out.println(resultString);
+        assertTrue(resultString.equals("File not correctly configured"));
+    }
+
     @Test
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForAssignedFallbackReturns1WhenVMDimensionsMatchDD() throws Exception {
