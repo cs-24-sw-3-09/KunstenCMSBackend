@@ -7,11 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -788,8 +783,8 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(weekdaysChosen,
             startDate, endDate, startTime, endTime);
         String json = objectMapper.writeValueAsString(ts4); 
-        //int[] associationTs4 = {4};
-        json = TestDataUtil.createDDJsonWithId(json, associations);
+        json = TestDataUtil.createTSJsonWithDDIds(json, associations);
+
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")

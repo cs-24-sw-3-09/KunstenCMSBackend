@@ -517,7 +517,6 @@ public class VisualMediaControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-
     @Test
 	@WithMockUser(roles = { "PLANNER" })
 	public void getAllVisualMedias() throws Exception {
