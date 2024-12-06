@@ -91,6 +91,13 @@ public class VisualMediaController {
         return visualMediaEntities.map(visualMediaMapper::mapTo);
     }
 
+    
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<VisualMediaDto>> getAllVisualMedias() {
+        List<VisualMediaEntity> visualMediaEntities = visualMediaService.findAll();
+        return ResponseEntity.ok(visualMediaEntities.stream().map(visualMediaMapper::mapTo).toList());
+    }
+
     @GetMapping(path = "/{id}")
     public ResponseEntity<VisualMediaDto> getVisualMedia(@PathVariable("id") Long id) {
         Optional<VisualMediaEntity> foundVisualMedia = visualMediaService.findOne(id);
@@ -242,7 +249,7 @@ public class VisualMediaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        visualMediaService.deleteRelation(visualMediaId, tagId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        VisualMediaEntity updatedVisualMedia = visualMediaService.deleteRelation(visualMediaId, tagId);
+        return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMedia),HttpStatus.NO_CONTENT);
     }
 }
