@@ -125,10 +125,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public void delete(Long id) {
-        VisualMediaEntity timeslot = visualMediaRepository.findById(Math.toIntExact(id))
+        VisualMediaEntity visualMedia = visualMediaRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
-        timeslot.getTags().clear();
-        visualMediaRepository.save(timeslot);
+        visualMedia.getTags().clear();
+        visualMediaRepository.save(visualMedia);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }

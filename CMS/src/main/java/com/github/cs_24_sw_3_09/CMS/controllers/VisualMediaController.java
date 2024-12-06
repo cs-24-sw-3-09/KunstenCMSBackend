@@ -195,7 +195,6 @@ public class VisualMediaController {
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         visualMediaService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
