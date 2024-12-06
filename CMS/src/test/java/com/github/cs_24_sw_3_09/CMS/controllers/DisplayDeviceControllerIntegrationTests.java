@@ -13,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -670,4 +668,49 @@ public class DisplayDeviceControllerIntegrationTests {
 		);
 	}
 
+	@Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllDisplayDevices() throws Exception {
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+
+		assertTrue(displayDeviceService.isExists(1L));
+		assertTrue(displayDeviceService.isExists(2L));
+		assertTrue(displayDeviceService.isExists(3L));
+		assertTrue(displayDeviceService.isExists(4L));
+		assertTrue(displayDeviceService.isExists(5L));
+		assertTrue(displayDeviceService.isExists(6L));
+		assertTrue(displayDeviceService.isExists(7L));
+		assertTrue(displayDeviceService.isExists(8L));
+		assertTrue(displayDeviceService.isExists(9L));
+		
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/display_devices/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(9));
+	}
+
+	@Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void getAllDisplayDevicesWithNoDevicesInDatabase() throws Exception {
+		mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/display_devices/all")
+        ).andExpect(
+			MockMvcResultMatchers.status().isOk())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$").isArray())
+		.andExpect(
+			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+	}
 }
