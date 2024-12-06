@@ -391,8 +391,9 @@ public class TestDataUtil {
         return json;
     }
 
-
-
-    
+    public static String createDDJsonWithFBCIds(String json, String id, String type) {
+        String res = "\"fallbackContent\":{\"id\":"+id+",\"type\":\""+type+"\"}";
+        return json.replace("\"fallbackContent\":null", res);
+    }
 
 }
