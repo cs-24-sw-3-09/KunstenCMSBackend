@@ -3,7 +3,10 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -168,5 +171,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         FileUtils.createVisualMediaFile(file, String.valueOf(id));
         return HttpStatus.OK;
 
+    }
+
+    @Override
+    public List<Map<String, Object>> findStateOfEveryVisualMedia() {
+
+        return null;
     }
 }
