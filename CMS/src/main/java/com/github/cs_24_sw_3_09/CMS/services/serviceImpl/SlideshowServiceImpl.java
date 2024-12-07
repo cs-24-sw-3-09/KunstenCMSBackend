@@ -126,8 +126,8 @@ public class SlideshowServiceImpl implements SlideshowService {
         SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
 
-        slideshow.getVisualMediaInclusionCollection().clear();
-        slideshowRepository.save(slideshow);
+        //slideshow.getVisualMediaInclusionCollection().clear();
+        //slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
@@ -144,6 +144,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
     
+    @Override
     public List<Map<String, Object>> findStateOfEverySlideshow() {
         List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
         List<TimeSlotEntity> allTimeSlotsWithSlideshowAsContent = timeSlotRepository.getAllTimeSlotsWithSlideshowAsContent();

@@ -91,6 +91,10 @@ public class VisualMediaController {
         return visualMediaEntities.map(visualMediaMapper::mapTo);
     }
 
+    @GetMapping(path = "/states")
+    public ResponseEntity<List<Map<String, Object>>> getStateOfAllVisualMedia() {
+        return new ResponseEntity<>(visualMediaService.findStateOfEveryVisualMedia(), HttpStatus.OK);
+    }
     
     @GetMapping(path = "/all")
     public ResponseEntity<List<VisualMediaDto>> getAllVisualMedias() {
