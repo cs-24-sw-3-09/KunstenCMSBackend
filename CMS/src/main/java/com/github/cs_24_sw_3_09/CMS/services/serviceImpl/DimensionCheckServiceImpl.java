@@ -203,7 +203,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         try {
             File videoFile = new File(absolutePath);
 
-            // Extract a frame from the video
+            // Get frame-level access to video
             FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(videoFile));
 
             // Get the first frame to determine dimensions

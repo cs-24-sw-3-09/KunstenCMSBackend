@@ -25,4 +25,7 @@ public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity,
 
     @Query("SELECT vm.id FROM VisualMediaEntity vm")
     List<Integer> getAllVisualMediaIds();
+
+    @Query("SELECT v FROM VisualMediaEntity v WHERE v.location LIKE CONCAT('%', :id, '.png')")
+    VisualMediaEntity findByIdWithPngExtension(@Param("id") Long id);
 }

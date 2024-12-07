@@ -163,7 +163,7 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
             //if the visual media is a video -> calculate duration
             if (foundVisualMediaEntity != null && foundVisualMediaEntity.getFileType().equals("video/mp4") 
                 || foundVisualMediaEntity.getFileType().equals("mp4")) {
-                // Calculate the slide duration using the method
+                // Calculate the slide duration
                 Integer slideDuration = findVideoDuration(foundVisualMediaEntity.getLocation());
                 existingVisualMediaInclusion.setSlideDuration(slideDuration);
             }

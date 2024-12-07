@@ -21,7 +21,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+
 
 
 public class TestDataUtil {
@@ -105,6 +108,7 @@ public class TestDataUtil {
                 //.lastDateModified("30/10/2003")
                 .location("/djao/dhau.jpg")
                 .name("Test_name")
+                .fileType(".jpeg")
                 .build();
     }
 
@@ -476,6 +480,5 @@ public class TestDataUtil {
         );
         return mockImageFile;
     }
-
     
 }

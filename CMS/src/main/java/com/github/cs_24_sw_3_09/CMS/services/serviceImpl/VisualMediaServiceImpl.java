@@ -1,6 +1,12 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,10 +15,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import java.awt.*;
+import javax.imageio.ImageIO;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.model.Picture;
+import org.jcodec.api.awt.AWTUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -28,7 +44,13 @@ import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -58,6 +80,12 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public VisualMediaEntity save(VisualMediaEntity visualMedia) {
         VisualMediaEntity toReturn = visualMediaRepository.save(visualMedia);
+
+        if(visualMedia.getFileType().equals("video/mp4")){
+            VisualMediaEntity videoAsImage = createFrameFromVideo(visualMedia);
+            visualMediaRepository.save(videoAsImage);          
+        }
+        
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
     }
@@ -104,10 +132,10 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             Optional.ofNullable(visualMediaEntity.getName()).ifPresent(existingVisualMedia::setName);
             Optional.ofNullable(visualMediaEntity.getLocation()).ifPresent(existingVisualMedia::setLocation);
             Optional.ofNullable(visualMediaEntity.getDescription()).ifPresent(existingVisualMedia::setDescription);
-            Optional.ofNullable(visualMediaEntity.getFileType()).ifPresent(existingVisualMedia::setFileType);
             Optional.ofNullable(visualMediaEntity.getLastDateModified())
                     .ifPresent(existingVisualMedia::setLastDateModified);
             Optional.ofNullable(visualMediaEntity.getTags()).ifPresent(existingVisualMedia::setTags);
+            Optional.ofNullable(visualMediaEntity.getFileType()).ifPresent(existingVisualMedia::setFileType);
 
             VisualMediaEntity toReturn = visualMediaRepository.save(existingVisualMedia);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
@@ -144,6 +172,12 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         inclusions.forEach(visualMediaInclusionRepository::delete);
 
         visualMediaRepository.save(VM);
+        if (VM.getFileType().equals("video/mp4")) {
+            VisualMediaEntity videoAsImage = visualMediaRepository.findByIdWithPngExtension((long) VM.getId());
+            if (videoAsImage != null) {
+                visualMediaRepository.deleteById(videoAsImage.getId());
+            }
+        }
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
@@ -180,7 +214,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaRepository.save(visualMediaEntity);
 
         //Created the new file.
-        FileUtils.createVisualMediaFile(file, String.valueOf(id));
         return HttpStatus.OK;
 
     }
@@ -220,5 +253,54 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             visualMediaStatusList.add(visualMediaStatus);
         });
         return visualMediaStatusList;
+    }
+
+    public VisualMediaEntity createFrameFromVideo(VisualMediaEntity visualMediaVideo){
+        Picture frame = extractFrameFromVideo(visualMediaVideo.getLocation());
+        if (frame == null) {
+            throw new NullPointerException("Could not extract frame");
+        }
+        BufferedImage bufferedImage = AWTUtil.toBufferedImage(frame);
+
+        String frameFilePath = visualMediaVideo.getLocation() + visualMediaVideo.getId() + ".png";
+
+        try {
+        File outputFile = new File(frameFilePath);
+        ImageIO.write(bufferedImage, "PNG", outputFile);  // Save image as PNG
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new VisualMediaEntity().builder()
+                .name(""+visualMediaVideo.getId())
+                .location(frameFilePath)
+                .fileType(".png")
+                .description(visualMediaVideo.getDescription())
+                .lastDateModified(visualMediaVideo.getLastDateModified())
+                .tags(visualMediaVideo.getTags())    
+                .build();
+    } 
+
+    private Picture extractFrameFromVideo(String visualMediaPath){
+        String rootPath = System.getProperty("user.dir"); 
+        String relativePath = visualMediaPath;
+        String absolutePath = Paths.get(rootPath, relativePath).toString();
+        
+        try {
+            File videoFile = new File(absolutePath);
+            if (!videoFile.exists()) {
+                throw new IllegalArgumentException("The video file does not exist at path: " + absolutePath);
+            }
+            // Get frame-level access to video
+            FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(videoFile));
+            // Get the first frame
+            Picture picture = grab.getNativeFrame();
+
+            return picture;                      
+        } catch (NullPointerException | IOException | JCodecException | IllegalArgumentException e) {
+            e.printStackTrace();
+            e.getMessage();
+        } 
+        return null; //in case of error, return null
     }
 }
