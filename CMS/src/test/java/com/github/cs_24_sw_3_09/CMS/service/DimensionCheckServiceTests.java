@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -72,21 +73,6 @@ public class DimensionCheckServiceTests {
         this.displayDeviceService = displayDeviceService;
         this.dimensionCheckService = dimensionCheckService;
         this.timeSlotService = timeSlotService;
-    }
-
-    @Test
-    @WithMockUser(roles="PLANNER")
-    public void testThatCorrectStringIsReturnedWhenNull() throws Exception{
-        DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDevice).get();
-
-        VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntity();
-        visualMediaService.save(visualMediaWithoutPath);
-        System.out.println("found vm: "+visualMediaService.findAll());
-        assertTrue(visualMediaService.isExists(visualMediaWithoutPath.getId().longValue()));
-        String resultString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), visualMediaWithoutPath);
-        System.out.println(resultString);
-        assertTrue(resultString.equals("File not correctly configured"));
     }
 
     @Test
@@ -281,6 +267,28 @@ public class DimensionCheckServiceTests {
         resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(updatedTimeSlot);
         assertTrue(resultString.equals("The dimensions of slideshow are mixed"));
 
+    }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatWhenObjectNotFoundCorrectErrorStringIsReturned() throws Exception{
+        //the same test can be made for any optional<Object> in the DimensionCheckService, here only one is provided
+        VisualMediaEntity visualMedia = TestDataUtil.createVisualMediaEntity();
+        visualMediaService.save(visualMedia);
+        assertThrows(IllegalArgumentException.class, () -> dimensionCheckService.checkDimensionForAssignedFallback(1, visualMedia));
+    }
+    
+    @Test
+    @WithMockUser(roles="PLANNER")
+    public void testThatCorrectStringIsReturnedWhenNull() throws Exception{
+        DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
+        displayDeviceService.save(displayDevice).get();
+
+        VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntity();
+        visualMediaService.save(visualMediaWithoutPath);
+        
+        String resultString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), visualMediaWithoutPath);
+        assertTrue(resultString.equals("File not correctly configured"));
     }
 
     private void createHorizontalVisualMediaWithFile() throws Exception{
