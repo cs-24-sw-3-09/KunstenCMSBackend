@@ -112,21 +112,32 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     @Override
     public VisualMediaInclusionEntity partialUpdate(Long id, VisualMediaInclusionEntity visualMediaInclusionEntity) {
         visualMediaInclusionEntity.setId(Math.toIntExact(id));
+
         return visualMediaInclusionRepository.findById(Math.toIntExact(id)).map(existingVisualMediaInclusion -> {
             // if display device from request has name, we set it to the existing display
             // device. (same with other atts)
-            Optional.ofNullable(visualMediaInclusionEntity.getId()).ifPresent(existingVisualMediaInclusion::setId);
-            Optional.ofNullable(visualMediaInclusionEntity.getSlideDuration())
-                    .ifPresent(existingVisualMediaInclusion::setSlideDuration);
+            Optional.ofNullable(visualMediaInclusionEntity.getId())
+                    .ifPresent(existingVisualMediaInclusion::setId);
             Optional.ofNullable(visualMediaInclusionEntity.getSlideshowPosition())
                     .ifPresent(existingVisualMediaInclusion::setSlideshowPosition);
             Optional.ofNullable(visualMediaInclusionEntity.getVisualMedia())
                     .ifPresent(existingVisualMediaInclusion::setVisualMedia);
 
+            Optional.ofNullable(visualMediaInclusionEntity.getSlideDuration())
+                    .ifPresent(slideDuration -> {
+                        // Check if visual media exists and has file type "mp4"
+                        VisualMediaEntity visualMedia = visualMediaInclusionEntity.getVisualMedia();
+                        if (visualMedia != null && "mp4".equals(visualMedia.getFileType())) {
+                            // Calculate the slide duration using the method
+                            slideDuration = findVideoDuration(visualMedia.getLocation());
+                        }
+                        existingVisualMediaInclusion.setSlideDuration(slideDuration);
+                    });
+
             VisualMediaInclusionEntity toReturn = visualMediaInclusionRepository.save(existingVisualMediaInclusion);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
-        }).orElseThrow(() -> new RuntimeException("Visual Media Inclusion does not exist"));
+        }).orElseThrow(() -> new RuntimeException("Visual Media Inclusion does not exist"));        
     }
 
     @Override
@@ -146,6 +157,13 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
             VisualMediaEntity foundVisualMediaEntity = visualMediaService.findOne(visualMediaId)
                     .orElseThrow(() -> new RuntimeException("Visual Media does not exist"));
             existingVisualMediaInclusion.setVisualMedia(foundVisualMediaEntity);
+            
+            //if the visual media is a video -> calculate duration
+            if (foundVisualMediaEntity != null && "mp4".equals(foundVisualMediaEntity.getFileType())) {
+                // Calculate the slide duration using the method
+                Integer slideDuration = findVideoDuration(foundVisualMediaEntity.getLocation());
+                existingVisualMediaInclusion.setSlideDuration(slideDuration);
+            }
 
             return visualMediaInclusionRepository.save(existingVisualMediaInclusion);
         }).orElseThrow(() -> new RuntimeException("Visual Media inclusion does not exist"));
