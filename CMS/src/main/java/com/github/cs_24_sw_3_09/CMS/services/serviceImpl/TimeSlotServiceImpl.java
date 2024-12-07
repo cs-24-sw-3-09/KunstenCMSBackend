@@ -309,9 +309,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         List<TimeSlotEntity> timeslots = findAll();
 
         timeslots.forEach(timeSlotEntity -> {
-            System.out.println(timeSlotEntity.getId());
             if (findOverlappingTimeSlots(Long.valueOf(timeSlotEntity.getId())).isEmpty()) {
-            System.out.println("No overlap");
                 TimeSlotColor timeslotColor = TimeSlotColor.builder()
                         .id(Long.valueOf(timeSlotEntity.getId()))
                         .color("neutral")
@@ -319,7 +317,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
                 timeSlotColors.add(timeslotColor);
             } else {
-                System.out.println("overlap");
                 TimeSlotColor timeslotColor = TimeSlotColor.builder()
                         .id(Long.valueOf(timeSlotEntity.getId()))
                         .color("red")
@@ -328,7 +325,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
                 timeSlotColors.add(timeslotColor);
             }
         });
-        System.out.println("----------");
 
         return timeSlotColors;
     }
