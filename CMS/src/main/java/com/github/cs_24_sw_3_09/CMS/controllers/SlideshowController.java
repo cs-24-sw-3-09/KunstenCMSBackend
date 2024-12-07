@@ -159,6 +159,7 @@ public class SlideshowController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+        //check whether the dimensions of the slideshow and new visualMediaInclusion fit
         if(forceDimensions == false){
             String checkResult = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(
             visualMediaInclusionId, id);

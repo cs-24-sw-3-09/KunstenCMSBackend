@@ -1,16 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
-
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
@@ -21,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,29 +29,35 @@ import java.util.Optional;
 public class DisplayDeviceController {
 
     private final DisplayDeviceService displayDeviceService;
-    private final VisualMediaService visualMediaService;
-    private final SlideshowService slideshowService;
     private final TimeSlotService timeSlotService;
     private Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
     private ContentUtils contentUtils;
+    private final DimensionCheckService dimensionCheckService;
+    private final VisualMediaService visualMediaService;
+    private final SlideshowService slideshowService;
 
     @Autowired
     public DisplayDeviceController(DisplayDeviceService displayDeviceService,
             Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
-            VisualMediaService visualMediaService, SlideshowService slideshowService,
-            ContentUtils contentUtils, TimeSlotService timeSlotService) {
+            ContentUtils contentUtils, TimeSlotService timeSlotService,
+            DimensionCheckService dimensionCheckService,
+            VisualMediaService visualMediaService,
+            SlideshowService slideshowService) {
         this.displayDeviceService = displayDeviceService;
         this.displayDeviceMapper = displayDeviceMapper;
-        this.visualMediaService = visualMediaService;
         this.contentUtils = contentUtils;
-        this.slideshowService = slideshowService;
         this.timeSlotService = timeSlotService;
+        this.dimensionCheckService = dimensionCheckService;
+        this.visualMediaService = visualMediaService;
+        this.slideshowService = slideshowService;
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<DisplayDeviceDto> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
+    public ResponseEntity<?> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
+        
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
+
         Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         
         if (savedDisplayDeviceEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -90,14 +90,25 @@ public class DisplayDeviceController {
 
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<DisplayDeviceDto> fullUpdateDisplayDevice(@PathVariable("id") Long id,
-            @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
+    public ResponseEntity<?> fullUpdateDisplayDevice(@PathVariable("id") Long id,
+            @Valid @RequestBody DisplayDeviceDto displayDeviceDto,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         displayDeviceDto.setId(Math.toIntExact(id));
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDeviceDto);
+
+        //check whether the dimensions of the displayDevice and the fallbackContent fit
+        if (displayDeviceEntity.getFallbackContent() != null) {
+            if(forceDimensions == false){
+                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity.getId(), displayDeviceEntity.getFallbackContent());
+                if(!"1".equals(checkResult)){
+                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
+                }
+            }
+        }
 
         Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         if (savedDisplayDeviceEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -129,11 +140,12 @@ public class DisplayDeviceController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping(path = "/{id}/fallbackContent")
+    @PatchMapping(path = "/{id}/fallback_content")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<DisplayDeviceDto> setFallbackContent(
+    public ResponseEntity<?> setFallbackContent(
             @PathVariable("id") Long id,
-            @RequestBody Map<String, Object> requestBody) {
+            @RequestBody Map<String, Object> requestBody,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
 
         // Validate input and extract fallbackId
         if (!requestBody.containsKey("fallbackId")) {
@@ -154,7 +166,21 @@ public class DisplayDeviceController {
                 || !displayDeviceService.isExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
+   
+         //check whether the dimensions of the displayDevice and the fallbackContent fit 
+        if(forceDimensions == false){
+            ContentEntity fallbackContent = null;
+            if(type.equals("VisualMediaEntity")){
+                fallbackContent = visualMediaService.findOne(fallbackId).get(); //already chekced that they exist -> safe to use .get()
+            } else if (type.equals("SlideshowEntity")) {
+                fallbackContent = slideshowService.findOne(fallbackId).get();
+            }  
+            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(id, fallbackContent);
+            if(!"1".equals(checkResult)){
+                return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
+            }
+        } 
+        
         // Update the display device and return the response
         DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.setFallbackContent(id, fallbackId, type);
 

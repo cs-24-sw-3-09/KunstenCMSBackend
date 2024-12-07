@@ -57,12 +57,12 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         }
         DisplayDeviceEntity displayDevice = optionalDisplayDevice.get();
         String displayDeviceOrientation = displayDevice.getDisplayOrientation();
-
+    
         String fallbackOrientation;
         if (fallbackContent instanceof VisualMediaEntity) {
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(fallbackContent.getId().longValue());
             if(optionalVisualMedia.isEmpty()){
-                System.out.println("here");
+                
                 throw new IllegalArgumentException("Visual Media with ID " + fallbackContent.getId() + " does not exist.");   
             }
             VisualMediaEntity visualMedia = optionalVisualMedia.get();
@@ -72,12 +72,10 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             }
 
             fallbackOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
-            
             if(!fallbackOrientation.equals(displayDeviceOrientation)){
                 return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
                 "\nFallback Visual Media orientation: "+ fallbackOrientation;
             }
-
             //1 is returned if the orientations match, therefore the service logic can continue
             return "1";
 
@@ -96,7 +94,6 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
                 "\nFallback Slide show orientation: "+ fallbackOrientation;
             } 
-
             return "1";
         } 
         return "Fallback content not set";      
