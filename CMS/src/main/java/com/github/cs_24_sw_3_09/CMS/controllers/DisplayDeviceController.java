@@ -54,9 +54,20 @@ public class DisplayDeviceController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice) {
+    public ResponseEntity<?> createDisplayDevice(@Valid @RequestBody DisplayDeviceDto displayDevice,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions ) {
         
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
+
+        //check whether the dimensions of the displayDevice and the fallbackContent fit
+        if (displayDeviceEntity.getFallbackContent() != null) {
+            if(forceDimensions == false){
+                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
+                if(!"1".equals(checkResult)){
+                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
+                }
+            }
+        }
 
         Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         
@@ -103,7 +114,7 @@ public class DisplayDeviceController {
         //check whether the dimensions of the displayDevice and the fallbackContent fit
         if (displayDeviceEntity.getFallbackContent() != null) {
             if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity.getId(), displayDeviceEntity.getFallbackContent());
+                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
                 if(!"1".equals(checkResult)){
                     return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
                 }
@@ -119,13 +130,13 @@ public class DisplayDeviceController {
 
     @PatchMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<DisplayDeviceDto> partialUpdateDisplayDevice(@PathVariable("id") Long id,
+    public ResponseEntity<?> partialUpdateDisplayDevice(@PathVariable("id") Long id,
             @Valid @RequestBody DisplayDeviceDto displayDeviceDto) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDeviceDto);
+
         DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.partialUpdate(id, displayDeviceEntity);
         return new ResponseEntity<>(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity), HttpStatus.OK);
     }
@@ -174,8 +185,9 @@ public class DisplayDeviceController {
                 fallbackContent = visualMediaService.findOne(fallbackId).get(); //already chekced that they exist -> safe to use .get()
             } else if (type.equals("SlideshowEntity")) {
                 fallbackContent = slideshowService.findOne(fallbackId).get();
-            }  
-            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(id, fallbackContent);
+            } 
+            DisplayDeviceEntity displayDevice = displayDeviceService.findOne(id).get(); 
+            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
             if(!"1".equals(checkResult)){
                 return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
             }
