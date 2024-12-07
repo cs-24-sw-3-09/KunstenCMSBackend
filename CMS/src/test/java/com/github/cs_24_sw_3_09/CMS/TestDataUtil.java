@@ -172,6 +172,7 @@ public class TestDataUtil {
                 .build();
     }
 
+
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
         displayDevices.add(
