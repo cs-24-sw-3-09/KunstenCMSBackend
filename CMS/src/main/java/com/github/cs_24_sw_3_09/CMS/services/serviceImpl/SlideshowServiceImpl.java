@@ -144,6 +144,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
     }
     
+    @Override
     public List<Map<String, Object>> findStateOfEverySlideshow() {
         List<Integer> allSlideshowIds = slideshowRepository.getAllSlideshowIds();
         List<TimeSlotEntity> allTimeSlotsWithSlideshowAsContent = timeSlotRepository.getAllTimeSlotsWithSlideshowAsContent();
@@ -214,7 +215,6 @@ public class SlideshowServiceImpl implements SlideshowService {
         }
         return slideshowStatusList;
     }
-    
 
     @Override
     public Optional<SlideshowEntity> duplicate(Long id, String name) {

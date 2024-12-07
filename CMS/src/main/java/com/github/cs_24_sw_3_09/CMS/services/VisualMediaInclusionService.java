@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface VisualMediaInclusionService {
    Optional<VisualMediaInclusionEntity> save(VisualMediaInclusionEntity visualMediaInclusionEntity);
@@ -25,4 +26,6 @@ public interface VisualMediaInclusionService {
     VisualMediaInclusionEntity setVisualMedia(Long id, Long visualMediaId);
 
     Optional<List<VisualMediaInclusionEntity>> updateSlideshowPosition(List<VisualMediaInclusionEntity> visualMediaInclusions);
+
+    Set<VisualMediaInclusionEntity> findAllVisualMediaInclusionInSlideshow(long slideshowId);
 }

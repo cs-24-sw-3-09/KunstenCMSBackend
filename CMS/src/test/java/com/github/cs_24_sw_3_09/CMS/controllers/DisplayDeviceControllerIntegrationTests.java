@@ -329,7 +329,8 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
-						.patch("/api/display_devices/" + savedDisplayDeviceEntity.getId() + "/fallbackContent")
+						.patch("/api/display_devices/" + savedDisplayDeviceEntity.getId() + "/fallback_content")
+						.param("forceDimensions", "true")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBodyJson))
 				.andExpect(
@@ -372,7 +373,8 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
-						.patch("/api/display_devices/" + savedDisplayDeviceEntity.getId() + "/fallbackContent")
+						.patch("/api/display_devices/" + savedDisplayDeviceEntity.getId() + "/fallback_content")
+						.param("forceDimensions", "true")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBodyJson))
 				.andExpect(
@@ -457,6 +459,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/display_devices")
+						.param("forceDimensions", "true")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(displayDeviceJson)
         ).andExpect(
@@ -497,6 +500,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/display_devices")
+						.param("forceDimensions", "true")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(displayDeviceJson)
         ).andExpect(
@@ -532,6 +536,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/display_devices")
+						.param("forceDimensions", "true")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(displayDeviceJson)
         ).andExpect(
@@ -747,7 +752,7 @@ public class DisplayDeviceControllerIntegrationTests {
         ).andExpect(
             MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(1)
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("$.fallbackContent.name").value("Billede navn")
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.name").value("Test_name")
         );
 
 		assertEquals(

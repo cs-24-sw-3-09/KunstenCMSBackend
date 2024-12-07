@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 @ToString
 public class SlideshowEntity extends ContentEntity {
 
+    @NotNull
     private String name;
     private Boolean isArchived;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

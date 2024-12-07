@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -134,5 +135,9 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         return Optional.of(visualMediaInclusionsToReturn);
     }
 
+    @Override
+    public Set<VisualMediaInclusionEntity> findAllVisualMediaInclusionInSlideshow(long slideshowId){
+        return visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(slideshowId);
+    }
     
 }
