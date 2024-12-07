@@ -8,10 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -865,25 +862,33 @@ public class TimeSlotControllerIntegrationTests {
     @Test
     @WithMockUser(roles = {"PLANNER"})
     public void testThatGetTSColorsReturnColors() throws Exception {
-        //timeSlotService.save(TestDataUtil.createTimeSlotEntityFromData(3, "",));
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        DisplayDeviceEntity dd1 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
+        DisplayDeviceEntity dd2 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
+        DisplayDeviceEntity dd3 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
 
+        displayDeviceService.save(dd1).get();
+        displayDeviceService.save(dd2).get();
+        displayDeviceService.save(dd3).get();
+
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(displayDeviceService.isExists(3L));
+
+        int[] associations1 = {1, 2, 3};
+        addTsHelper(31, "2024-12-9",
+                "2024-12-13", "12:00:00", "14:00:00", associations1);
         assertTrue(timeSlotService.isExists(1L));
+
+        int[] associations2 = {2};
+        addTsHelper(31, "2024-12-09",
+                "2024-12-13", "11:00:00", "15:00:00", associations2);
         assertTrue(timeSlotService.isExists(2L));
-        assertTrue(timeSlotService.isExists(3L));
-        assertTrue(timeSlotService.isExists(4L));
-        assertTrue(timeSlotService.isExists(5L));
-        assertTrue(timeSlotService.isExists(6L));
-        assertTrue(timeSlotService.isExists(7L));
-        assertTrue(timeSlotService.isExists(8L));
-        assertTrue(timeSlotService.isExists(9L));
+
+        int[] associations3 = {1, 3};
+        addTsHelper(31, "2024-12-09",
+                "2024-12-13", "08:00:00", "12:00:00", associations3);
+        assertTrue(timeSlotService.isExists(2L));
+
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/time_slots/overlapping_time_slots")
@@ -892,7 +897,9 @@ public class TimeSlotControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[3].color").value("red"));
+                        MockMvcResultMatchers.jsonPath("$[0].color").value("red"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[2].color").value("neutral"));
     }
 
 }

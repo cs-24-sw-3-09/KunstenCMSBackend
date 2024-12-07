@@ -486,4 +486,11 @@ public class VisualMediaInclusionControllerIntegrationTests {
 		);
 	}
 
+	@Test
+	@WithMockUser("")
+	public void testThatGetVisualMediaInclusionReturnsVisualMediaInclusion() {
+		VisualMediaInclusionEntity vmi = TestDataUtil.createVisualMediaInclusionEntity();
+		;
+	}
+
 }
