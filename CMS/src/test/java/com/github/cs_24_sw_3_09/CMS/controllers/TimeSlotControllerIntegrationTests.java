@@ -8,10 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,22 +96,22 @@ public class TimeSlotControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.status().isOk());
     }
-    
-    @Test 
+
+    @Test
     @WithMockUser
-    public void testThatGetTimeSlotsSuccessfullyReturnsListOfTimeSlots() throws Exception{
+    public void testThatGetTimeSlotsSuccessfullyReturnsListOfTimeSlots() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotService.save(testTimeSlotEntity);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/time_slots")
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
+                MockMvcResultMatchers.jsonPath("content.[0].id").isNumber()
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("content.[0].startDate").value(testTimeSlotEntity.getStartDate().toString())
+                MockMvcResultMatchers.jsonPath("content.[0].startDate").value(testTimeSlotEntity.getStartDate().toString())
         ).andExpect(
-            MockMvcResultMatchers.jsonPath("content.[0].startTime").value(testTimeSlotEntity.getStartTime().toString())
+                MockMvcResultMatchers.jsonPath("content.[0].startTime").value(testTimeSlotEntity.getStartTime().toString())
         ).andExpect(
-            MockMvcResultMatchers.status().isOk());
+                MockMvcResultMatchers.status().isOk());
     }
 
     @Test
@@ -146,8 +143,8 @@ public class TimeSlotControllerIntegrationTests {
                         MockMvcResultMatchers.jsonPath("numberOfElements").value(4))
                 .andExpect(
                         MockMvcResultMatchers.status().isOk());
-      
-                MockMvcResultMatchers.status().isOk();
+
+        MockMvcResultMatchers.status().isOk();
     }
 
     @Test
@@ -200,7 +197,7 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatDeleteTimeSlotReturnsStatus204() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
@@ -209,27 +206,27 @@ public class TimeSlotControllerIntegrationTests {
 
         TimeSlotEntity tsToCompare = timeSlotService.findOne((long) 1).get();
         assertNotEquals(
-            null,
-            tsToCompare.getDisplayDevices()
+                null,
+                tsToCompare.getDisplayDevices()
         );
         assertNotEquals(
-            null,
-            tsToCompare.getDisplayContent()
+                null,
+                tsToCompare.getDisplayContent()
         );
 
-		Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
+        Long id = Long.valueOf(savedTimeSlotEntitiy.getId());
 
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
+                MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId())
         ).andExpect(
-            MockMvcResultMatchers.status().isNoContent()
+                MockMvcResultMatchers.status().isNoContent()
         );
 
-		assertFalse(timeSlotService.isExists(id));
+        assertFalse(timeSlotService.isExists(id));
         assertTrue(
-            displayDeviceService.findOne((long) 1).get()
-            .getTimeSlots().stream()
-            .noneMatch(timeSlot -> timeSlotService.isExists((long) timeSlot.getId()))
+                displayDeviceService.findOne((long) 1).get()
+                        .getTimeSlots().stream()
+                        .noneMatch(timeSlot -> timeSlotService.isExists((long) timeSlot.getId()))
         );
     }
 
@@ -315,40 +312,40 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(roles="PLANNER")
+    @WithMockUser(roles = "PLANNER")
     public void testThatDeletesAssociationBetweenTSAndDDWithMoreAssociationsThanOne() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotEntity.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
         assertTrue(timeSlotService.isExists((long) 1));
         assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(
-            displayDevice -> displayDeviceService.isExists(displayDevice.getId().longValue())
+                displayDevice -> displayDeviceService.isExists(displayDevice.getId().longValue())
         ));
         assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
         assertEquals(2, timeSlotService.countDisplayDeviceAssociations((long) 1));
 
         Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
-		String body = "{\"ddId\":" + ddId + "}";
+        String body = "{\"ddId\":" + ddId + "}";
 
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(body)
+                MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
         ).andExpect(
-            MockMvcResultMatchers.status().isNoContent()
+                MockMvcResultMatchers.status().isNoContent()
         );
 
-		Long tsId = Long.valueOf(savedTimeSlotEntitiy.getId());
-		assertTrue(timeSlotService.isExists(tsId));
-		for(DisplayDeviceEntity dd : timeSlotService.findOne(tsId).get().getDisplayDevices()) {
-			assertNotEquals(ddId, dd.getId());
-		}
+        Long tsId = Long.valueOf(savedTimeSlotEntitiy.getId());
+        assertTrue(timeSlotService.isExists(tsId));
+        for (DisplayDeviceEntity dd : timeSlotService.findOne(tsId).get().getDisplayDevices()) {
+            assertNotEquals(ddId, dd.getId());
+        }
 
         assertEquals(1, timeSlotService.countDisplayDeviceAssociations((long) 1));
     }
 
-	@Test
-    @WithMockUser(roles="PLANNER")
+    @Test
+    @WithMockUser(roles = "PLANNER")
     public void testThatDeletesAssociationBetweenTSAndDDWithOnlyOneAssociation() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
@@ -360,62 +357,63 @@ public class TimeSlotControllerIntegrationTests {
         String body = "{\"ddId\": 1 }";
 
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(body)
+                MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
         ).andExpect(
-            MockMvcResultMatchers.status().isNoContent()
+                MockMvcResultMatchers.status().isNoContent()
         );
 
-		assertFalse(timeSlotService.isExists((long) 1));
+        assertFalse(timeSlotService.isExists((long) 1));
     }
 
 
-	@Test
-    @WithMockUser(roles="PLANNER")
+    @Test
+    @WithMockUser(roles = "PLANNER")
     public void testThatTriesToDeleteAssociationButDoesntContainAssociation() throws Exception {
-		//Where Display Device does not exist
-		TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
+        //Where Display Device does not exist
+        TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
         assertTrue(timeSlotService.isExists((long) 1));
         assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
 
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content("{\"ddId\":500}")
+                MockMvcRequestBuilders.delete("/api/time_slots/" + savedTimeSlotEntitiy.getId() + "/display_devices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ddId\":500}")
         ).andExpect(
-            MockMvcResultMatchers.status().isNotFound()
+                MockMvcResultMatchers.status().isNotFound()
         );
 
-		//Where Time Slot Does not exist
-		Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
+        //Where Time Slot Does not exist
+        Integer ddId = savedTimeSlotEntitiy.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId();
         String json = "{\"ddId\":" + ddId + "}";
         mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/time_slots/500/display_devices")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(json)
+                MockMvcRequestBuilders.delete("/api/time_slots/500/display_devices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
         ).andExpect(
-            MockMvcResultMatchers.status().isNotFound()
+                MockMvcResultMatchers.status().isNotFound()
         );
     }
+
     @Test
 
     @WithMockUser(roles = {"PLANNER"})
     public void testThatUploadesTimeSlotWithDisplayDeviceThatOnlyHasId() throws Exception {
-  
+
         DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity displayDeviceEntity = displayDeviceRepository.save(displayDeviceToSave);
 
         String timeSlot = "{"
-        + "\"name\": \"Time slot Example\","
-        + "\"startDate\": \"2024-11-25\","
-        + "\"endDate\": \"2024-11-26\","
-        + "\"startTime\": \"12:00:00\","
-        + "\"endTime\": \"16:00:00\","
-        + "\"weekdaysChosen\": 1,"
-        + "\"displayDevices\": [{\"id\": 1}]"
-        +"}";
+                + "\"name\": \"Time slot Example\","
+                + "\"startDate\": \"2024-11-25\","
+                + "\"endDate\": \"2024-11-26\","
+                + "\"startTime\": \"12:00:00\","
+                + "\"endTime\": \"16:00:00\","
+                + "\"weekdaysChosen\": 1,"
+                + "\"displayDevices\": [{\"id\": 1}]"
+                + "}";
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
@@ -427,31 +425,31 @@ public class TimeSlotControllerIntegrationTests {
 
         assertTrue(timeSlotService.isExists((long) 1));
 
-		TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
+        TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
 
         assertEquals(
-			timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId(),
-			displayDeviceEntity.getId()
-		);
+                timeSlotEntity.getDisplayDevices().toArray(new DisplayDeviceEntity[0])[0].getId(),
+                displayDeviceEntity.getId()
+        );
 
-		assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(displayDevice -> 
-			displayDeviceService.isExists((long) displayDevice.getId())
-		));
+        assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(displayDevice ->
+                displayDeviceService.isExists((long) displayDevice.getId())
+        ));
     }
 
-	@Test
-    @WithMockUser(roles={"PLANNER"}) 
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
     public void testThatTriesToUploadTimeSlotButReturns404() throws Exception {
 
         String timeSlot = "{"
-        + "\"name\": \"Time slot Example\","
-        + "\"startDate\": \"2024-11-25\","
-        + "\"endDate\": \"2024-11-26\","
-        + "\"startTime\": \"12:00:00\","
-        + "\"endTime\": \"16:00:00\","
-        + "\"weekdaysChosen\": 1,"
-        + "\"displayDevices\": [{\"id\": 1}]"
-        +"}";
+                + "\"name\": \"Time slot Example\","
+                + "\"startDate\": \"2024-11-25\","
+                + "\"endDate\": \"2024-11-26\","
+                + "\"startTime\": \"12:00:00\","
+                + "\"endTime\": \"16:00:00\","
+                + "\"weekdaysChosen\": 1,"
+                + "\"displayDevices\": [{\"id\": 1}]"
+                + "}";
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
@@ -464,28 +462,28 @@ public class TimeSlotControllerIntegrationTests {
         assertFalse(timeSlotService.isExists((long) 1));
     }
 
-	@Test
-    @WithMockUser(roles={"PLANNER"}) 
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
     public void testThatUploadesTimeSlotWithDisplayDevicesThatOnlyHasId() throws Exception {
-        
+
         DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         displayDeviceRepository.save(displayDeviceToSave);
 
-		DisplayDeviceEntity displayDevice2ToSave = TestDataUtil.createSecDisplayDeviceEntity();
+        DisplayDeviceEntity displayDevice2ToSave = TestDataUtil.createSecDisplayDeviceEntity();
         displayDeviceRepository.save(displayDevice2ToSave);
 
         String timeSlot = "{"
-        + "\"name\": \"Time slot Example\","
-        + "\"startDate\": \"2024-11-25\","
-        + "\"endDate\": \"2024-11-26\","
-        + "\"startTime\": \"12:00:00\","
-        + "\"endTime\": \"16:00:00\","
-        + "\"weekdaysChosen\": 1,"
-        + "\"displayDevices\": [" 
-		+"{\"id\": 1},"
-		+"{\"id\": 2}"
-		+"]"
-        +"}";
+                + "\"name\": \"Time slot Example\","
+                + "\"startDate\": \"2024-11-25\","
+                + "\"endDate\": \"2024-11-26\","
+                + "\"startTime\": \"12:00:00\","
+                + "\"endTime\": \"16:00:00\","
+                + "\"weekdaysChosen\": 1,"
+                + "\"displayDevices\": ["
+                + "{\"id\": 1},"
+                + "{\"id\": 2}"
+                + "]"
+                + "}";
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
@@ -497,42 +495,42 @@ public class TimeSlotControllerIntegrationTests {
 
         assertTrue(timeSlotService.isExists((long) 1));
 
-		TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
+        TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
 
-		assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(displayDevice -> 
-			displayDeviceService.isExists((long) displayDevice.getId())
-		));
+        assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(displayDevice ->
+                displayDeviceService.isExists((long) displayDevice.getId())
+        ));
     }
 
-	@Test
-    @WithMockUser(roles={"PLANNER"}) 
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
     public void testThatUploadesTimeSlotWithVisualMediaThatOnlyHasId() throws Exception {
-		//Create a Display Device and visual media such that the id exists
-		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+        //Create a Display Device and visual media such that the id exists
+        DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         displayDeviceRepository.save(displayDeviceToSave);
-		assertTrue(displayDeviceRepository.findById(1).isPresent());
-		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
-		VisualMediaEntity visualMediaToCompare = visualMediaRepository.save(visualMediaToSave);
-		assertTrue(visualMediaRepository.findById(1).isPresent());
+        assertTrue(displayDeviceRepository.findById(1).isPresent());
+        VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity visualMediaToCompare = visualMediaRepository.save(visualMediaToSave);
+        assertTrue(visualMediaRepository.findById(1).isPresent());
 
-		String timeSlot = 
-		"{"
-		+ 	"\"name\": \"Time slot Example\","
-		+ 	"\"startDate\": \"2024-11-25\","
-		+ 	"\"endDate\": \"2024-11-26\","
-		+ 	"\"startTime\": \"12:00:00\","
-		+ 	"\"endTime\": \"16:00:00\","
-		+ 	"\"weekdaysChosen\": 1,"
-		+ 	"\"displayContent\": {"
-		+ 		"\"id\": 1,"
-		+		"\"type\": \"visualMedia\""
-		+	"},"
-		+ 	"\"displayDevices\": [" 
-				+"{\"id\": 1}"
-			+"]"
-        +"}";
+        String timeSlot =
+                "{"
+                        + "\"name\": \"Time slot Example\","
+                        + "\"startDate\": \"2024-11-25\","
+                        + "\"endDate\": \"2024-11-26\","
+                        + "\"startTime\": \"12:00:00\","
+                        + "\"endTime\": \"16:00:00\","
+                        + "\"weekdaysChosen\": 1,"
+                        + "\"displayContent\": {"
+                        + "\"id\": 1,"
+                        + "\"type\": \"visualMedia\""
+                        + "},"
+                        + "\"displayDevices\": ["
+                        + "{\"id\": 1}"
+                        + "]"
+                        + "}";
 
-		mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(timeSlot)
@@ -540,88 +538,88 @@ public class TimeSlotControllerIntegrationTests {
                 MockMvcResultMatchers.status().isCreated()
         );
 
-		assertTrue(timeSlotService.isExists((long) 1));
+        assertTrue(timeSlotService.isExists((long) 1));
 
-		TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
+        TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
 
-		assertEquals(
-			timeSlotEntity.getDisplayContent().getId(),
-			visualMediaToCompare.getId()
-		);
-	}
+        assertEquals(
+                timeSlotEntity.getDisplayContent().getId(),
+                visualMediaToCompare.getId()
+        );
+    }
 
-	@Test
-    @WithMockUser(roles={"PLANNER"}) 
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
     public void testThatUploadesTimeSlotWithSlideShowThatOnlyHasId() throws Exception {
-		//Create a Display Device and visual media such that the id exists
-		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+        //Create a Display Device and visual media such that the id exists
+        DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         displayDeviceRepository.save(displayDeviceToSave);
-		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
-		SlideshowEntity slideshowToCompare = slideshowRepository.save(slideshowToSave);
-		assertTrue(displayDeviceRepository.findById(1).isPresent());
-		assertTrue(slideshowRepository.findById(1).isPresent());
+        SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
+        SlideshowEntity slideshowToCompare = slideshowRepository.save(slideshowToSave);
+        assertTrue(displayDeviceRepository.findById(1).isPresent());
+        assertTrue(slideshowRepository.findById(1).isPresent());
 
-		String timeSlot = 
-		"{"
-		+ 	"\"name\": \"Time slot Example\","
-		+ 	"\"startDate\": \"2024-11-25\","
-		+ 	"\"endDate\": \"2024-11-26\","
-		+ 	"\"startTime\": \"12:00:00\","
-		+ 	"\"endTime\": \"16:00:00\","
-		+ 	"\"weekdaysChosen\": 1,"
-		+ 	"\"displayContent\": {"
-		+ 		"\"id\": 1," 
-		+		"\"type\": \"slideshow\""
-		+	"},"
-		+ 	"\"displayDevices\": [" 
-				+"{\"id\": 1}"
-			+"]"
-        +"}";
+        String timeSlot =
+                "{"
+                        + "\"name\": \"Time slot Example\","
+                        + "\"startDate\": \"2024-11-25\","
+                        + "\"endDate\": \"2024-11-26\","
+                        + "\"startTime\": \"12:00:00\","
+                        + "\"endTime\": \"16:00:00\","
+                        + "\"weekdaysChosen\": 1,"
+                        + "\"displayContent\": {"
+                        + "\"id\": 1,"
+                        + "\"type\": \"slideshow\""
+                        + "},"
+                        + "\"displayDevices\": ["
+                        + "{\"id\": 1}"
+                        + "]"
+                        + "}";
 
-		mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(timeSlot)
         ).andExpect(
                 MockMvcResultMatchers.status().isCreated()
         );
-      
-		assertTrue(timeSlotService.isExists((long) 1));
 
-		TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
+        assertTrue(timeSlotService.isExists((long) 1));
 
-		assertEquals(
-			timeSlotEntity.getDisplayContent().getId(),
-			slideshowToCompare.getId()
-		);
-	}
+        TimeSlotEntity timeSlotEntity = timeSlotService.findOne((long) 1).get();
 
-	@Test
-    @WithMockUser(roles={"PLANNER"}) 
+        assertEquals(
+                timeSlotEntity.getDisplayContent().getId(),
+                slideshowToCompare.getId()
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
     public void testThatUploadesTimeSlotWithInvalidVisualMediaAndReturns404() throws Exception {
-		//Create a Display Device that the id exists
-		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+        //Create a Display Device that the id exists
+        DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
         displayDeviceRepository.save(displayDeviceToSave);
-		assertTrue(displayDeviceRepository.findById(1).isPresent());
+        assertTrue(displayDeviceRepository.findById(1).isPresent());
 
-		String timeSlot = 
-		"{"
-		+ 	"\"name\": \"Time slot Example\","
-		+ 	"\"startDate\": \"2024-11-25\","
-		+ 	"\"endDate\": \"2024-11-26\","
-		+ 	"\"startTime\": \"12:00:00\","
-		+ 	"\"endTime\": \"16:00:00\","
-		+ 	"\"weekdaysChosen\": 1,"
-		+ 	"\"displayContent\": {"
-		+ 		"\"id\": 1,"
-		+		"\"type\": \"slideshow\"" 
-		+	"},"
-		+ 	"\"displayDevices\": [" 
-				+"{\"id\": 1}"
-			+"]"
-        +"}";
+        String timeSlot =
+                "{"
+                        + "\"name\": \"Time slot Example\","
+                        + "\"startDate\": \"2024-11-25\","
+                        + "\"endDate\": \"2024-11-26\","
+                        + "\"startTime\": \"12:00:00\","
+                        + "\"endTime\": \"16:00:00\","
+                        + "\"weekdaysChosen\": 1,"
+                        + "\"displayContent\": {"
+                        + "\"id\": 1,"
+                        + "\"type\": \"slideshow\""
+                        + "},"
+                        + "\"displayDevices\": ["
+                        + "{\"id\": 1}"
+                        + "]"
+                        + "}";
 
-		mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(timeSlot)
@@ -682,35 +680,35 @@ public class TimeSlotControllerIntegrationTests {
         assertTrue(displayDeviceService.isExists(2L));
         assertTrue(displayDeviceService.isExists(3L));
 
-        int[] associations1 = {1,2,3};
+        int[] associations1 = {1, 2, 3};
         addTsHelper(11, "2024-12-02",
-        "2024-12-05", "12:00:00", "14:00:00", associations1);
+                "2024-12-05", "12:00:00", "14:00:00", associations1);
         assertTrue(timeSlotService.isExists(1L));
 
         int[] associations2 = {1};
         addTsHelper(3, "2024-12-02",
-        "2024-12-03", "11:00:00", "13:00:00", associations2);
+                "2024-12-03", "11:00:00", "13:00:00", associations2);
 
         int[] associations3 = {2};
         addTsHelper(1, "2024-12-02",
-        "2024-12-02", "11:00:00", "15:00:00", associations3);
-        
+                "2024-12-02", "11:00:00", "15:00:00", associations3);
+
         int[] associations4 = {2};
         addTsHelper(2, "2024-12-03",
-        "2024-12-03", "13:00:00", "15:00:00", associations4);
-        
+                "2024-12-03", "13:00:00", "15:00:00", associations4);
+
         int[] associations5 = {2};
         addTsHelper(8, "2024-12-05",
-        "2024-12-05", "14:00:00", "15:00:00", associations5);
-        
+                "2024-12-05", "14:00:00", "15:00:00", associations5);
+
         int[] associations6 = {3};
         addTsHelper(4, "2024-12-04",
-        "2024-12-04", "8:00:00", "15:00:00", associations6);
-        
+                "2024-12-04", "8:00:00", "15:00:00", associations6);
+
         int[] associations7 = {3};
         addTsHelper(1, "2024-12-02",
-        "2024-12-02", "13:00:00", "13:30:00", associations7);
-        
+                "2024-12-02", "13:00:00", "13:30:00", associations7);
+
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(timeSlotService.isExists(2L));
         assertTrue(timeSlotService.isExists(3L));
@@ -748,32 +746,32 @@ public class TimeSlotControllerIntegrationTests {
         assertTrue(displayDeviceService.isExists(3L));
         assertTrue(displayDeviceService.isExists(4L));
 
-        int[] associations1 = {1,2,3};
-        int[] associations2 = {2,3};
-        int[] associations3 = {1,2,4};
+        int[] associations1 = {1, 2, 3};
+        int[] associations2 = {2, 3};
+        int[] associations3 = {1, 2, 4};
         int[] associations4 = {4};
 
         addTsHelper(
-            127, "2024-12-01", "2024-12-25", 
-            "12:00:00", "17:00:00", associations1
+                127, "2024-12-01", "2024-12-25",
+                "12:00:00", "17:00:00", associations1
         );
         addTsHelper(
-            127, "2024-12-01", "2024-12-25", 
-            "10:00:00", "12:00:00", associations2
+                127, "2024-12-01", "2024-12-25",
+                "10:00:00", "12:00:00", associations2
         );
         addTsHelper(
-            127, "2024-12-01", "2024-12-25", 
-            "17:00:00", "19:00:00", associations3
+                127, "2024-12-01", "2024-12-25",
+                "17:00:00", "19:00:00", associations3
         );
         addTsHelper(
-            127, "2024-12-01", "2024-12-25", 
-            "10:00:00", "19:00:00", associations4
+                127, "2024-12-01", "2024-12-25",
+                "10:00:00", "19:00:00", associations4
         );
-        
+
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(timeSlotService.isExists(2L));
         assertTrue(timeSlotService.isExists(3L));
-        assertTrue(timeSlotService.isExists(4L));        
+        assertTrue(timeSlotService.isExists(4L));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1/overlapping_time_slots")
@@ -787,18 +785,19 @@ public class TimeSlotControllerIntegrationTests {
     }
 
     private void addTsHelper(int weekdaysChosen,
-    String startDate, String endDate, String startTime, String endTime, int[] associations) throws Exception {
+                             String startDate, String endDate, String startTime, String endTime, int[] associations) throws Exception {
 
         TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(weekdaysChosen,
             startDate, endDate, startTime, endTime);
+      
         String json = objectMapper.writeValueAsString(ts4); 
-        //int[] associationTs4 = {4};
-        json = TestDataUtil.createDDJsonWithId(json, associations);
+        json = TestDataUtil.createTSJsonWithDDIds(json, associations);
+
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isCreated()
         );
@@ -807,7 +806,7 @@ public class TimeSlotControllerIntegrationTests {
     @Test
     @WithMockUser(roles = {"PLANNER"})
     public void testThatChecksOverlapWhereTimeSlotDoesntExistAndReturns404() throws Exception {
-        
+
         assertFalse(timeSlotService.isExists(1L));
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1/overlapping_time_slots")
@@ -815,54 +814,241 @@ public class TimeSlotControllerIntegrationTests {
                 MockMvcResultMatchers.status().isNotFound()
         );
 
-  
-		assertFalse(timeSlotService.isExists((long) 1));
+
+        assertFalse(timeSlotService.isExists((long) 1));
+    }
+
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
+    public void getAllTimeSlots() throws Exception {
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(timeSlotService.isExists(2L));
+        assertTrue(timeSlotService.isExists(3L));
+        assertTrue(timeSlotService.isExists(4L));
+        assertTrue(timeSlotService.isExists(5L));
+        assertTrue(timeSlotService.isExists(6L));
+        assertTrue(timeSlotService.isExists(7L));
+        assertTrue(timeSlotService.isExists(8L));
+        assertTrue(timeSlotService.isExists(9L));
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/time_slots/all")
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.length()").value(9));
+    }
+
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
+    public void getAllTimeSlotsWithNoDevicesInDatabase() throws Exception {
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/time_slots/all")
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    @WithMockUser(roles = {"PLANNER"})
+    public void testThatGetTSColorsReturnColors() throws Exception {
+        DisplayDeviceEntity dd1 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
+        DisplayDeviceEntity dd2 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
+        DisplayDeviceEntity dd3 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
+
+        displayDeviceService.save(dd1).get();
+        displayDeviceService.save(dd2).get();
+        displayDeviceService.save(dd3).get();
+
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(displayDeviceService.isExists(3L));
+
+        int[] associations1 = {1, 2, 3};
+        addTsHelper(31, "2024-12-9",
+                "2024-12-13", "12:00:00", "14:00:00", associations1);
+        assertTrue(timeSlotService.isExists(1L));
+
+        int[] associations2 = {2};
+        addTsHelper(31, "2024-12-09",
+                "2024-12-13", "11:00:00", "15:00:00", associations2);
+        assertTrue(timeSlotService.isExists(2L));
+
+        int[] associations3 = {1, 3};
+        addTsHelper(31, "2024-12-09",
+                "2024-12-13", "08:00:00", "12:00:00", associations3);
+        assertTrue(timeSlotService.isExists(2L));
+
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/time_slots/overlapping_time_slots")
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].color").value("red"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[2].color").value("neutral"));
+    }
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void testThatFullPatchTimeSlotWithDisplayDevicesIds() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        timeSlot.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
+
+        assertEquals(
+            2, 
+            timeSlot.getDisplayDevices().size()
+        );
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+
+        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+        assertTrue(displayDeviceService.isExists(3L));
+        assertTrue(displayDeviceService.isExists(4L));
+
+        String json = objectMapper.writeValueAsString(tsToSend);
+        int[] arr = {3, 4};
+        json = TestDataUtil.createTSJsonWithDDIds(json, arr);
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices").isArray()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices.length()").value(2)
+        );
+
+		assertEquals(
+			2, 
+			timeSlotService.findOne(1L).get().getDisplayDevices().size()
+		);
 	}
 
     @Test
 	@WithMockUser(roles = { "PLANNER" })
-	public void getAllTimeSlots() throws Exception {
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-		timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+	public void testThatFullPatchTimeSlotWithDisplayContentIds() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(slideshowRepository.findById(1).isPresent());
 
-		assertTrue(timeSlotService.isExists(1L));
-		assertTrue(timeSlotService.isExists(2L));
-		assertTrue(timeSlotService.isExists(3L));
-		assertTrue(timeSlotService.isExists(4L));
-		assertTrue(timeSlotService.isExists(5L));
-		assertTrue(timeSlotService.isExists(6L));
-		assertTrue(timeSlotService.isExists(7L));
-		assertTrue(timeSlotService.isExists(8L));
-		assertTrue(timeSlotService.isExists(9L));
-		
+        slideshowRepository.save(TestDataUtil.createSlideshowEntity());
+        assertTrue(slideshowRepository.findById(2).isPresent());
+
+        tsToSend.setDisplayContent(null);
+        String json = objectMapper.writeValueAsString(tsToSend);
+        json = TestDataUtil.createTSJsonWithDCIds(json, "2", "slideshow");
+
 		mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/time_slots/all")
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
         ).andExpect(
-			MockMvcResultMatchers.status().isOk())
-		.andExpect(
-			MockMvcResultMatchers.jsonPath("$").isArray())
-		.andExpect(
-			MockMvcResultMatchers.jsonPath("$.length()").value(9));
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent").isNotEmpty()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.name").value("testSS")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.id").value(2)
+        );
+
+		assertEquals(
+			2, 
+			timeSlotService.findOne(1L).get().getDisplayContent().getId()
+		);
 	}
 
-	@Test
+    @Test
 	@WithMockUser(roles = { "PLANNER" })
-	public void getAllTimeSlotsWithNoDevicesInDatabase() throws Exception {
+	public void testThatFullPatchTimeSlotWithNothing() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(slideshowRepository.findById(1).isPresent());
+
+        tsToSend.setDisplayContent(null);
+        String json = objectMapper.writeValueAsString(tsToSend);
+        
 		mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/time_slots/all")
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
         ).andExpect(
-			MockMvcResultMatchers.status().isOk())
-		.andExpect(
-			MockMvcResultMatchers.jsonPath("$").isArray())
-		.andExpect(
-			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent").isNotEmpty()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.name").value("test1")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.id").value(1)
+        );
+
+		assertEquals(
+			1, 
+			timeSlotService.findOne(1L).get().getDisplayContent().getId()
+		);
+	}
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void testThatFullPatchTimeSlotWithNoDisplayIdsGiven() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        timeSlot.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
+
+        assertEquals(
+            2, 
+            timeSlot.getDisplayDevices().size()
+        );
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+
+        tsToSend.setDisplayDevices(null);
+        String json = objectMapper.writeValueAsString(tsToSend);
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices").isArray()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices.length()").value(2)
+        );
+
+		assertEquals(
+			2, 
+			timeSlotService.findOne(1L).get().getDisplayDevices().size()
+		);
 	}
 
 }

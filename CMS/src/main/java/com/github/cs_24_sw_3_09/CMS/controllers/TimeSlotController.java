@@ -1,15 +1,11 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
 import java.sql.Date;
-import java.time.LocalDate;
+import java.util.*;
 import java.util.List;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotColor;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
@@ -20,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
@@ -82,8 +76,7 @@ public class TimeSlotController {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
-       
-        //check whether the dimensions of the displayDevice and the fallbackContent fit
+
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
         
         if (savedTimeSlotEntity.isEmpty()) {
@@ -129,14 +122,24 @@ public class TimeSlotController {
 
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<TimeSlotDto> fullUpdateTimeSlot(@PathVariable("id") Long id,
-                                                          @Valid @RequestBody TimeSlotDto timeSlotDto) {
+    public ResponseEntity<?> fullUpdateTimeSlot(@PathVariable("id") Long id,
+            @Valid @RequestBody TimeSlotDto timeSlotDto,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         timeSlotDto.setId(Math.toIntExact(id));
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
+        //check if dimensions of displaydevice and content fit
+        if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null) {
+            if(forceDimensions == false){
+                String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
+                if(!"1".equals(checkResult)){
+                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
+                }
+            }
+        }
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
         if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -155,7 +158,6 @@ public class TimeSlotController {
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
 
         //check if dimensions of displaydevice and content fit
-
         if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null) {
             if(forceDimensions == false){
                 String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
@@ -284,12 +286,12 @@ public class TimeSlotController {
 
         TimeSlotEntity updatedTimeSlot = timeSlotService.addDisplayDevice(id, displayDeviceId);
 
-
         // If tag was not found, updatedVisualMedia will be null.
         if (updatedTimeSlot == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     @GetMapping(path = "/{id}/overlapping_time_slots")
     public ResponseEntity<List<TimeSlotDto>> getOverlappingTimeSlots(@PathVariable("id") Long id) {
         if (!timeSlotService.isExists(id)) {
@@ -302,5 +304,16 @@ public class TimeSlotController {
 
         return new ResponseEntity<>(overlappingTimeSlotDtos, HttpStatus.OK);
     }
+
+    @GetMapping(path = "/overlapping_time_slots")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<List<TimeSlotColor>> getAllTimeSlotColors() {
+
+
+        List<TimeSlotColor> timeslotColors  = timeSlotService.getTimeSlotColors();
+        return new ResponseEntity<>(timeslotColors, HttpStatus.OK);
+    }
+
+
 }
 

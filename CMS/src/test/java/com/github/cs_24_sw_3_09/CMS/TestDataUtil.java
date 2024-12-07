@@ -202,6 +202,10 @@ public class TestDataUtil {
                 .build();
     }
 
+
+    
+
+
     
 
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
@@ -406,13 +410,13 @@ public class TestDataUtil {
                 .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
                 .displayDevices(displayDeviceEntities)
                 .build();
-    }
+    }    
 
-    public static String createDDJsonWithId(String json, int[] ids) {
+    public static String createTSJsonWithDDIds(String json, int[] ids) {
         String res = "\"displayDevices\":[";
         for (int i = 0; i < ids.length; i++) {
             res += "{\"id\":"+ids[i]+"}";
-            
+
             if (i != ids.length - 1) {
                 res += ",";
             }
@@ -423,7 +427,15 @@ public class TestDataUtil {
         return json;
     }
 
-    
+    public static String createDDJsonWithFBCIds(String json, String id, String type) {
+        String res = "\"fallbackContent\":{\"id\":"+id+",\"type\":\""+type+"\"}";
+        return json.replace("\"fallbackContent\":null", res);
+    }
+
+    public static String createTSJsonWithDCIds(String json, String id, String type) {
+        String res = "\"displayContent\":{\"id\":"+id+",\"type\":\""+type+"\"}";
+        return json.replace("\"displayContent\":null", res);
+    }
 
 
 
@@ -465,18 +477,5 @@ public class TestDataUtil {
         return mockImageFile;
     }
 
-    public static String createTSJsonWithDDIds(String json, int[] ids) {
-        String res = "\"displayDevices\":[";
-        for (int i = 0; i < ids.length; i++) {
-            res += "{\"id\":"+ids[i]+"}";
-
-            if (i != ids.length - 1) {
-                res += ",";
-            }
-        }
-        res += "]";
-
-        json = json.replace("\"displayDevices\":[]", res);
-        return json;
-    }
+    
 }

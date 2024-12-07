@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 import java.util.List;
@@ -18,6 +19,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface VisualMediaInclusionRepository extends CrudRepository<VisualMediaInclusionEntity, Integer>,
         PagingAndSortingRepository<VisualMediaInclusionEntity, Integer> {
 
-                @Query("SELECT vmic FROM SlideshowEntity ss JOIN ss.visualMediaInclusionCollection vmic WHERE ss.id = :slideshowId")
-                 Set<VisualMediaInclusionEntity> findAllVisualMediaInclusionForSlideshow(@Param("slideshowId") Long slideshowId);
-        }
+        List<VisualMediaInclusionEntity> findAllByVisualMedia(VisualMediaEntity visualMedia);
+        
+ @Query("SELECT vmic FROM SlideshowEntity ss JOIN ss.visualMediaInclusionCollection vmic WHERE ss.id = :slideshowId")
+        Set<VisualMediaInclusionEntity> findAllVisualMediaInclusionForSlideshow(@Param("slideshowId") Long slideshowId);        
+}

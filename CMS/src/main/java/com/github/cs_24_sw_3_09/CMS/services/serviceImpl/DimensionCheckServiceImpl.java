@@ -148,10 +148,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         if(displayDeviceOrientation.size() > 1) {
             return "The dimensions of display devices are mixed";
         }
-        
+
         String displayContentOrientation;
         if (displayContent instanceof VisualMediaEntity) {
-            System.out.println("Here");
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(displayContent.getId().longValue());
             if(optionalVisualMedia.isEmpty()) {
                 throw new IllegalArgumentException("Visual Media with ID " + displayContent.getId() + " does not exist.");

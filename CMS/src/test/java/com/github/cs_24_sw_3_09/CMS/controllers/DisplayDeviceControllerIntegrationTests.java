@@ -669,6 +669,138 @@ public class DisplayDeviceControllerIntegrationTests {
 	}
 
 	@Test
+	@WithMockUser(roles = { "PLANNER", "ADMIN" })
+	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceContainsAFallbackId() throws Exception {
+		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+		displayDeviceService.save(displayDeviceToSave).get();
+		assertTrue(displayDeviceService.isExists((long) 1)); 
+
+		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
+		visualMediaService.save(visualMediaToSave);
+		assertTrue(visualMediaService.isExists((long) 1));
+
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		assertEquals(
+			1, 
+			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+		);
+
+		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
+		slideshowService.save(slideshowToSave);
+		assertTrue(slideshowService.isExists((long) 2)); 
+
+		DisplayDeviceEntity ddEntity = displayDeviceService.findOne(1L).get();
+		ddEntity.setFallbackContent(null);
+		String json = objectMapper.writeValueAsString(ddEntity);
+		System.out.println(json);
+		json = TestDataUtil.createDDJsonWithFBCIds(json, "2", "slideshow");
+		System.out.println(json);
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/display_devices/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(2)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.name").value("testSS")
+        );
+
+		assertEquals(
+			2, 
+			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+		);
+	}
+	@Test
+	@WithMockUser(roles = { "PLANNER", "ADMIN" })
+	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceDoesntContainAFallback() throws Exception {
+		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+		displayDeviceService.save(displayDeviceToSave).get();
+		assertTrue(displayDeviceService.isExists((long) 1)); 
+
+		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
+		visualMediaService.save(visualMediaToSave);
+		assertTrue(visualMediaService.isExists((long) 1));
+
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		assertEquals(
+			1, 
+			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+		);
+
+		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
+		slideshowService.save(slideshowToSave);
+		assertTrue(slideshowService.isExists((long) 2)); 
+
+		DisplayDeviceEntity ddEntity = displayDeviceService.findOne(1L).get();
+		ddEntity.setFallbackContent(null);
+		String json = objectMapper.writeValueAsString(ddEntity);
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/display_devices/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(1)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.name").value("Billede navn")
+        );
+
+		assertEquals(
+			1, 
+			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+		);
+	}
+	@Test
+	@WithMockUser(roles = { "PLANNER", "ADMIN" })
+	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceDoesntContainAFallbackId() throws Exception {
+		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
+		displayDeviceService.save(displayDeviceToSave).get();
+		assertTrue(displayDeviceService.isExists(1L)); 
+
+		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
+		visualMediaService.save(visualMediaToSave);
+		assertTrue(visualMediaService.isExists(1L));
+
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		assertEquals(
+			1, 
+			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+		);
+
+		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
+		slideshowService.save(slideshowToSave);
+		assertTrue(slideshowService.isExists(2L)); 
+
+		DisplayDeviceEntity ddEntity = displayDeviceService.findOne(1L).get();
+		ddEntity.setFallbackContent(null);
+		String json = objectMapper.writeValueAsString(ddEntity);
+		json = TestDataUtil.createDDJsonWithFBCIds(json, "null", "visualMedia");
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/display_devices/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(3)
+        );
+
+		//Should save a new fallback
+		assertEquals(
+			3, 
+			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+		);
+	}
+
+	
+
+
 	@WithMockUser(roles = { "PLANNER" })
 	public void getAllDisplayDevices() throws Exception {
 		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
@@ -713,4 +845,5 @@ public class DisplayDeviceControllerIntegrationTests {
 		.andExpect(
 			MockMvcResultMatchers.jsonPath("$.length()").value(0));
 	}
+
 }

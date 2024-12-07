@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotColor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.Result;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface TimeSlotService {
@@ -42,4 +42,6 @@ public interface TimeSlotService {
     TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException;
 
     List<TimeSlotEntity> findOverlappingTimeSlots(Long id);
+
+    List<TimeSlotColor> getTimeSlotColors();
 }

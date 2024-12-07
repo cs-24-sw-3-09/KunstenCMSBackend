@@ -2,7 +2,6 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.mappers.Mapper;
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
@@ -10,7 +9,6 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
-import jakarta.persistence.EntityNotFoundException;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -127,8 +125,18 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
                     .ifPresent(existingDisplayDevice::setDisplayOrientation);
             Optional.ofNullable(displayDeviceEntity.getLocation()).ifPresent(existingDisplayDevice::setLocation);
             Optional.ofNullable(displayDeviceEntity.getResolution()).ifPresent(existingDisplayDevice::setResolution);
-            Optional.ofNullable(displayDeviceEntity.getFallbackContent())
-                    .ifPresent(existingDisplayDevice::setFallbackContent);
+
+            //Fallback content
+            Optional.ofNullable(displayDeviceEntity.getFallbackContent()).ifPresent(fallback -> {
+                if (fallback.getId() == null) {
+                    existingDisplayDevice.setFallbackContent(fallback);
+                    return;
+                }
+                Optional<ContentEntity> content = findContentById(fallback.getId());
+                if (content.isEmpty()) return;
+                existingDisplayDevice.setFallbackContent(content.get());
+            });
+
             Optional.ofNullable(displayDeviceEntity.getMonday_start()).ifPresent(existingDisplayDevice::setMonday_start);
             Optional.ofNullable(displayDeviceEntity.getMonday_end()).ifPresent(existingDisplayDevice::setMonday_end);
             Optional.ofNullable(displayDeviceEntity.getTuesday_start()).ifPresent(existingDisplayDevice::setTuesday_start);
