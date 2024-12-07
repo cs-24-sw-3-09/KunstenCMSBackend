@@ -36,15 +36,13 @@ import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     private VisualMediaService visualMediaService;
-    private DisplayDeviceService displayDeviceService;
     private VisualMediaInclusionService visualMediaInclusionService;
     private SlideshowService slideshowService;
 
-    public DimensionCheckServiceImpl(VisualMediaService visualMediaService, DisplayDeviceService displayDeviceService,
+    public DimensionCheckServiceImpl(VisualMediaService visualMediaService,
                                         VisualMediaInclusionService visualMediaInclusionService,
                                         SlideshowService slideshowService){
         this.visualMediaService = visualMediaService;
-        this.displayDeviceService = displayDeviceService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.slideshowService = slideshowService;
     }
@@ -139,10 +137,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     }
 
     @Override
-    public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(TimeSlotEntity timeSlot){
+    public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(ContentEntity displayContent, Set<DisplayDeviceEntity> displayDevices){
        
-        Set<DisplayDeviceEntity> displayDevices = timeSlot.getDisplayDevices();
-        System.out.println("ts: " +timeSlot);
         Set<String> displayDeviceOrientation = new HashSet<>();
         for (DisplayDeviceEntity device : displayDevices){
             String orientation = device.getDisplayOrientation();
@@ -152,10 +148,10 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         if(displayDeviceOrientation.size() > 1) {
             return "The dimensions of display devices are mixed";
         }
-
-        ContentEntity displayContent = timeSlot.getDisplayContent();
+        
         String displayContentOrientation;
         if (displayContent instanceof VisualMediaEntity) {
+            System.out.println("Here");
             Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(displayContent.getId().longValue());
             if(optionalVisualMedia.isEmpty()) {
                 throw new IllegalArgumentException("Visual Media with ID " + displayContent.getId() + " does not exist.");

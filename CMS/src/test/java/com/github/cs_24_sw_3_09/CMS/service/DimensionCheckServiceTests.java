@@ -206,7 +206,7 @@ public class DimensionCheckServiceTests {
         timeSlotService.setDisplayContent(timeslot.getId().longValue(), visualMediaContent.getId().longValue(), "visualMedia");
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
 
-        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(updatedTimeSlot);
+        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
         assertTrue(resultString.equals("1"));
     }
 
@@ -221,7 +221,7 @@ public class DimensionCheckServiceTests {
 
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         
-        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(updatedTimeSlot);
+        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow, updatedTimeSlot.getDisplayDevices());
         assertTrue(resultString.equals("1"));
     }
 
@@ -238,7 +238,7 @@ public class DimensionCheckServiceTests {
         timeSlotService.setDisplayContent(timeslot.getId().longValue(), visualMediaContent.getId().longValue(), "visualMedia");
         
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
-        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(updatedTimeSlot);
+        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
         System.out.println(resultString);
         assertTrue(resultString.equals("The dimension do not match:\nDisplay Device orientation: [horizontal]" + 
                 "\nthe visual media orientation: vertical"));
@@ -255,7 +255,7 @@ public class DimensionCheckServiceTests {
         timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow.getId().longValue(), "slideshow");
         
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
-        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(updatedTimeSlot);
+        String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow, updatedTimeSlot.getDisplayDevices());
         assertTrue(resultString.equals("The dimension do not match:\nDisplay Device orientation: [horizontal]" + 
                 "\nthe visual media orientation: vertical"));
 
@@ -264,7 +264,7 @@ public class DimensionCheckServiceTests {
         timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow2.getId().longValue(), "slideshow");
         
         updatedTimeSlot = timeSlotService.findOne(1L).get();
-        resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(updatedTimeSlot);
+        resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow2, updatedTimeSlot.getDisplayDevices());
         assertTrue(resultString.equals("The dimensions of slideshow are mixed"));
 
     }
