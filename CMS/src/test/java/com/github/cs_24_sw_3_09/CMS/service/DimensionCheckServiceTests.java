@@ -85,7 +85,7 @@ public class DimensionCheckServiceTests {
         assertTrue(visualMediaService.isExists(1L));
         ContentEntity visualMediaContent = visualMediaService.findOne(1L).get();
 
-        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), visualMediaContent);
+        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, visualMediaContent);
         assertTrue(returnString.equals("1"));
     }
 
@@ -98,7 +98,7 @@ public class DimensionCheckServiceTests {
         
         SlideshowEntity slideshow = createHorizontalSlideshow();
 
-        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), slideshow);
+        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow);
         assertTrue(returnString.equals("1"));
     }
 
@@ -113,7 +113,7 @@ public class DimensionCheckServiceTests {
         assertTrue(visualMediaService.isExists(1L));
         ContentEntity visualMediaContent = visualMediaService.findOne(1L).get();
     
-        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), visualMediaContent);
+        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, visualMediaContent);
         
         assertTrue(returnString.equals("The dimension do not match:\nDisplay Device orientation: horizontal" + 
                 "\nFallback Visual Media orientation: vertical"));
@@ -128,7 +128,7 @@ public class DimensionCheckServiceTests {
         //Case 1: slideshow and display device has different dimensions
        SlideshowEntity slideshow = createVerticalSlideshow();
 
-        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), slideshow);
+        String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow);
         assertTrue(returnString.equals("The dimension do not match:\nDisplay Device orientation: horizontal" + 
                 "\nFallback Slide show orientation: vertical"));
 
@@ -136,7 +136,7 @@ public class DimensionCheckServiceTests {
         //Case 2: the Visual Media Inclusions in the Slideshow has mixed dimensions
         SlideshowEntity slideshow2 = createMixedSlideshow();
 
-        returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), slideshow2);
+        returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow2);
         assertTrue(returnString.equals("The media in the slideshow has mixed orientation"));
     }
 
@@ -273,9 +273,10 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatWhenObjectNotFoundCorrectErrorStringIsReturned() throws Exception{
         //the same test can be made for any optional<Object> in the DimensionCheckService, here only one is provided
+        DisplayDeviceEntity displaydevice = TestDataUtil.createDisplayDeviceEntity(); 
         VisualMediaEntity visualMedia = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(visualMedia);
-        assertThrows(IllegalArgumentException.class, () -> dimensionCheckService.checkDimensionForAssignedFallback(1, visualMedia));
+        assertThrows(IllegalArgumentException.class, () -> dimensionCheckService.checkDimensionForAssignedFallback(displaydevice, visualMedia));
     }
     
     @Test
@@ -287,7 +288,7 @@ public class DimensionCheckServiceTests {
         VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(visualMediaWithoutPath);
         
-        String resultString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice.getId(), visualMediaWithoutPath);
+        String resultString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, visualMediaWithoutPath);
         assertTrue(resultString.equals("File not correctly configured"));
     }
 

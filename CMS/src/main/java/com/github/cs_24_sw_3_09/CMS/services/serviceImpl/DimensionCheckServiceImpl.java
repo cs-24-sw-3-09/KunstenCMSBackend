@@ -142,10 +142,12 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(TimeSlotEntity timeSlot){
        
         Set<DisplayDeviceEntity> displayDevices = timeSlot.getDisplayDevices();
+        System.out.println("ts: " +timeSlot);
         Set<String> displayDeviceOrientation = new HashSet<>();
         for (DisplayDeviceEntity device : displayDevices){
             String orientation = device.getDisplayOrientation();
             displayDeviceOrientation.add(orientation);
+            System.out.println("o: "+orientation);
         }
         if(displayDeviceOrientation.size() > 1) {
             return "The dimensions of display devices are mixed";

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
@@ -49,33 +50,43 @@ public class TimeSlotController {
     private final TimeSlotService timeSlotService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
     private final DisplayDeviceService displayDeviceService;
-    private final SlideshowService slideshowService;
-    private final VisualMediaService visualMediaService;
     private ContentUtils contentUtils;
+    private final DimensionCheckService dimensionCheckService;
 
     @Autowired
     public TimeSlotController(
             TimeSlotService timeSlotService,
             Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper,
             DisplayDeviceService displayDeviceService,
-            VisualMediaService visualMediaService,
-            SlideshowService slideshowService,
-            ContentUtils contentUtils
+            ContentUtils contentUtils,
+            DimensionCheckService dimensionCheckService
     ) {
         this.timeSlotService = timeSlotService;
         this.timeSlotMapper = timeSlotMapper;
         this.displayDeviceService = displayDeviceService;
-        this.visualMediaService = visualMediaService;
-        this.slideshowService = slideshowService;
         this.contentUtils = contentUtils;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<TimeSlotDto> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot) {
+    public ResponseEntity<?> createTimeSlot(@Valid @RequestBody TimeSlotDto timeSlot,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions ) {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
+        System.out.println("dto: "+timeSlot);
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
+        System.out.println("ts i c: "+timeSlotEntity);
+        //check whether the dimensions of the displayDevice and the fallbackContent fit
+        if (timeSlotEntity.getDisplayDevices() != null && timeSlotEntity.getDisplayContent() != null) {
+            if(forceDimensions == false){
+                String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity);
+                System.out.println(checkResult);
+                if(!"1".equals(checkResult)){
+                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
+                }
+            }
+        }
 
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
         
