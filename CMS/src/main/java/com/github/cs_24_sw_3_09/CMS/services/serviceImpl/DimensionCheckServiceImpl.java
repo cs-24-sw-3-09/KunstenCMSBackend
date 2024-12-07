@@ -94,6 +94,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     private String getVisualMediaOrientation(String filetype, String path) {
         return switch(filetype) {
+            case "video/mp4" -> getVisualMediaVideoOrientation(path);
             case "mp4" -> getVisualMediaVideoOrientation(path);
             default -> getVisualMediaImageOrientation(path);
         };
