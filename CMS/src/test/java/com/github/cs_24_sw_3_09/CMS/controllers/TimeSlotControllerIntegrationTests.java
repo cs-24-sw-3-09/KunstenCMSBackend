@@ -933,8 +933,9 @@ public class TimeSlotControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
@@ -966,8 +967,9 @@ public class TimeSlotControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
@@ -997,8 +999,9 @@ public class TimeSlotControllerIntegrationTests {
         
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
@@ -1035,8 +1038,9 @@ public class TimeSlotControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(

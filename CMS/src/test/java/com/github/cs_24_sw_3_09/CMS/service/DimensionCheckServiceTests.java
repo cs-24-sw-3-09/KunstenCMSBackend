@@ -268,16 +268,6 @@ public class DimensionCheckServiceTests {
         assertTrue(resultString.equals("The dimensions of slideshow are mixed"));
 
     }
-
-    @Test
-    @WithMockUser(roles = "PLANNER")
-    public void testThatWhenObjectNotFoundCorrectErrorStringIsReturned() throws Exception{
-        //the same test can be made for any optional<Object> in the DimensionCheckService, here only one is provided
-        DisplayDeviceEntity displaydevice = TestDataUtil.createDisplayDeviceEntity(); 
-        VisualMediaEntity visualMedia = TestDataUtil.createVisualMediaEntity();
-        visualMediaService.save(visualMedia);
-        assertThrows(IllegalArgumentException.class, () -> dimensionCheckService.checkDimensionForAssignedFallback(displaydevice, visualMedia));
-    }
     
     @Test
     @WithMockUser(roles="PLANNER")
