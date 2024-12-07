@@ -33,8 +33,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity save(UserEntity user) {
-        return userRepository.save(user);
+    public Optional<UserEntity> save(UserEntity user) {
+        for (UserEntity userToCmp : findAll()) {
+            if (user.getEmail().equals(userToCmp.getEmail())) return Optional.empty();
+        }
+        
+        return Optional.of(userRepository.save(user));
     }
 
     @Override

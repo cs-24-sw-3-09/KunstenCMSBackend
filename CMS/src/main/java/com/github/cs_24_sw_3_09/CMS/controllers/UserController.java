@@ -42,21 +42,29 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
+    //todo: Check if work
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto user) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto user) {
 
         user.setPassword(encoder.encode(user.getPassword()));
 
         UserEntity userEntity = userMapper.mapFrom(user);
-        UserEntity savedUserEntity = userService.save(userEntity);
-        return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.CREATED);
+        Optional<UserEntity> savedUserEntity = userService.save(userEntity);
+
+        if (savedUserEntity.isEmpty()) {
+            /*UserDto errorResponse = new UserDto();
+            errorResponse.setMessage("Failed to create user. Please check your input."); // Add a 'message' field to UserDto
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);*/
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(userMapper.mapTo(savedUserEntity.get()), HttpStatus.CREATED);
     }
 
     @GetMapping
-    //TODO: WTF? naming?
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public Page<UserDto> getDisplayDevices(Pageable pageable) {
+    public Page<UserDto> getUsers(Pageable pageable) {
         Page<UserEntity> userEntities = userService.findAll(pageable);
         return userEntities.map(userMapper::mapTo);
     }
@@ -99,14 +107,13 @@ public class UserController {
         return new ResponseEntity<>(userMapper.mapTo(updatedUserEntity), HttpStatus.OK);
     }
 
-    //TODO: skal man kunne slette sig selv?
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id) {
         if (!userService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
