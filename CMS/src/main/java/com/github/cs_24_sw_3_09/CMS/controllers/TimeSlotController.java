@@ -122,7 +122,7 @@ public class TimeSlotController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    //todo: Maybe do it here as well -> Do we even use put though? 
+    //todo: Maybe do it here as well -> Do we even use put? 
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<?> fullUpdateTimeSlot(@PathVariable("id") Long id,
@@ -154,21 +154,6 @@ public class TimeSlotController {
     public ResponseEntity<?> partialUpdateTimeSlot(@PathVariable("id") Long id,
                 @Valid @RequestBody TimeSlotDto timeSlotDto,
                 @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
-        /*if (!timeSlotService.isExists(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
-
-        //check if dimensions of displaydevice and content fit
-        if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null) {
-            if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
-                if(!"1".equals(checkResult)){
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-                }
-            }
-        }*/
 
         Result<TimeSlotEntity> updatedTimeSlotEntity = timeSlotService.partialUpdate(id, timeSlotMapper.mapFrom(timeSlotDto), forceDimensions != null ? forceDimensions : false);
         if (updatedTimeSlotEntity.isErr()) {
@@ -257,23 +242,7 @@ public class TimeSlotController {
             return ResponseEntity.badRequest().build();
         }
         Long displayDeviceId = ((Integer) requestBody.get("displayDeviceId")).longValue();
-        /*if (!timeSlotService.isExists(id) || !displayDeviceService.isExists(displayDeviceId)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        //check if dimensions of displaydevice and content fit
-        TimeSlotEntity timeSlotEntity = timeSlotService.findOne(id).get();
-        Optional<DisplayDeviceEntity> optionalDevice = displayDeviceService.findOne(displayDeviceId);
-        Set<DisplayDeviceEntity> displayDevice = Set.of(optionalDevice.get());//safe to use .get() since already validated existence
-        if (timeSlotEntity.getDisplayContent() != null) {
-            if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), displayDevice);
-                if(!"1".equals(checkResult)){
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-                }
-            }
-        }*/
-
+        
         Result<TimeSlotEntity> updatedTimeSlot = timeSlotService.addDisplayDevice(id, displayDeviceId, forceDimensions != null ? forceDimensions : null);
         // If tag was not found, updatedVisualMedia will be null.
         if (updatedTimeSlot.isErr()) {

@@ -198,29 +198,6 @@ public class DisplayDeviceController {
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        //todo: Logic from earlier -> If ok: delete
-        // Get content type and validate existence of dd and content
-        /*String type = contentUtils.getContentTypeById(Math.toIntExact(fallbackId));
-        if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId)
-                || !displayDeviceService.isExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-   
-         //check whether the dimensions of the displayDevice and the fallbackContent fit 
-        if(forceDimensions == false){
-            ContentEntity fallbackContent = null;
-            if(type.equals("VisualMediaEntity")){
-                fallbackContent = visualMediaService.findOne(fallbackId).get(); //already chekced that they exist -> safe to use .get()
-            } else if (type.equals("SlideshowEntity")) {
-                fallbackContent = slideshowService.findOne(fallbackId).get();
-            } 
-            DisplayDeviceEntity displayDevice = displayDeviceService.findOne(id).get(); 
-            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
-            if(!"1".equals(checkResult)){
-                return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-            }
-        } */
         
         // Update the display device and return the response
         Result<DisplayDeviceEntity> updatedDisplayDeviceEntity = displayDeviceService.addFallback(id, fallbackId, forceDimensions != null ? forceDimensions : false);
