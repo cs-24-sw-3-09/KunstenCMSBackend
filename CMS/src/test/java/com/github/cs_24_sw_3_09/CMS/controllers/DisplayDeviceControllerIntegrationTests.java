@@ -559,9 +559,10 @@ public class DisplayDeviceControllerIntegrationTests {
 		String body = "{\"fallbackId\":1,\"type\":\"visualMedia\"}}";
 
 		mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback")
+                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
+						.param("forceDimensions", "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -588,6 +589,7 @@ public class DisplayDeviceControllerIntegrationTests {
                 MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
+						.param("forceDimensions", "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -647,7 +649,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		Result<DisplayDeviceEntity> dd = displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), false);
+		Result<DisplayDeviceEntity> dd = displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		System.out.println(dd.getErrMsg());
 		
 		assertEquals(
@@ -665,6 +667,7 @@ public class DisplayDeviceControllerIntegrationTests {
                 MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
+						.param("forceDimensions", "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -686,7 +689,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), false);
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
@@ -731,7 +734,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), false);
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
@@ -773,7 +776,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists(1L));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), false);
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()

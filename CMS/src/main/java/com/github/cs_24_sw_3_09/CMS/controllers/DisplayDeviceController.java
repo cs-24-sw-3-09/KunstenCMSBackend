@@ -210,10 +210,6 @@ public class DisplayDeviceController {
             @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
 
         // Validate input and extract fallbackId
-        if (!requestBody.containsKey("fallbackId")) {
-            return ResponseEntity.badRequest().build();
-        }
-
         // check if is a number
         Long fallbackId;
         try {

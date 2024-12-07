@@ -227,9 +227,8 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     public Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions) {
         Optional<ContentEntity> content = findContentById(Math.toIntExact(fallbackId));
         Optional<DisplayDeviceEntity> displayDeviceToCheck = displayDeviceRepository.findById(Math.toIntExact(id)); 
-        String type = contentUtils.getContentTypeById(Math.toIntExact(fallbackId));
         
-        if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId) || displayDeviceToCheck.isEmpty() || content.isEmpty()) {
+        if (displayDeviceToCheck.isEmpty() || content.isEmpty()) {
             return new Result<>("Not found");
         }
         
@@ -237,7 +236,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
         DisplayDeviceEntity displayDevice = displayDeviceToCheck.get();
 
          //check whether the dimensions of the displayDevice and the fallbackContent fit 
-        if (forceDimensions){
+        if (!forceDimensions){
             String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
             if(!"1".equals(checkResult)) return new Result<>(checkResult); 
         }
