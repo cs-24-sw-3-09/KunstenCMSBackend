@@ -6,11 +6,14 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -62,7 +65,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
     @Override
     public Optional<DisplayDeviceEntity> save(DisplayDeviceEntity displayDeviceEntity) {
-        if (displayDeviceEntity.getFallbackContent() != null) {
+        if (displayDeviceEntity.getFallbackContent() != null) {           
             Optional<DisplayDeviceEntity> displayDevice = addFallbackContent(displayDeviceEntity);
             if (displayDevice.isEmpty()) return Optional.empty();
             displayDeviceEntity = displayDevice.get();

@@ -13,6 +13,7 @@ import java.util.stream.StreamSupport;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotColor;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,9 +41,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private VisualMediaService visualMediaService;
     private SlideshowService slideshowService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
-
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
-                               SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, VisualMediaService visualMediaService, SlideshowService slideshowService) {
+    
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
+                            Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
+                            SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, 
+                            VisualMediaService visualMediaService, SlideshowService slideshowService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
@@ -73,7 +76,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity) {
+    public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity){
         //Handle display devices
         Optional<TimeSlotEntity> updatedTimeSlot = addDisplayDevice(timeSlotEntity);
         if (updatedTimeSlot.isEmpty()) return Optional.empty();
@@ -87,10 +90,12 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         }
 
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);
+
+        //If time slot is active then it notifies display devices
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return Optional.of(toReturn);
     }
-
+    
     private Optional<TimeSlotEntity> addDisplayDevice(TimeSlotEntity timeSlotEntity) {
         Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
 

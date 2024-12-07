@@ -215,7 +215,6 @@ public class SlideshowServiceImpl implements SlideshowService {
         }
         return slideshowStatusList;
     }
-    
 
     @Override
     public Optional<SlideshowEntity> duplicate(Long id, String name) {

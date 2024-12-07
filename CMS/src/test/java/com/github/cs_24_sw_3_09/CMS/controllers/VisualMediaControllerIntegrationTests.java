@@ -76,10 +76,10 @@ public class VisualMediaControllerIntegrationTests {
         MockMultipartFile file = TestDataUtil.createVisualMediaFile();
 
         mockMvc.perform(
-                multipart("/api/visual_medias")
-                        .file(file))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpg"))
+                        multipart("/api/visual_medias")
+                                .file(file)
+                ).andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test-image.jpeg"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fileType").value(MediaType.IMAGE_JPEG_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.location").value("/files/visual_media/1.jpg"));
     }
@@ -467,6 +467,11 @@ public class VisualMediaControllerIntegrationTests {
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias")
                 .file("file", newFile1.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        VisualMediaEntity vm = visualMediaService.findOne(1L).get();
+
+        System.out.println(vm.getName() + " " + vm.getFileType() + " " + vm.getLocation());
+        
         // Step 2: Replace the file
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias/1/file")
                 .file("file", newFile2.getBytes()))

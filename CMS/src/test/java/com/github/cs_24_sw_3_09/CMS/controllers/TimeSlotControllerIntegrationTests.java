@@ -259,9 +259,13 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
 
+        System.out.println((timeSlotService.isExists(1L)));
+
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
-
+        int [] array = {1};
+        timeSlotDtoToJson = TestDataUtil.createTSJsonWithDDIds(timeSlotDtoToJson, array);
+        System.out.println(timeSlotDtoToJson);
         mockMvc.perform(
                 MockMvcRequestBuilders.put("/api/time_slots/" + savedTimeSlotEntitiy.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -929,8 +933,9 @@ public class TimeSlotControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
@@ -962,8 +967,9 @@ public class TimeSlotControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
@@ -993,8 +999,9 @@ public class TimeSlotControllerIntegrationTests {
         
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
@@ -1031,8 +1038,9 @@ public class TimeSlotControllerIntegrationTests {
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
+                .param("forceDimensions", "true")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(

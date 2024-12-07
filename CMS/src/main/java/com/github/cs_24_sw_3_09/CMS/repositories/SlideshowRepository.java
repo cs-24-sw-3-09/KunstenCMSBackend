@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.repositories;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
+import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 
 import java.util.ArrayList;
 import java.util.List;

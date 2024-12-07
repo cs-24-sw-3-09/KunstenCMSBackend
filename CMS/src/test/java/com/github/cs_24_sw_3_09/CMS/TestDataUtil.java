@@ -18,6 +18,12 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+
 public class TestDataUtil {
 
     static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
@@ -96,10 +102,9 @@ public class TestDataUtil {
     public static VisualMediaEntity createVisualMediaEntity() {
         return VisualMediaEntity.builder()
                 .description("dkaoidkao test descpt")
-                .fileType("jpg")
-                // .lastDateModified("30/10/2003")
-                .location("/djao/dhau")
-                .name("Billede navn")
+                //.lastDateModified("30/10/2003")
+                .location("/djao/dhau.jpg")
+                .name("Test_name")
                 .build();
     }
 
@@ -142,28 +147,53 @@ public class TestDataUtil {
 
     public static TimeSlotDto createTimeSlotDto() {
         return TimeSlotDto.builder()
-                .name("Test1 TimeSlot")
-                .startDate(java.sql.Date.valueOf("2024-11-20"))
-                .endDate(java.sql.Date.valueOf("2024-11-20"))
-                .startTime(java.sql.Time.valueOf("10:20:30"))
-                .endTime(java.sql.Time.valueOf("11:21:31"))
-                .weekdaysChosen(3)
-                .displayContent(new SlideshowEntity())
-                .displayDevices(new HashSet<DisplayDeviceEntity>())
-                .build();
+        .name("Test1 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2024-11-20"))
+        .endDate(java.sql.Date.valueOf("2024-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayContent(null)
+        .displayDevices(new HashSet<DisplayDeviceEntity>())
+        .build();
+    }
+
+    public static TimeSlotDto createTimeSlotDtoWithAssignedContentAndDD(){
+        return TimeSlotDto.builder()
+        .name("Test1 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2024-11-20"))
+        .endDate(java.sql.Date.valueOf("2024-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayContent(assignedSlideshow())
+        .displayDevices(assignDisplayDevice())
+        .build();
+    }
+
+    public static TimeSlotEntity createTimeSlotEntityWithoutContent(){
+        return TimeSlotEntity.builder()
+        .name("Test2 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2025-11-20"))
+        .endDate(java.sql.Date.valueOf("2026-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayDevices(assignDisplayDevice())
+        .build();
     }
 
     public static TimeSlotEntity createTimeSlotEntity() {
         return TimeSlotEntity.builder()
-                .name("Test2 TimeSlot")
-                .startDate(java.sql.Date.valueOf("2025-11-20"))
-                .endDate(java.sql.Date.valueOf("2026-11-20"))
-                .startTime(java.sql.Time.valueOf("10:20:30"))
-                .endTime(java.sql.Time.valueOf("11:21:31"))
-                .weekdaysChosen(3)
-                .displayContent(assignedSlideshow())
-                .displayDevices(assignDisplayDevice())
-                .build();
+        .name("Test2 TimeSlot")
+        .startDate(java.sql.Date.valueOf("2025-11-20"))
+        .endDate(java.sql.Date.valueOf("2026-11-20"))
+        .startTime(java.sql.Time.valueOf("10:20:30"))
+        .endTime(java.sql.Time.valueOf("11:21:31"))
+        .weekdaysChosen(3)
+        .displayContent(assignedSlideshow())
+        .displayDevices(assignDisplayDevice())
+        .build();
     }
 
     public static TimeSlotEntity createTimeSlotEntityWithOnlyId(Integer id) {
@@ -172,6 +202,11 @@ public class TestDataUtil {
                 .build();
     }
 
+
+    
+
+
+    
 
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
@@ -238,7 +273,7 @@ public class TestDataUtil {
     public static MockMultipartFile createVisualMediaFile() {
         return new MockMultipartFile(
                 "file",
-                "test-image.jpg",
+                "test-image.jpeg",
                 MediaType.IMAGE_JPEG_VALUE,
                 "Fake JPEG file content".getBytes()
         );
@@ -375,13 +410,13 @@ public class TestDataUtil {
                 .endTime(Time.valueOf(endTime))   // Requires the format HH:mm:ss
                 .displayDevices(displayDeviceEntities)
                 .build();
-    }
+    }    
 
     public static String createTSJsonWithDDIds(String json, int[] ids) {
         String res = "\"displayDevices\":[";
         for (int i = 0; i < ids.length; i++) {
             res += "{\"id\":"+ids[i]+"}";
-            
+
             if (i != ids.length - 1) {
                 res += ",";
             }
@@ -402,4 +437,45 @@ public class TestDataUtil {
         return json.replace("\"displayContent\":null", res);
     }
 
+
+
+    public static MockMultipartFile createHorizontalImage() throws IOException {
+        int width = 200;
+        int height = 100;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Write the image to a byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+
+        // Create a MockMultipartFile using the image bytes
+        MockMultipartFile mockImageFile = new MockMultipartFile(
+                "file",                 // Form field name
+                "test-image.jpeg",       // File name
+                "image/jpg",           // MIME type
+                baos.toByteArray()      // File content
+        );
+        return mockImageFile;
+    }
+
+    public static MockMultipartFile createVerticalImage() throws IOException {
+        int width = 100;
+        int height = 200;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        // Write the image to a byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+
+        // Create a MockMultipartFile using the image bytes
+        MockMultipartFile mockImageFile = new MockMultipartFile(
+                "file",                 // Form field name
+                "test-image.jpeg",       // File name
+                "image/jpg",           // MIME type
+                baos.toByteArray()      // File content
+        );
+        return mockImageFile;
+    }
+
+    
 }
