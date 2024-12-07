@@ -1,9 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.jcodec.api.FrameGrab;
+import org.jcodec.common.io.SeekableByteChannel;
+import org.jcodec.common.io.NIOUtils;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +51,42 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return Optional.of(toReturn);
     }
-
+    
     private Optional<VisualMediaInclusionEntity> getVisualMedia(VisualMediaInclusionEntity visualMediaInclusionEntity) {
-        Optional<VisualMediaEntity> visualMedia = visualMediaService.findOne((long) visualMediaInclusionEntity.getVisualMedia().getId());
-        if (visualMedia.isEmpty()) return Optional.empty();
-        visualMediaInclusionEntity.setVisualMedia(visualMedia.get());
+        Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne((long) visualMediaInclusionEntity.getVisualMedia().getId());
+        if (optionalVisualMedia.isEmpty()) return Optional.empty();
+        VisualMediaEntity visualMedia = optionalVisualMedia.get();
+        visualMediaInclusionEntity.setVisualMedia(visualMedia);
+        
+        //if the visual media is a video, the slideDuration field should have the length of the video
+        if (visualMedia.getFileType().equals("mp4")) {
+            Integer videoDuration = findVideoDuration(visualMedia.getLocation());
+            visualMediaInclusionEntity.setSlideDuration(videoDuration);
+        }
+                
         return Optional.of(visualMediaInclusionEntity);
+    }
+
+    private Integer findVideoDuration(String visualMediaPath){
+        String rootPath = System.getProperty("user.dir"); 
+        String relativePath = visualMediaPath;
+        String absolutePath = Paths.get(rootPath, relativePath).toString();
+
+        try {
+            File videoFile = new File(absolutePath);
+            //SeekableByteChannel -> used to read video file efficiently
+            SeekableByteChannel channel = NIOUtils.readableChannel(videoFile);
+            // Get frame-level access to video
+            FrameGrab grab = FrameGrab.createFrameGrab(channel);
+            // Get the video duration in seconds, must return a double
+            double durationInSeconds = grab.getVideoTrack().getMeta().getTotalDuration();
+            //convert to field type Integer
+            Integer durationsInSecondsInteger = Integer.valueOf((int) Math.round(durationInSeconds));
+            return durationsInSecondsInteger;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Override
