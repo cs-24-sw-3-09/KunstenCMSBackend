@@ -144,7 +144,7 @@ public class VisualMediaControllerIntegrationTests {
                 (long) savedVisualMediaEntity.getId());
 
         SlideshowEntity updatedSlideshow = slideshowService.addVisualMediaInclusion((long) savedSlideshow.getId(),
-                (long) savedVisualMediaInclusionEntity.getId());
+                (long) savedVisualMediaInclusionEntity.getId(), true).getValue();
         Set<VisualMediaInclusionEntity> inclusions = updatedSlideshow.getVisualMediaInclusionCollection();
         //convert to List so that indexing can be used
         List<VisualMediaInclusionEntity> inclusionList = new ArrayList<>(inclusions);
@@ -563,7 +563,7 @@ public class VisualMediaControllerIntegrationTests {
         visualMediaInclusionService.setVisualMedia((long) savedVisualMediaInclusionEntity.getId(), (long) 2);
 
         slideshowService.addVisualMediaInclusion((long) 3,
-                (long) savedVisualMediaInclusionEntity.getId());
+                (long) savedVisualMediaInclusionEntity.getId(), true);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/visual_medias/states"))
                 .andExpect(MockMvcResultMatchers.status().isOk())

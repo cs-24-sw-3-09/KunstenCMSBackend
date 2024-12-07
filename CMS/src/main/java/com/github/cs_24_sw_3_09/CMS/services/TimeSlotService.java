@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 public interface TimeSlotService {
     Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity);
@@ -29,7 +30,7 @@ public interface TimeSlotService {
 
     Set<TimeSlotDto> findSetOfTimeSlotsSlideshowIsAPartOf(Long id);
 
-    TimeSlotEntity partialUpdate(Long id, TimeSlotEntity timeSlotEntity);
+    Result<TimeSlotEntity> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions);
 
     int countDisplayDeviceAssociations(Long timeSlotId);
 
@@ -37,9 +38,9 @@ public interface TimeSlotService {
 
     void deleteRelation(Long tsId, Long ddId);
 
-    TimeSlotEntity setDisplayContent(Long tsId, Long dcId, String type);
+    Result<TimeSlotEntity> setDisplayContent(Long tsId, Long dcId, String type, Boolean forceDimensions);
   
-    TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException;
+    Result<TimeSlotEntity> addDisplayDevice(Long id, Long displayDeviceId, Boolean forceDimensions) throws RuntimeException;
 
     List<TimeSlotEntity> findOverlappingTimeSlots(Long id);
 

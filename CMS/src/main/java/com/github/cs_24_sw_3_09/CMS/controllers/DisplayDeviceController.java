@@ -183,25 +183,6 @@ public class DisplayDeviceController {
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
 
-    /*@PatchMapping(path = "/{id}/fallback")
-    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<DisplayDeviceDto> addFallback(@PathVariable("id") Long id,
-                                                 @RequestBody Map<String, Object> requestBody) {
-        Long fallbackId = ((Integer) requestBody.get("fallbackId")).longValue();
-
-        if (!displayDeviceService.isExists(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Optional<DisplayDeviceEntity> updatedDisplayDevice = displayDeviceService.addFallback(id, fallbackId);
-
-        // If fallback content was not found, updatedDisplayDevice will be empty.
-        if (updatedDisplayDevice.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(displayDeviceMapper.mapTo(updatedDisplayDevice.get()), HttpStatus.OK);
-    }    */
-
     @PatchMapping(path = "/{id}/fallback_content")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<?> setFallbackContent(
@@ -218,6 +199,7 @@ public class DisplayDeviceController {
             return ResponseEntity.badRequest().build();
         }
 
+        //todo: Logic from earlier -> If ok: delete
         // Get content type and validate existence of dd and content
         /*String type = contentUtils.getContentTypeById(Math.toIntExact(fallbackId));
         if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId)
