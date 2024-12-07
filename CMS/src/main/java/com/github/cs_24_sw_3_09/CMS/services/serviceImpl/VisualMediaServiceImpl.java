@@ -1,16 +1,18 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
+
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
+import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
@@ -34,17 +37,22 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final VisualMediaRepository visualMediaRepository;
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final TagRepository tagRepository;
-    private PushTSService pushTSService;
-    private SlideshowRepository slideshowRepository;
+    private final PushTSService pushTSService;
+    private final SlideshowRepository slideshowRepository;
+
+    @Lazy
+    private final SlideshowService slideshowService;
 
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService,
-            TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository,
-            VisualMediaInclusionRepository visualMediaInclusionRepository) {
+            TagRepository tagRepository, VisualMediaInclusionRepository visualMediaInclusionRepository,
+            PushTSService pushTSService, SlideshowRepository slideshowRepository,
+            @org.springframework.context.annotation.Lazy SlideshowService slideshowService) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
+        this.slideshowService = slideshowService;
     }
 
     @Override
@@ -175,5 +183,42 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         FileUtils.createVisualMediaFile(file, String.valueOf(id));
         return HttpStatus.OK;
 
+    }
+
+    @Override
+    public List<Map<String, Object>> findStateOfEveryVisualMedia() {
+        List<Map<String, Object>> slideshowStateList = slideshowService.findStateOfEverySlideshow();
+        List<Integer> visualMediaIds = visualMediaRepository.getAllVisualMediaIds();
+        List<Map<String, Object>> visualMediaStatusList = new ArrayList<>();
+        visualMediaIds.forEach(id -> {
+            Map<String, Object> visualMediaStatus = new HashMap<>();
+            visualMediaStatus.put("visualMediaId", id);
+            visualMediaStatus.put("color", "grey");
+            Set<Long> slideShowsForVM = slideshowRepository.findSlideshowIdsByVisualMediaId(id.longValue());
+
+            slideShowsForVM.forEach(SSId -> {
+                String color = slideshowStateList.stream()
+                        .filter(map -> map.get("slideshowId") != SSId)
+                        .map(map -> (String) map.get("color"))
+                        .findFirst()
+                        .orElse(null);
+                String VMcolor = visualMediaStatus.get("color").toString();
+                switch (color) {
+                    case "green":
+                        visualMediaStatus.put("color", "green");
+                        return;
+                    case "yellow":
+                        visualMediaStatus.put("color", "yellow");
+                        break;
+                    case "red":
+                        if (VMcolor != "yellow") {
+                            visualMediaStatus.put("color", "red");
+                        }
+                        break;
+                }
+            });
+            visualMediaStatusList.add(visualMediaStatus);
+        });
+        return visualMediaStatusList;
     }
 }
