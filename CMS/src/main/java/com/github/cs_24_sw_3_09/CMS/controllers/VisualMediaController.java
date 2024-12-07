@@ -186,11 +186,10 @@ public class VisualMediaController {
         return new ResponseEntity<>(visualMediaMapper.mapTo(updatedVisualMediaEntity), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/{id}/file")
+    @PatchMapping(path = "/{id}/file")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<HttpStatus> replaceFile(@PathVariable("id") Long id,
                                                   @RequestParam("file") MultipartFile file) throws IOException {
-
         if (!visualMediaService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
