@@ -10,6 +10,8 @@ import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
+
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,60 +145,12 @@ public class DisplayDeviceController {
 
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteDisplayDevice(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteDisplayDevice(@PathVariable("id") Long id) {
         if (!displayDeviceService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         displayDeviceService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PatchMapping(path = "/{id}/fallback_content")
-    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
-    public ResponseEntity<?> setFallbackContent(
-            @PathVariable("id") Long id,
-            @RequestBody Map<String, Object> requestBody,
-            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
-
-        // Validate input and extract fallbackId
-        if (!requestBody.containsKey("fallbackId")) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        // check if is a number
-        Long fallbackId;
-        try {
-            fallbackId = Long.valueOf(requestBody.get("fallbackId").toString());
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        // Get content type and validate existence of dd and content
-        String type = contentUtils.getContentTypeById(Math.toIntExact(fallbackId));
-        if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId)
-                || !displayDeviceService.isExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-   
-         //check whether the dimensions of the displayDevice and the fallbackContent fit 
-        if(forceDimensions == false){
-            ContentEntity fallbackContent = null;
-            if(type.equals("VisualMediaEntity")){
-                fallbackContent = visualMediaService.findOne(fallbackId).get(); //already chekced that they exist -> safe to use .get()
-            } else if (type.equals("SlideshowEntity")) {
-                fallbackContent = slideshowService.findOne(fallbackId).get();
-            } 
-            DisplayDeviceEntity displayDevice = displayDeviceService.findOne(id).get(); 
-            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
-            if(!"1".equals(checkResult)){
-                return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-            }
-        } 
-        
-        // Update the display device and return the response
-        DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.setFallbackContent(id, fallbackId, type);
-
-        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
 
     @PatchMapping(path = "/{id}/time_slots")
@@ -229,7 +183,7 @@ public class DisplayDeviceController {
         return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity));
     }
 
-    @PatchMapping(path = "/{id}/fallback")
+    /*@PatchMapping(path = "/{id}/fallback")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<DisplayDeviceDto> addFallback(@PathVariable("id") Long id,
                                                  @RequestBody Map<String, Object> requestBody) {
@@ -246,5 +200,60 @@ public class DisplayDeviceController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(displayDeviceMapper.mapTo(updatedDisplayDevice.get()), HttpStatus.OK);
-    }    
+    }    */
+
+    @PatchMapping(path = "/{id}/fallback_content")
+    @PreAuthorize("hasAuthority('ROLE_PLANNER')")
+    public ResponseEntity<?> setFallbackContent(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestBody,
+            @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
+
+        // Validate input and extract fallbackId
+        if (!requestBody.containsKey("fallbackId")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // check if is a number
+        Long fallbackId;
+        try {
+            fallbackId = Long.valueOf(requestBody.get("fallbackId").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Get content type and validate existence of dd and content
+        /*String type = contentUtils.getContentTypeById(Math.toIntExact(fallbackId));
+        if (type == null || !contentUtils.isFallbackContentValid(type, fallbackId)
+                || !displayDeviceService.isExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+   
+         //check whether the dimensions of the displayDevice and the fallbackContent fit 
+        if(forceDimensions == false){
+            ContentEntity fallbackContent = null;
+            if(type.equals("VisualMediaEntity")){
+                fallbackContent = visualMediaService.findOne(fallbackId).get(); //already chekced that they exist -> safe to use .get()
+            } else if (type.equals("SlideshowEntity")) {
+                fallbackContent = slideshowService.findOne(fallbackId).get();
+            } 
+            DisplayDeviceEntity displayDevice = displayDeviceService.findOne(id).get(); 
+            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
+            if(!"1".equals(checkResult)){
+                return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
+            }
+        } */
+        
+        // Update the display device and return the response
+        Result<DisplayDeviceEntity> updatedDisplayDeviceEntity = displayDeviceService.addFallback(id, fallbackId, forceDimensions != null ? forceDimensions : false);
+        if (updatedDisplayDeviceEntity.isErr()) {
+            return switch(updatedDisplayDeviceEntity.getErrMsg()) {
+                case "Not found" -> ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                default -> new ResponseEntity<>(updatedDisplayDeviceEntity.getErrMsg(), HttpStatus.CONFLICT);
+            };
+        }
+        
+        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity.getValue()));
+    }
+
 }
