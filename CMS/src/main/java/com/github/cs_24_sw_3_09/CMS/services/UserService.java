@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface UserService extends UserDetailsService {
     Optional<UserEntity> save(UserEntity user);
 
+    UserEntity forceSave(UserEntity user);
+
     List<UserEntity> findAll();
 
     Page<UserEntity> findAll(Pageable pageable);

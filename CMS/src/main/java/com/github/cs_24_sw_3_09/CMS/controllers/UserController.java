@@ -42,7 +42,6 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    //todo: Check if work
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto user) {
@@ -53,12 +52,8 @@ public class UserController {
         Optional<UserEntity> savedUserEntity = userService.save(userEntity);
 
         if (savedUserEntity.isEmpty()) {
-            /*UserDto errorResponse = new UserDto();
-            errorResponse.setMessage("Failed to create user. Please check your input."); // Add a 'message' field to UserDto
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);*/
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-
         return new ResponseEntity<>(userMapper.mapTo(savedUserEntity.get()), HttpStatus.CREATED);
     }
 
@@ -90,7 +85,7 @@ public class UserController {
 
         userDto.setId(Math.toIntExact(id));
         UserEntity userEntity = userMapper.mapFrom(userDto);
-        UserEntity savedUserEntity = userService.save(userEntity);
+        UserEntity savedUserEntity = userService.forceSave(userEntity);
         return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.OK);
     }
 

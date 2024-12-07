@@ -5,13 +5,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntityDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,6 +37,11 @@ public class UserServiceImpl implements UserService {
         }
         
         return Optional.of(userRepository.save(user));
+    }
+
+    @Override
+    public UserEntity forceSave(UserEntity user) {
+        return userRepository.save(user);
     }
 
     @Override
