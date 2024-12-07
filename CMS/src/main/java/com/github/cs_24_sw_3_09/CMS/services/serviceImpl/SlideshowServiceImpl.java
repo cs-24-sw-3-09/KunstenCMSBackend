@@ -126,8 +126,8 @@ public class SlideshowServiceImpl implements SlideshowService {
         SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
 
-        slideshow.getVisualMediaInclusionCollection().clear();
-        slideshowRepository.save(slideshow);
+        //slideshow.getVisualMediaInclusionCollection().clear();
+        //slideshowRepository.save(slideshow);
         slideshowRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }

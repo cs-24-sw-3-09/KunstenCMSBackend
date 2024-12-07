@@ -7,11 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -788,8 +783,8 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity ts4 = TestDataUtil.createTimeSlotEntityFromData(weekdaysChosen,
             startDate, endDate, startTime, endTime);
         String json = objectMapper.writeValueAsString(ts4); 
-        //int[] associationTs4 = {4};
-        json = TestDataUtil.createDDJsonWithId(json, associations);
+        json = TestDataUtil.createTSJsonWithDDIds(json, associations);
+
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
@@ -859,6 +854,150 @@ public class TimeSlotControllerIntegrationTests {
 			MockMvcResultMatchers.jsonPath("$").isArray())
 		.andExpect(
 			MockMvcResultMatchers.jsonPath("$.length()").value(0));
+	}
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void testThatFullPatchTimeSlotWithDisplayDevicesIds() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        timeSlot.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
+
+        assertEquals(
+            2, 
+            timeSlot.getDisplayDevices().size()
+        );
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+
+        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+        assertTrue(displayDeviceService.isExists(3L));
+        assertTrue(displayDeviceService.isExists(4L));
+
+        String json = objectMapper.writeValueAsString(tsToSend);
+        int[] arr = {3, 4};
+        json = TestDataUtil.createTSJsonWithDDIds(json, arr);
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices").isArray()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices.length()").value(2)
+        );
+
+		assertEquals(
+			2, 
+			timeSlotService.findOne(1L).get().getDisplayDevices().size()
+		);
+	}
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void testThatFullPatchTimeSlotWithDisplayContentIds() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(slideshowRepository.findById(1).isPresent());
+
+        slideshowRepository.save(TestDataUtil.createSlideshowEntity());
+        assertTrue(slideshowRepository.findById(2).isPresent());
+
+        tsToSend.setDisplayContent(null);
+        String json = objectMapper.writeValueAsString(tsToSend);
+        json = TestDataUtil.createTSJsonWithDCIds(json, "2", "slideshow");
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent").isNotEmpty()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.name").value("testSS")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.id").value(2)
+        );
+
+		assertEquals(
+			2, 
+			timeSlotService.findOne(1L).get().getDisplayContent().getId()
+		);
+	}
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void testThatFullPatchTimeSlotWithNothing() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(slideshowRepository.findById(1).isPresent());
+
+        tsToSend.setDisplayContent(null);
+        String json = objectMapper.writeValueAsString(tsToSend);
+        
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent").isNotEmpty()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.name").value("test1")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayContent.id").value(1)
+        );
+
+		assertEquals(
+			1, 
+			timeSlotService.findOne(1L).get().getDisplayContent().getId()
+		);
+	}
+
+    @Test
+	@WithMockUser(roles = { "PLANNER" })
+	public void testThatFullPatchTimeSlotWithNoDisplayIdsGiven() throws Exception {
+		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+        timeSlot.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
+
+        assertEquals(
+            2, 
+            timeSlot.getDisplayDevices().size()
+        );
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+
+        tsToSend.setDisplayDevices(null);
+        String json = objectMapper.writeValueAsString(tsToSend);
+
+		mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices").isArray()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.displayDevices.length()").value(2)
+        );
+
+		assertEquals(
+			2, 
+			timeSlotService.findOne(1L).get().getDisplayDevices().size()
+		);
 	}
 
 }

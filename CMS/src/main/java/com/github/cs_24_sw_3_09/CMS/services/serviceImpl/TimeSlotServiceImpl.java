@@ -1,14 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 
-import java.util.Set;
 import java.sql.Date;
-import java.util.HashSet;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -183,7 +176,30 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             Optional.ofNullable(timeSlotEntity.getStartTime()).ifPresent(existingTimeSlot::setStartTime);
             Optional.ofNullable(timeSlotEntity.getEndTime()).ifPresent(existingTimeSlot::setEndTime);
             Optional.ofNullable(timeSlotEntity.getWeekdaysChosen()).ifPresent(existingTimeSlot::setWeekdaysChosen);
-            Optional.ofNullable(timeSlotEntity.getDisplayContent()).ifPresent(existingTimeSlot::setDisplayContent);
+            //Display Devices
+            Optional.ofNullable(timeSlotEntity.getDisplayDevices()).ifPresent(displayDevices -> {
+                Set<DisplayDeviceEntity> updatedDisplayDevices = new HashSet<>();
+                displayDevices.stream().forEach(displayDevice -> {
+                    if (displayDevice.getId() == null) {
+                        updatedDisplayDevices.add(displayDevice);
+                        return;
+                    }
+                    Optional<DisplayDeviceEntity> foundDisplayDevice = displayDeviceRepository.findById(displayDevice.getId());
+                    if (foundDisplayDevice.isEmpty()) return;
+                    updatedDisplayDevices.add(displayDevice);
+                });
+                existingTimeSlot.setDisplayDevices(displayDevices);
+            });
+            //Display Content
+            Optional.ofNullable(timeSlotEntity.getDisplayContent()).ifPresent(displayContent -> {
+                if (displayContent.getId() == null) {
+                    existingTimeSlot.setDisplayContent(displayContent);
+                    return;
+                }
+                Optional<ContentEntity> content = findContentById(displayContent.getId());
+                if (content.isEmpty()) return;
+                existingTimeSlot.setDisplayContent(content.get());
+            });
 
             TimeSlotEntity toReturn = timeSlotRepository.save(existingTimeSlot);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
@@ -207,16 +223,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         timeSlotRepository.delete(timeSlotToDelete);
     }
 
-    /*private void deleteRelationWithTS(DisplayDeviceEntity displayDevice, Integer timeSlotId) {
-        List<TimeSlotEntity> timeSlots = displayDevice.getTimeSlots();
-        for(int i = 0; i < timeSlots.size(); i++) {
-            if(timeSlots.get(i).getId() == timeSlotId) {
-                timeSlots.remove(i);
-                break;
-            }
-        }
-    }*/
-
     @Override
     public void deleteRelation(Long tsId, Long ddId) {
         //Checked that it already exists, therefore this will never throw an error
@@ -231,8 +237,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         DisplayDeviceEntity dd = displayDeviceRepository.findById(Math.toIntExact(ddId)).get();
 
         ts.getDisplayDevices().remove(dd);
-
-        //TODO: Added this line
         dd.getTimeSlots().remove(ts);
 
         timeSlotRepository.save(ts);

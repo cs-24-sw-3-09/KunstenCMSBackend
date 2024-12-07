@@ -1,9 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +9,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.VisualMediaDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 
@@ -22,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
@@ -37,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class VisualMediaServiceImpl implements VisualMediaService {
 
     private final VisualMediaRepository visualMediaRepository;
+    private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final TagRepository tagRepository;
     private final PushTSService pushTSService;
     private final SlideshowRepository slideshowRepository;
@@ -45,12 +44,14 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final SlideshowService slideshowService;
 
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService,
-            TagRepository tagRepository, PushTSService pushTSService, SlideshowRepository slideshowRepository,
+            TagRepository tagRepository, VisualMediaInclusionRepository visualMediaInclusionRepository,
+            PushTSService pushTSService, SlideshowRepository slideshowRepository,
             @org.springframework.context.annotation.Lazy SlideshowService slideshowService) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
+        this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.slideshowService = slideshowService;
     }
 
@@ -136,10 +137,13 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public void delete(Long id) {
-        VisualMediaEntity timeslot = visualMediaRepository.findById(Math.toIntExact(id))
+        VisualMediaEntity VM = visualMediaRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
-        timeslot.getTags().clear();
-        visualMediaRepository.save(timeslot);
+        VM.getTags().clear();
+        List<VisualMediaInclusionEntity> inclusions = visualMediaInclusionRepository.findAllByVisualMedia(VM);
+        inclusions.forEach(visualMediaInclusionRepository::delete);
+
+        visualMediaRepository.save(VM);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
