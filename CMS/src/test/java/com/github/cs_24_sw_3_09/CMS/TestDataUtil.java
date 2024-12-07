@@ -135,14 +135,14 @@ public class TestDataUtil {
 
     public static UserEntity createUserEntity() {
         return UserEntity.builder()
-                .firstName("FirstTestName")
-                .lastName("LastTestName")
-                .email("test@test.com")
-                .password("testtest123")
-                .notificationState(true)
-                .mediaPlanner(true)
-                .admin(true)
-                .build();
+        .firstName("FirstTestName")
+        .lastName("LastTestName")
+        .email("test@test.com")
+        .password("testtest123")
+        .notificationState(true)
+        .mediaPlanner(true)
+        .admin(true)
+        .build();
     }
 
     public static TimeSlotDto createTimeSlotDto() {

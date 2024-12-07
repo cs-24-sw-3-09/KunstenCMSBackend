@@ -107,12 +107,12 @@ public class AccountController {
     @PostMapping("/reset-password/new")
     public ResponseEntity<HttpStatus> resetPasswordForUserWithtToken(@Valid @RequestBody AuthResetNewDto resetPasswordNewDto) {
         Optional<UserEntity> optionalUser = userService.findByEmail(resetPasswordNewDto.getEmail());
-        if (!optionalUser.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (optionalUser.isEmpty()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (!jwtService.validateResetToken(resetPasswordNewDto.getToken(), resetPasswordNewDto.getEmail()))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         UserEntity user = optionalUser.get();
         user.setPassword(new BCryptPasswordEncoder().encode(resetPasswordNewDto.getPassword()));
-        userService.save(user);
+        userService.forceSave(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

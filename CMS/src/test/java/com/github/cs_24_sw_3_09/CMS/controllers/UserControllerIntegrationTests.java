@@ -5,6 +5,10 @@ import com.github.cs_24_sw_3_09.CMS.TestDataUtil;
 import com.github.cs_24_sw_3_09.CMS.model.dto.UserDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import com.github.cs_24_sw_3_09.CMS.services.UserService;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +114,7 @@ public class UserControllerIntegrationTests {
     @WithMockUser(roles = "ADMIN")
     public void testThatDeleteUserReturnsStatus200() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
-        UserEntity savedUserEntiity = userService.save(userEntity);
+        UserEntity savedUserEntiity = userService.save(userEntity).get();
 
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/users/" + savedUserEntiity.getId())
@@ -149,7 +153,7 @@ public class UserControllerIntegrationTests {
     @WithMockUser(roles = "ADMIN")
     public void testThatFullUpdateUserReturnsStatus200WhenUserExists() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
-        UserEntity savedUserEntity = userService.save(userEntity);
+        UserEntity savedUserEntity = userService.save(userEntity).get();
 
         // Have to be hardcoded as a Json string, due to the password only being write and not read
         String userDtoJson = "{\"firstName\": \"FirstTestName\", \"lastName\":\"LastTestName\", \"email\":\"test@test.com\", \"password\":\"testtest1234\"}";
@@ -166,7 +170,7 @@ public class UserControllerIntegrationTests {
     @WithMockUser(roles = "ADMIN")
     public void testThatPatchUpdateUserReturnsStatus200() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
-        UserEntity savedUserEntity = userService.save(userEntity);
+        UserEntity savedUserEntity = userService.save(userEntity).get();
 
         UserDto userDto = TestDataUtil.createUserDto();
         String userDtoJson = objectMapper.writeValueAsString(userDto);
@@ -205,7 +209,7 @@ public class UserControllerIntegrationTests {
     @WithMockUser(roles = "ADMIN")
     public void testThatPatchPasswordEncryptsPassword() throws Exception {
         UserEntity userEntity = TestDataUtil.createUserEntity();
-        UserEntity savedUserEntity = userService.save(userEntity);
+        UserEntity savedUserEntity = userService.save(userEntity).get();
 
         UserDto userDto = TestDataUtil.createUserDto();
         String userDtoJson = objectMapper.writeValueAsString(userDto);
@@ -222,4 +226,26 @@ public class UserControllerIntegrationTests {
                 );
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testThatTriesToMakeNewUserWithExistingMailReturns409() throws Exception {
+        UserEntity userEntity = TestDataUtil.createUserEntity();
+		userService.save(userEntity);
+        assertTrue(userService.isExists(2L));
+		//One user is hardcoded into the system
+		assertFalse(userService.isExists(3L));
+
+		String userDtoJson = "{\"firstName\": \"FirstTestName\", \"lastName\":\"LastTestName\", \"email\":\"test@test.com\", \"password\":\"testtest1234\"}";
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/api/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(userDtoJson)
+                )
+                .andExpect(
+                        MockMvcResultMatchers.status().isConflict()
+                );
+                
+		assertFalse(userService.isExists(3L));
+	}
 }
