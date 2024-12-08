@@ -107,7 +107,6 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         // Store the slideshow and position information before deletion
         Long SSId = slideshowRepository.findSlideshowIdByVisualMediaInclusionId(id);
         Integer position = visualMediaInclusion.getSlideshowPosition();
-        System.out.println("SSID: " + SSId + " Pos: " + position);
 
         visualMediaInclusion.setVisualMedia(null);
         visualMediaInclusionRepository.save(visualMediaInclusion);
