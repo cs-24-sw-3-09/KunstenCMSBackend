@@ -47,11 +47,6 @@ public class SecurityConfig {
         this.authFilter = authFilter;
         this.allowedOrigins = new ArrayList<>();
         this.allowedOrigins.add("http://localhost:5173");
-        this.allowedOrigins.add("http://127.0.0.1:5173");
-        this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
-        this.allowedOrigins.add("https://kunsten.stjernholm.cloud/");
-        this.allowedOrigins.add("https://kunsten.stjernholm.cloud:443");
-        this.allowedOrigins.add("https://kunsten.stjernholm.cloud:443/");
         this.allowedOrigins.add(frontendUrl);
 
     }
@@ -94,12 +89,12 @@ public class SecurityConfig {
 
     @Bean
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(allowedOrigins);
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-    configuration.addAllowedHeader("*");
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
-    return source;
-}
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
