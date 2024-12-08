@@ -56,6 +56,8 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                //Allow cors preflight    
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 //Allow files
                 .requestMatchers(HttpMethod.GET, "/files/visual_media/**").permitAll()
                 //Allow auth request without token
