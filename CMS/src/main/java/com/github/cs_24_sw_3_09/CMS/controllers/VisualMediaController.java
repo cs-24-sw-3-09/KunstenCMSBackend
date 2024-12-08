@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,7 +78,14 @@ public class VisualMediaController {
         String location = "/files/visual_media/" + savedEntity.getId() + FileUtils.mimeToType(savedEntity.getFileType());
         savedEntity.setLocation(location);
         fileStorageService.saveVisualMediaFile(file, String.valueOf(savedEntity.getId()));
+        System.out.println("path in controller: "+location+" entity "+savedEntity.getLocation());
 
+        if(savedEntity.getFileType().equals("video/mp4")){
+            //VisualMediaEntity videoAsImage = 
+            visualMediaService.createFrameFromVideo(savedEntity);
+            
+            //visualMediaService.save(videoAsImage);          
+        }
 
         //Save the updated entity
         savedEntity = visualMediaService.save(savedEntity);

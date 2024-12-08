@@ -5,6 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -80,11 +82,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     @Override
     public VisualMediaEntity save(VisualMediaEntity visualMedia) {
         VisualMediaEntity toReturn = visualMediaRepository.save(visualMedia);
-
-        if(visualMedia.getFileType().equals("video/mp4")){
-            VisualMediaEntity videoAsImage = createFrameFromVideo(visualMedia);
-            visualMediaRepository.save(videoAsImage);          
-        }
         
         pushTSService.updateDisplayDevicesToNewTimeSlots();
         return toReturn;
@@ -173,9 +170,16 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         visualMediaRepository.save(VM);
         if (VM.getFileType().equals("video/mp4")) {
-            VisualMediaEntity videoAsImage = visualMediaRepository.findByIdWithPngExtension((long) VM.getId());
-            if (videoAsImage != null) {
-                visualMediaRepository.deleteById(videoAsImage.getId());
+            String possibleFrameFilePath = VM.getLocation().replace(".mp4", ".png");
+            Path path = Paths.get(possibleFrameFilePath);
+            if(Files.exists(path)){
+                File file = new File(path.toString());
+                boolean deleted = file.delete();
+                if (deleted) {
+                    System.out.println("File deleted successfully: " + path);
+                } else {
+                    System.out.println("Failed to delete the file: " + path);
+                }
             }
         }
         visualMediaRepository.deleteById(Math.toIntExact(id));
@@ -255,18 +259,40 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         return visualMediaStatusList;
     }
 
+    @Override 
     public VisualMediaEntity createFrameFromVideo(VisualMediaEntity visualMediaVideo){
         Picture frame = extractFrameFromVideo(visualMediaVideo.getLocation());
         if (frame == null) {
             throw new NullPointerException("Could not extract frame");
         }
+        
         BufferedImage bufferedImage = AWTUtil.toBufferedImage(frame);
+        System.out.println("vm loc: "+visualMediaVideo.getLocation() + "id: "+ visualMediaVideo.getId());
+        if (bufferedImage == null) {
+            System.out.println("BufferedImage is null.");
+        } else {
+            System.out.println("BufferedImage width: " + bufferedImage.getWidth());
+            System.out.println("BufferedImage height: " + bufferedImage.getHeight());
+        }
 
-        String frameFilePath = visualMediaVideo.getLocation() + visualMediaVideo.getId() + ".png";
-
+        String frameFilePath = visualMediaVideo.getLocation().replace(".mp4", ".png");
+        System.out.println("frameFilePath: "+frameFilePath);
+        File outputDir = new File("files/visual_media");
+        if (!outputDir.canWrite()) {
+            System.out.println("No write permissions for directory: " + outputDir.getAbsolutePath());
+        }
         try {
         File outputFile = new File(frameFilePath);
-        ImageIO.write(bufferedImage, "PNG", outputFile);  // Save image as PNG
+        outputFile.getParentFile().mkdirs();
+        boolean result = ImageIO.write(bufferedImage, "PNG", outputFile);  // Save image as PNG
+        if (!result) {
+            System.out.println("ImageIO could not write the file.");
+        }
+        System.out.println("Saving to: " + outputFile.getAbsolutePath());
+        Path path = Paths.get(frameFilePath);
+        System.out.println(Files.exists(path));
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -274,7 +300,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         return new VisualMediaEntity().builder()
                 .name(""+visualMediaVideo.getId())
                 .location(frameFilePath)
-                .fileType(".png")
+                .fileType("image/png")
                 .description(visualMediaVideo.getDescription())
                 .lastDateModified(visualMediaVideo.getLastDateModified())
                 .tags(visualMediaVideo.getTags())    
@@ -282,9 +308,14 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     } 
 
     private Picture extractFrameFromVideo(String visualMediaPath){
+        if (visualMediaPath == null || visualMediaPath.isEmpty()) {
+            throw new IllegalArgumentException("The visual media path cannot be null or empty.");
+        }
+
         String rootPath = System.getProperty("user.dir"); 
         String relativePath = visualMediaPath;
         String absolutePath = Paths.get(rootPath, relativePath).toString();
+        System.out.println("Current working directory: " + System.getProperty("user.dir"));
         
         try {
             File videoFile = new File(absolutePath);
