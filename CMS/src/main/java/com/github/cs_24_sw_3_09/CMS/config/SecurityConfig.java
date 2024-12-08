@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -26,6 +27,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -49,8 +51,7 @@ public class SecurityConfig {
         this.authFilter = authFilter;
         this.allowedOrigins = new ArrayList<>();
         this.allowedOrigins.add("http://localhost:5173");
-        this.allowedOrigins.add(frontendUrl);
-        System.out.println("AHSFU()IGAHS/)F(UIHASUIOF);;;;;;;;;;;;;;;;;;; " + frontendUrl);
+        this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
 
     }
 
