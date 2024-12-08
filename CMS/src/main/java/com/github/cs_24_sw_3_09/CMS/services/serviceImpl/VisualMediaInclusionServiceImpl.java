@@ -11,12 +11,14 @@ import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionService {
@@ -24,12 +26,15 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
     private final VisualMediaService visualMediaService;
     private PushTSService pushTSService;
+    private SlideshowRepository slideshowRepository;
 
     public VisualMediaInclusionServiceImpl(VisualMediaInclusionRepository visualMediaInclusionRepository,
-            VisualMediaService visualMediaService ,PushTSService pushTSService) {
+            VisualMediaService visualMediaService, PushTSService pushTSService,
+            SlideshowRepository slideshowRepository) {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.visualMediaService = visualMediaService;
         this.pushTSService = pushTSService;
+        this.slideshowRepository = slideshowRepository;
     }
 
     @Override
@@ -93,14 +98,29 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
         }).orElseThrow(() -> new RuntimeException("Visual Media Inclusion does not exist"));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         VisualMediaInclusionEntity visualMediaInclusion = visualMediaInclusionRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media Inclusion with id " + id + " not found"));
+
+        // Store the slideshow and position information before deletion
+        Long SSId = slideshowRepository.findSlideshowIdByVisualMediaInclusionId(id);
+        Integer position = visualMediaInclusion.getSlideshowPosition();
+
         visualMediaInclusion.setVisualMedia(null);
         visualMediaInclusionRepository.save(visualMediaInclusion);
         visualMediaInclusionRepository.deleteById(Math.toIntExact(id));
+
+        this.updatePositionsAfterDeletion(SSId, position);
+
         pushTSService.updateDisplayDevicesToNewTimeSlots();
+    }
+
+    @Transactional
+    @Override
+    public void updatePositionsAfterDeletion(Long slideshowId, Integer deletedPosition) {
+        visualMediaInclusionRepository.updatePositionsAfterDeletion(slideshowId, deletedPosition);
     }
 
     @Override
