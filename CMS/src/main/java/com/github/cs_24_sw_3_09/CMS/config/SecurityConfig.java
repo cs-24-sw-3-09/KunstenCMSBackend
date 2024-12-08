@@ -47,6 +47,11 @@ public class SecurityConfig {
         this.authFilter = authFilter;
         this.allowedOrigins = new ArrayList<>();
         this.allowedOrigins.add("http://localhost:5173");
+        this.allowedOrigins.add("http://127.0.0.1:5173");
+        this.allowedOrigins.add("https://kunstenapi.stjernholm.cloud");
+        this.allowedOrigins.add("https://kunstenapi.stjernholm.cloud/");
+        this.allowedOrigins.add("https://kunstenapi.stjernholm.cloud:443");
+        this.allowedOrigins.add("https://kunstenapi.stjernholm.cloud:443/");
         this.allowedOrigins.add(frontendUrl);
 
     }
