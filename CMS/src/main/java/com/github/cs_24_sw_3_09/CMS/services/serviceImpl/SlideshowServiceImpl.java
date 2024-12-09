@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,7 +163,10 @@ public class SlideshowServiceImpl implements SlideshowService {
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
             if (timeSlotsCurrentlyShown.contains(ts.getId())) {
                 activeTimeSlots.add(ts);
-            } else if (ts.getStartDate().after(new Date())){
+            } else if (ts.getStartDate().after(new Date()) ||
+                    (ts.getStartDate().equals(new Date())
+                            && ts.getStartTime().after(new Time((new Date()).getTime())))) {
+                // If the start date is in the future OR if the start date is today and the start time is in the future
                 futureTimeSlots.add(ts);
             }
         }
