@@ -193,15 +193,16 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaIds.forEach(id -> {
             Map<String, Object> visualMediaStatus = new HashMap<>();
             visualMediaStatus.put("visualMediaId", id);
-            visualMediaStatus.put("color", "grey");
+            visualMediaStatus.put("color", "red");
             Set<Long> slideShowsForVM = slideshowRepository.findSlideshowIdsByVisualMediaId(id.longValue());
 
             slideShowsForVM.forEach(SSId -> {
                 String color = slideshowStateList.stream()
-                        .filter(map -> map.get("slideshowId") != SSId)
+                        .filter(map -> (int) map.get("slideshowId") == SSId)
                         .map(map -> (String) map.get("color"))
                         .findFirst()
                         .orElse(null);
+
                 String VMcolor = visualMediaStatus.get("color").toString();
                 switch (color) {
                     case "green":
@@ -212,7 +213,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                         break;
                     case "red":
                         if (VMcolor != "yellow") {
-                            visualMediaStatus.put("color", "red");
+                            visualMediaStatus.put("color", "yellow");
                         }
                         break;
                 }
