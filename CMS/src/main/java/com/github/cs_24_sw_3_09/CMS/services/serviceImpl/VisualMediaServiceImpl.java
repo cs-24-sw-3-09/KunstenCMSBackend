@@ -198,10 +198,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
             slideShowsForVM.forEach(SSId -> {
                 String color = slideshowStateList.stream()
-                        .filter(map -> map.get("slideshowId") == SSId)
+                        .filter(map -> (int) map.get("slideshowId") == SSId)
                         .map(map -> (String) map.get("color"))
                         .findFirst()
                         .orElse(null);
+
                 String VMcolor = visualMediaStatus.get("color").toString();
                 switch (color) {
                     case "green":
