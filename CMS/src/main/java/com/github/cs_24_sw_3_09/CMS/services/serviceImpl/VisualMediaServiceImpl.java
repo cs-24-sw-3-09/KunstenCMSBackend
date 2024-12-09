@@ -193,7 +193,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaIds.forEach(id -> {
             Map<String, Object> visualMediaStatus = new HashMap<>();
             visualMediaStatus.put("visualMediaId", id);
-            visualMediaStatus.put("color", "grey");
+            visualMediaStatus.put("color", "red");
             Set<Long> slideShowsForVM = slideshowRepository.findSlideshowIdsByVisualMediaId(id.longValue());
 
             slideShowsForVM.forEach(SSId -> {
@@ -212,7 +212,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                         break;
                     case "red":
                         if (VMcolor != "yellow") {
-                            visualMediaStatus.put("color", "red");
+                            visualMediaStatus.put("color", "yellow");
                         }
                         break;
                 }
