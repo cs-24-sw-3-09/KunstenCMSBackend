@@ -52,6 +52,7 @@ public class SecurityConfig {
         this.allowedOrigins = new ArrayList<>();
         this.allowedOrigins.add("http://localhost:5173");
         this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
+        this.allowedOrigins.add("https://kunsten2.stjernholm.cloud");
 
     }
 
