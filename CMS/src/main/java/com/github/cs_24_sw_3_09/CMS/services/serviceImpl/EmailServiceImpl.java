@@ -47,24 +47,21 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public String sendSimpleMail(EmailDetailsEntity details) {
         try {
-            // Create a MimeMessage
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-            // Use MimeMessageHelper to set up the message
+            // Use MimeMessageHelper to set up the message. This is do to the email needed to be HTML
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
             helper.setFrom(sender);
             helper.setTo(details.getRecipient());
             helper.setSubject(details.getSubject());
-            helper.setText(details.getMsgBody(), true); // Enable HTML content
+            helper.setText(details.getMsgBody(), true);
 
-            // Send the email
             javaMailSender.send(mimeMessage);
             return "Mail Sent Successfully To " + details.getRecipient();
         } catch (Exception e) {
             e.printStackTrace();
             return "Error while Sending Mail..." + e.getMessage();
         }
-
     }
 
     @Override
@@ -79,9 +76,9 @@ public class EmailServiceImpl implements EmailService {
         if (!displayDeviceService.isExists((long) id)) {
             return "Did not sent mail, as DD is not found in DB";
         }
-        DisplayDeviceEntity dd = displayDeviceService.findOne((long) id).get(); // Gets the DD from the DB
+        DisplayDeviceEntity dd = displayDeviceService.findOne((long) id).get();
 
-        // Making sure that the should be on
+        // Making sure that it should be on
         if (!shallDDSendMailForWeek(dd, currentTime, LocalDate.now().getDayOfWeek()))
             return "Did not sent mail, as DD should be off";
 
@@ -94,7 +91,8 @@ public class EmailServiceImpl implements EmailService {
 
         // Findes all user where that should get a notification and sends a email to them
         Set<UserEntity> userList = userRepository.findUserWithNotificationsEnabled();
-        userList = filterUsersOutsidePausePeriod(userList); // filters user outside of perioed
+        userList = filterUsersOutsidePausePeriod(userList); // filters of user with noficications paused
+        // Send mails and construct return status
         String mailResult = "Result from senting disconnect mail on id: " + id + " ";
         for (UserEntity user : userList) {
             email.setRecipient(user.getEmail());
