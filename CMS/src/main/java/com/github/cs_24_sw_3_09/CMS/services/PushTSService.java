@@ -10,8 +10,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 
 public interface PushTSService {
     // This method is to figure out what TS have the highest prioritisation for a DD
-    TimeSlotEntity timeSlotPrioritisationForDisplayDevice(List<TimeSlotEntity> timeSlotList,
-            DisplayDeviceDto displayDeviceDto);
+    TimeSlotEntity timeSlotPrioritisationForDisplayDevice(List<TimeSlotEntity> timeSlotList);
 
     // This method sends a TS or fallback content to a DD over the socket connection.
     void sendTimeSlotToDisplayDevice(TimeSlotEntity timeSlotEntity, DisplayDeviceEntity displayDeviceEntity);
