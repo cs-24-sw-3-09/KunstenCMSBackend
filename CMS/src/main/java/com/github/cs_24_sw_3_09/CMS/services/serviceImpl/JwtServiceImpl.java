@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import com.github.cs_24_sw_3_09.CMS.services.JwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -36,8 +37,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     public String generateToken(String email, TOKEN_TYPE type) {
+        JwtBuilder tokenBuilder = Jwts.builder()
+        .subject(email)
+        .issuedAt(new Date());
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", type.name());
+        tokenBuilder.claims(claims);
         long expiryTime = System.currentTimeMillis();
         switch(type) {
             case AUTH_TOKEN:
@@ -45,30 +50,15 @@ public class JwtServiceImpl implements JwtService {
             case RESET_TOKEN:
                 expiryTime += 1000 * 60 * 5; //Valid for 5 minutes
         }
-        return createToken(claims, email, expiryTime);
+        tokenBuilder.expiration(new Date(expiryTime));
+        return tokenBuilder.signWith(getSigningKey()).compact();
     }
 
-    private String createToken(Map<String, Object> claims, String email, long expiryTime) {
-        return Jwts.builder()
-                .claims(claims)
-                .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(expiryTime))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public TOKEN_TYPE extractType(String token) {
-        Function<Claims, TOKEN_TYPE> typeResolver = claims -> TOKEN_TYPE.valueOf(claims.get("type", String.class));
-        return extractClaim(token, typeResolver);
-    }
-
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+            .verifyWith(getSigningKey())
+            .build()
+            .parseSignedClaims(token).getPayload();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -76,11 +66,17 @@ public class JwtServiceImpl implements JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token).getPayload();
+    public TOKEN_TYPE extractType(String token) {
+        Function<Claims, TOKEN_TYPE> typeResolver = claims -> TOKEN_TYPE.valueOf(claims.get("type", String.class));
+        return extractClaim(token, typeResolver);
+    }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     private Boolean isTokenExpired(String token) {

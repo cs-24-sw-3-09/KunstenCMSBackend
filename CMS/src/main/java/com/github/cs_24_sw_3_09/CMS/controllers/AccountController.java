@@ -61,7 +61,7 @@ public class AccountController {
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(authRequest.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
         } else {
-            throw new UsernameNotFoundException("Invalid request!");
+            throw new UsernameNotFoundException("Not a valid user!");
         }
     }
 
