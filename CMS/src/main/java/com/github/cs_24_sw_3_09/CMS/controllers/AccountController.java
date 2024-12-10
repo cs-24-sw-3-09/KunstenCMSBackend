@@ -52,14 +52,14 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthLoginDto authRequest) {
-        // Authenticate with provided email and password from AuthRequestDto
+    public String authenticateAndGetToken(@RequestBody AuthLoginDto authLogin) {
+        // Authenticate with provided email and password from AuthLoginDto
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(authLogin.getEmail(), authLogin.getPassword())
         );
         //If valid email and password return jwt token for provided email (unique for our user).
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
+            return jwtService.generateToken(authLogin.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
         } else {
             throw new UsernameNotFoundException("Not a valid user!");
         }
