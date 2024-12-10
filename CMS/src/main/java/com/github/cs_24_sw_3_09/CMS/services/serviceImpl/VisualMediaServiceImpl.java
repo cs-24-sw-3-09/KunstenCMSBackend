@@ -57,9 +57,9 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     @Override
     public VisualMediaEntity save(VisualMediaEntity visualMedia) {
-        VisualMediaEntity toReturn = visualMediaRepository.save(visualMedia);
+        VisualMediaEntity savedVisualMedia = visualMediaRepository.save(visualMedia);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
+        return savedVisualMedia;
     }
 
     @Override

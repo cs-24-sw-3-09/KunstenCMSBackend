@@ -36,8 +36,7 @@ public class PushTSServiceImpl implements PushTSService {
     }
 
     @Override
-    public TimeSlotEntity timeSlotPrioritisationForDisplayDevice(List<TimeSlotEntity> timeSlotList,
-            DisplayDeviceDto displayDeviceDto) {
+    public TimeSlotEntity timeSlotPrioritisationForDisplayDevice(List<TimeSlotEntity> timeSlotList) {
         List<TimeSlotEntity> currentTimeSlots = new ArrayList<>();
 
         // Get the current date and time
@@ -115,10 +114,8 @@ public class PushTSServiceImpl implements PushTSService {
             if (!socketIOModule.isConnected(dd.getId())) {
                 continue;
             }
-            List<TimeSlotEntity> timeSlots = dd.getTimeSlots();
 
-            TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(timeSlots,
-                    displayDeviceMapper.mapTo(dd));
+            TimeSlotEntity timeSlotToBeDisplayed = timeSlotPrioritisationForDisplayDevice(dd.getTimeSlots());
             if (timeSlotToBeDisplayed == null) {
                 if (sendToDisplayDevices)
                     sendTimeSlotToDisplayDevice(dd.getFallbackContent(), dd);
