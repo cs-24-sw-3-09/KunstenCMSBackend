@@ -19,6 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/*
+ * The code in this class is inspired, taken or modified from the following:
+ * https://www.geeksforgeeks.org/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ 
+ */
 @Service
 public class JwtServiceImpl implements JwtService {
 

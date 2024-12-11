@@ -51,6 +51,10 @@ public class AccountController {
         this.emailService = emailService;
     }
 
+    /*
+    * The following is inspired, taken or modified from:
+    * https://www.geeksforgeeks.org/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ 
+    */
     @PostMapping("/login")
     public String authenticateAndGetToken(@RequestBody AuthLoginDto authLogin) {
         // Authenticate with provided email and password from AuthLoginDto
