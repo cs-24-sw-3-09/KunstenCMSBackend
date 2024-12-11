@@ -51,17 +51,21 @@ public class AccountController {
         this.emailService = emailService;
     }
 
+    /*
+    * The following is inspired, taken or modified from:
+    * https://www.geeksforgeeks.org/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ 
+    */
     @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthLoginDto authRequest) {
-        // Authenticate with provided email and password from AuthRequestDto
+    public String authenticateAndGetToken(@RequestBody AuthLoginDto authLogin) {
+        // Authenticate with provided email and password from AuthLoginDto
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(authLogin.getEmail(), authLogin.getPassword())
         );
         //If valid email and password return jwt token for provided email (unique for our user).
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
+            return jwtService.generateToken(authLogin.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
         } else {
-            throw new UsernameNotFoundException("Invalid request!");
+            throw new UsernameNotFoundException("Not a valid user!");
         }
     }
 
