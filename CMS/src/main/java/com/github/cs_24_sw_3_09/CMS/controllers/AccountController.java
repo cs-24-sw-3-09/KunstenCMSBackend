@@ -101,7 +101,7 @@ public class AccountController {
         String resetToken = jwtService.generateToken(resetPasswordDto.getEmail(), TOKEN_TYPE.RESET_TOKEN);
         EmailDetailsEntity resetEmail = EmailDetailsEntity.builder()
                 .recipient(resetPasswordDto.getEmail())
-                .msgBody("Reset your password using the following link (valid for 5 minutes):<br>http://http://"+ frontendUrl +"//reset-password?token=" + resetToken + "&email=" + resetPasswordDto.getEmail())
+                .msgBody("Reset your password using the following link (valid for 5 minutes):<br>"+ frontendUrl +"/reset-password?token=" + resetToken + "&email=" + resetPasswordDto.getEmail())
                 .subject("Password reset request - " + resetPasswordDto.getEmail())
                 .build();
         emailService.sendSimpleMail(resetEmail);
