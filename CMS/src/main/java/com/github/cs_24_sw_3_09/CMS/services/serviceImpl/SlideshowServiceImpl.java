@@ -1,7 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -187,16 +190,23 @@ public class SlideshowServiceImpl implements SlideshowService {
         List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
         
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
         //only get Time Slots that are currently shown or in the future
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
+
+            LocalDate startDate = ts.getStartDate().toLocalDate();
+            LocalTime startTime = ts.getStartTime().toLocalTime();
+            LocalDate endDate = ts.getEndDate().toLocalDate();
+                     
+            boolean isTodayWithinRange = startDate.isBefore(today) && endDate.isAfter(today);
+            boolean isValidToday = today.equals(startDate) && startTime.isAfter(now);
+
             if (timeSlotsCurrentlyShown.contains(ts.getId())) {
                 activeTimeSlots.add(ts);
-            } else if (ts.getStartDate().after(new Date()) ||
-                    (ts.getStartDate().equals(new Date())
-                            && ts.getStartTime().after(new Time((new Date()).getTime())))) {
-                // If the start date is in the future OR if the start date is today and the start time is in the future
+            } else if(isValidToday || today.isBefore(startDate) || isTodayWithinRange){
                 futureTimeSlots.add(ts);
-            }
+            }        
         }
 
         List<Map<String, Object>> slideshowStatusList = new ArrayList<>();
@@ -244,6 +254,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         }
         return slideshowStatusList;
     }
+
 
     @Override
     public Optional<SlideshowEntity> duplicate(Long id, String name) {
