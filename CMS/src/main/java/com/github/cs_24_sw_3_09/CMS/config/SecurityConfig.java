@@ -31,6 +31,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/*
+ * The code in this class is inspired, taken or modified from the following:
+ * https://www.geeksforgeeks.org/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ 
+ */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
@@ -52,6 +57,7 @@ public class SecurityConfig {
         this.allowedOrigins = new ArrayList<>();
         this.allowedOrigins.add("http://localhost:5173");
         this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
+        this.allowedOrigins.add("https://kunsten2.stjernholm.cloud");
 
     }
 
