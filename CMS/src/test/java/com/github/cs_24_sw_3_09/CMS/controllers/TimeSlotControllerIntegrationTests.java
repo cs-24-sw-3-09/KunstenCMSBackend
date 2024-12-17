@@ -533,7 +533,8 @@ public class TimeSlotControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(timeSlot)
+                                        .content(timeSlot).param("forceDimensions",
+                                                        "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isCreated()
         );
@@ -579,10 +580,12 @@ public class TimeSlotControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(timeSlot)
+                                        .content(timeSlot).param("forceDimensions",
+                                                        "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isCreated()
         );
+
 
         assertTrue(timeSlotService.isExists((long) 1));
 
@@ -622,7 +625,8 @@ public class TimeSlotControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/time_slots")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(timeSlot)
+                                        .content(timeSlot).param("forceDimensions",
+                                                        "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isNotFound()
         );

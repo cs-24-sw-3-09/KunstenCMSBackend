@@ -44,19 +44,22 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto user) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto user) {
 
         user.setPassword(encoder.encode(user.getPassword()));
 
         UserEntity userEntity = userMapper.mapFrom(user);
-        UserEntity savedUserEntity = userService.save(userEntity);
-        return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.CREATED);
+        Optional<UserEntity> savedUserEntity = userService.save(userEntity);
+
+        if (savedUserEntity.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(userMapper.mapTo(savedUserEntity.get()), HttpStatus.CREATED);
     }
 
     @GetMapping
-    //TODO: WTF? naming?
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public Page<UserDto> getDisplayDevices(Pageable pageable) {
+    public Page<UserDto> getUsers(Pageable pageable) {
         Page<UserEntity> userEntities = userService.findAll(pageable);
         return userEntities.map(userMapper::mapTo);
     }
@@ -82,7 +85,7 @@ public class UserController {
 
         userDto.setId(Math.toIntExact(id));
         UserEntity userEntity = userMapper.mapFrom(userDto);
-        UserEntity savedUserEntity = userService.save(userEntity);
+        UserEntity savedUserEntity = userService.forceSave(userEntity);
         return new ResponseEntity<>(userMapper.mapTo(savedUserEntity), HttpStatus.OK);
     }
 
@@ -99,7 +102,6 @@ public class UserController {
         return new ResponseEntity<>(userMapper.mapTo(updatedUserEntity), HttpStatus.OK);
     }
 
-    //TODO: skal man kunne slette sig selv?
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {

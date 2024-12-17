@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
+import com.github.cs_24_sw_3_09.CMS.repositories.*;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
@@ -18,12 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.github.cs_24_sw_3_09.CMS.repositories.TagRepository;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
-import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
-import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 
 import java.util.Set;
@@ -39,6 +36,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final TagRepository tagRepository;
     private final PushTSService pushTSService;
     private final SlideshowRepository slideshowRepository;
+    private final DisplayDeviceRepository displayDeviceRepository;
 
     @Lazy
     private final SlideshowService slideshowService;
@@ -46,20 +44,22 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService,
             TagRepository tagRepository, VisualMediaInclusionRepository visualMediaInclusionRepository,
             PushTSService pushTSService, SlideshowRepository slideshowRepository,
-            @org.springframework.context.annotation.Lazy SlideshowService slideshowService) {
+            @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
+            DisplayDeviceRepository displayDeviceRepository) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.slideshowService = slideshowService;
+        this.displayDeviceRepository = displayDeviceRepository;
     }
 
     @Override
     public VisualMediaEntity save(VisualMediaEntity visualMedia) {
-        VisualMediaEntity toReturn = visualMediaRepository.save(visualMedia);
+        VisualMediaEntity savedVisualMedia = visualMediaRepository.save(visualMedia);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return toReturn;
+        return savedVisualMedia;
     }
 
     @Override
@@ -143,6 +143,14 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         List<VisualMediaInclusionEntity> inclusions = visualMediaInclusionRepository.findAllByVisualMedia(VM);
         inclusions.forEach(visualMediaInclusionRepository::delete);
 
+        List<DisplayDeviceEntity> displayDeviceEntitiesWithVMAsFallback = displayDeviceRepository.findAllByVM(id);
+
+        for(DisplayDeviceEntity dd : displayDeviceEntitiesWithVMAsFallback) {
+            dd.setFallbackContent(null);
+            displayDeviceRepository.save(dd);
+        };
+
+
         visualMediaRepository.save(VM);
         visualMediaRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
@@ -168,20 +176,21 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public HttpStatus replaceFileById(Long id, MultipartFile file) throws IOException {
+    public VisualMediaEntity replaceFileById(Long id, MultipartFile file) throws IOException {
 
         VisualMediaEntity visualMediaEntity = findOne(id).orElseThrow();
-
+        String newLocation = visualMediaEntity.getLocation().split("\\.")[0] + FileUtils.mimeToType(file.getContentType());
         //Starts by deleting existing file from folder.
         FileUtils.removeVisualMediaFile(visualMediaEntity);
 
         //Updates the vm in database to be the new filetype
         visualMediaEntity.setFileType(file.getContentType());
-        visualMediaRepository.save(visualMediaEntity);
+        visualMediaEntity.setLocation(newLocation);
+        VisualMediaEntity updatedVisualMedia = visualMediaRepository.save(visualMediaEntity);
 
         //Created the new file.
         FileUtils.createVisualMediaFile(file, String.valueOf(id));
-        return HttpStatus.OK;
+        return updatedVisualMedia;
 
     }
 
@@ -193,15 +202,16 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         visualMediaIds.forEach(id -> {
             Map<String, Object> visualMediaStatus = new HashMap<>();
             visualMediaStatus.put("visualMediaId", id);
-            visualMediaStatus.put("color", "grey");
+            visualMediaStatus.put("color", "red");
             Set<Long> slideShowsForVM = slideshowRepository.findSlideshowIdsByVisualMediaId(id.longValue());
 
             slideShowsForVM.forEach(SSId -> {
                 String color = slideshowStateList.stream()
-                        .filter(map -> map.get("slideshowId") != SSId)
+                        .filter(map -> (int) map.get("slideshowId") == SSId)
                         .map(map -> (String) map.get("color"))
                         .findFirst()
                         .orElse(null);
+
                 String VMcolor = visualMediaStatus.get("color").toString();
                 switch (color) {
                     case "green":
@@ -212,7 +222,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                         break;
                     case "red":
                         if (VMcolor != "yellow") {
-                            visualMediaStatus.put("color", "red");
+                            visualMediaStatus.put("color", "yellow");
                         }
                         break;
                 }

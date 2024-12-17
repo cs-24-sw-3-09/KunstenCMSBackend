@@ -33,4 +33,9 @@ public interface SlideshowRepository extends CrudRepository<SlideshowEntity, Int
                         "WHERE vm.id = :visualMediaId")
         Set<Long> findSlideshowIdsByVisualMediaId(@Param("visualMediaId") Long visualMediaId);
 
+        @Query("SELECT DISTINCT ss.id FROM SlideshowEntity ss " +
+                        "JOIN ss.visualMediaInclusionCollection vmi " +
+                        "WHERE vmi.id = :visualMediaInclusionId")
+        Long findSlideshowIdByVisualMediaInclusionId(@Param("visualMediaInclusionId") Long visualMediaInclusionId);
+
 }

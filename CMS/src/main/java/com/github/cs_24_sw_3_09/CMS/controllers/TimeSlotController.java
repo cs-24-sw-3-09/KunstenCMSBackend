@@ -79,8 +79,19 @@ public class TimeSlotController {
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
 
+        //check if dimensions of displaydevice and content fit
+        if (timeSlotEntity.getDisplayDevices() != null && timeSlotEntity.getDisplayContent() != null) {
+            if (forceDimensions == null || forceDimensions == false) {
+                String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(
+                        timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
+                if (!"1".equals(checkResult)) {
+                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);
+                }
+            }
+        }
+
         Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        
+
         if (savedTimeSlotEntity.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

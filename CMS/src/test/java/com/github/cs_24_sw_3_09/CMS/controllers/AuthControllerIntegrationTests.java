@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,10 @@ public class AuthControllerIntegrationTests {
 		);
 
 		String passwordAfter = userService.findByEmail(email).get().getPassword();
+
+		System.out.println(passwordAfter);		
+		System.out.println(passwordBefore);
+
 		assertFalse(passwordBefore.equals(passwordAfter));
 	}
 

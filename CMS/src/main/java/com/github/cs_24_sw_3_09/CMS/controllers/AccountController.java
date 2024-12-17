@@ -51,17 +51,21 @@ public class AccountController {
         this.emailService = emailService;
     }
 
+    /*
+    * The following is inspired, taken or modified from:
+    * https://www.geeksforgeeks.org/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ 
+    */
     @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthLoginDto authRequest) {
-        // Authenticate with provided email and password from AuthRequestDto
+    public String authenticateAndGetToken(@RequestBody AuthLoginDto authLogin) {
+        // Authenticate with provided email and password from AuthLoginDto
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(authLogin.getEmail(), authLogin.getPassword())
         );
         //If valid email and password return jwt token for provided email (unique for our user).
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
+            return jwtService.generateToken(authLogin.getEmail(), TOKEN_TYPE.AUTH_TOKEN);
         } else {
-            throw new UsernameNotFoundException("Invalid request!");
+            throw new UsernameNotFoundException("Not a valid user!");
         }
     }
 
@@ -97,7 +101,7 @@ public class AccountController {
         String resetToken = jwtService.generateToken(resetPasswordDto.getEmail(), TOKEN_TYPE.RESET_TOKEN);
         EmailDetailsEntity resetEmail = EmailDetailsEntity.builder()
                 .recipient(resetPasswordDto.getEmail())
-                .msgBody("Reset your password using the following link (valid for 5 minutes):<br>http://http://"+ frontendUrl +"//reset-password?token=" + resetToken + "&email=" + resetPasswordDto.getEmail())
+                .msgBody("Reset your password using the following link (valid for 5 minutes):<br>"+ frontendUrl +"/reset-password?token=" + resetToken + "&email=" + resetPasswordDto.getEmail())
                 .subject("Password reset request - " + resetPasswordDto.getEmail())
                 .build();
         emailService.sendSimpleMail(resetEmail);
@@ -107,12 +111,12 @@ public class AccountController {
     @PostMapping("/reset-password/new")
     public ResponseEntity<HttpStatus> resetPasswordForUserWithtToken(@Valid @RequestBody AuthResetNewDto resetPasswordNewDto) {
         Optional<UserEntity> optionalUser = userService.findByEmail(resetPasswordNewDto.getEmail());
-        if (!optionalUser.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (optionalUser.isEmpty()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (!jwtService.validateResetToken(resetPasswordNewDto.getToken(), resetPasswordNewDto.getEmail()))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         UserEntity user = optionalUser.get();
         user.setPassword(new BCryptPasswordEncoder().encode(resetPasswordNewDto.getPassword()));
-        userService.save(user);
+        userService.forceSave(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

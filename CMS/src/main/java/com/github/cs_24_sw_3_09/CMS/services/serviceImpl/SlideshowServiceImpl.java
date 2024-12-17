@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -180,8 +181,8 @@ public class SlideshowServiceImpl implements SlideshowService {
         List<Integer> displayContentIds = new ArrayList<>();
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
             displayContentIds.add(ts.getDisplayContent().getId());
-        }   
-    
+        }
+
         Set<Integer> timeSlotsCurrentlyShown = pushTSService.updateDisplayDevicesToNewTimeSlots(false);
         List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
@@ -190,53 +191,53 @@ public class SlideshowServiceImpl implements SlideshowService {
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
             if (timeSlotsCurrentlyShown.contains(ts.getId())) {
                 activeTimeSlots.add(ts);
-            } else if (ts.getStartDate().after(new Date())){
+            } else if (ts.getStartDate().after(new Date()) ||
+                    (ts.getStartDate().equals(new Date())
+                            && ts.getStartTime().after(new Time((new Date()).getTime())))) {
+                // If the start date is in the future OR if the start date is today and the start time is in the future
                 futureTimeSlots.add(ts);
             }
         }
-    
+
         List<Map<String, Object>> slideshowStatusList = new ArrayList<>();
         for (Integer slideshowId : allSlideshowIds) {
             Map<String, Object> slideshowStatus = new HashMap<>();
             slideshowStatus.put("slideshowId", slideshowId);
             slideshowStatus.put("color", "red");
-    
+
             for (TimeSlotEntity ts : activeTimeSlots) {
-                for (Integer contentId : displayContentIds) {
-                    if (ts.getDisplayContent().getId().equals(contentId) && contentId.equals(slideshowId)) {
-                        slideshowStatus.put("color", "green"); 
+                if (ts.getDisplayContent().getId().equals(slideshowId)) {
+                    slideshowStatus.put("color", "green");
 
-                        // Convert display devices to a list of maps
-                        List<Map<String, Object>> displayDevices = new ArrayList<>();
-                        if (slideshowStatus.containsKey("displayDevices")){
-                            Object devices = slideshowStatus.get("displayDevices");
-                            if (devices instanceof List) {
-                                displayDevices = (List<Map<String, Object>>) devices;
-                            }
+                    // Convert display devices to a list of maps
+                    List<Map<String, Object>> displayDevices = new ArrayList<>();
+                    if (slideshowStatus.containsKey("displayDevices")){
+                        Object devices = slideshowStatus.get("displayDevices");
+                        if (devices instanceof List) {
+                            displayDevices = (List<Map<String, Object>>) devices;
                         }
-
-                        for (DisplayDeviceEntity obj : ts.getDisplayDevices()) {
-                            Map<String, Object> displayDeviceMap = new HashMap<>();
-                            displayDeviceMap.put("id", obj.getId());
-                            displayDeviceMap.put("name", obj.getName());
-                            displayDevices.add(displayDeviceMap);
-                        }
-                        slideshowStatus.put("displayDevices", displayDevices);
-                        break;
                     }
-                } 
+
+                    for (DisplayDeviceEntity obj : ts.getDisplayDevices()) {
+                        Map<String, Object> displayDeviceMap = new HashMap<>();
+                        displayDeviceMap.put("id", obj.getId());
+                        displayDeviceMap.put("name", obj.getName());
+                        displayDevices.add(displayDeviceMap);
+                    }
+                    slideshowStatus.put("displayDevices", displayDevices);
+                    break;
+                }
             }
-            if ("red".equals(slideshowStatus.get("color"))) {
+            if (slideshowStatus.get("color").equals("red")) {
                 for (TimeSlotEntity ts : futureTimeSlots) {
-                    for (Integer contentId : displayContentIds) {
-                        if (ts.getDisplayContent().getId().equals(contentId) && contentId.equals(slideshowId)) {
-                            slideshowStatus.put("color", "yellow"); 
-                            break;
-                        }
+                    if (ts.getDisplayContent().getId().equals(slideshowId)) {
+                        slideshowStatus.put("color", "yellow");
+                        break;
                     }
                 }
             }
-            if (!"green".equals(slideshowStatus.get("color"))) {
+
+            if (!slideshowStatus.get("color").equals("green")) {
                 slideshowStatus.remove("displayDevices");
             }
             slideshowStatusList.add(slideshowStatus);
