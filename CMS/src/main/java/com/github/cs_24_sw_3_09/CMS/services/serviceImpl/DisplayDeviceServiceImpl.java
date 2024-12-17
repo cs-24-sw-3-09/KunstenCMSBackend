@@ -14,8 +14,6 @@ import com.github.cs_24_sw_3_09.CMS.utils.Result;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -224,12 +222,12 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions) {
+    public Result<DisplayDeviceEntity, String> addFallback(Long id, Long fallbackId, Boolean forceDimensions) {
         Optional<ContentEntity> content = findContentById(Math.toIntExact(fallbackId));
         Optional<DisplayDeviceEntity> displayDeviceToCheck = displayDeviceRepository.findById(Math.toIntExact(id)); 
         
         if (displayDeviceToCheck.isEmpty() || content.isEmpty()) {
-            return new Result<>("Not found");
+            return Result.err("Not found");
         }
         
         ContentEntity fallbackContent = content.get();
@@ -238,12 +236,12 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
          //check whether the dimensions of the displayDevice and the fallbackContent fit 
         if (!forceDimensions){
             String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
-            if(!"1".equals(checkResult)) return new Result<>(checkResult); 
+            if(!"1".equals(checkResult)) return Result.err(checkResult); 
         }
        
         displayDevice.setFallbackContent(fallbackContent);
         DisplayDeviceEntity displayToReturn = displayDeviceRepository.save(displayDevice);
 
-        return new Result<>(displayToReturn);   
+        return Result.ok(displayToReturn);   
     }
 }

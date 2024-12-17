@@ -1,21 +1,24 @@
 package com.github.cs_24_sw_3_09.CMS.utils;
 
-public class Result<T> {
+public class Result<T, E> {
     private T value;
-    private String errMsg;
+    private E error;
     
-    public Result(T value) {
+    public Result(T value, E error) {
         this.value = value;
-        this.errMsg = null;
+        this.error = error;
     }
 
-    public Result(String errMsg) {
-        this.value = null;
-        this.errMsg = errMsg;
+    public static <T, E> Result<T, E> ok(T value) {
+        return new Result<>(value, null); 
     }
 
-    public T getValue() { return value; }
-    public String getErrMsg() { return errMsg; }
+    public static <T, E> Result<T, E> err(E error) {
+        return new Result<>(null, error); 
+    }
+
+    public T getOk() { return value; }
+    public E getErr() {return error; }
     public Boolean isOk() { return value != null; }
-    public Boolean isErr() { return errMsg != null; }
+    public Boolean isErr() { return error != null; }
 }

@@ -32,6 +32,6 @@ public interface DisplayDeviceService {
 
     DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId);
 
-    Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions);
+    Result<DisplayDeviceEntity, String> addFallback(Long id, Long fallbackId, Boolean forceDimensions);
 
 }

@@ -11,6 +11,8 @@ import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
 import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
+import lombok.AllArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
 
+@AllArgsConstructor
 @Service
 public class TimeSlotServiceImpl implements TimeSlotService {
 
@@ -44,7 +47,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
     private DimensionCheckService dimensionCheckService;
     
-    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
+    /*public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
                             Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
                             SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, 
                             VisualMediaService visualMediaService, SlideshowService slideshowService,
@@ -58,7 +61,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         this.slideshowService = slideshowService;
         this.timeSlotMapper = timeSlotMapper;
         this.dimensionCheckService = dimensionCheckService;
-    }
+    }*/
 
     @Override
     public TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity) {
@@ -172,21 +175,21 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public Result<TimeSlotEntity> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions) {
+    public Result<TimeSlotEntity, String> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions) {
         //Error handling
         if (!isExists(id)) {
-            return new Result<>("Not found");
+            return Result.err("Not found");
         }
         //check if dimensions of displaydevice and content fit
         if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null && !forceDimensions) {
             String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
             if(!"1".equals(checkResult)){
-                return new Result<>(checkResult);  
+                return Result.err(checkResult);  
             }
         }
 
         timeSlotEntity.setId(Math.toIntExact(id));
-        return new Result<>(timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
+        return Result.ok(timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
             // if time slot from request has name, we set it to the existing time slot.
             // (same with other atts)
 
@@ -269,7 +272,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
 
     @Override
-    public Result<TimeSlotEntity> setDisplayContent(Long tsId, Long dcId, String dcType, Boolean forceDimensions) {
+    public Result<TimeSlotEntity, String> setDisplayContent(Long tsId, Long dcId, String dcType, Boolean forceDimensions) {
         //check if dimensions of displaydevice and content fit
         Optional<TimeSlotEntity> timeSlotToCheck = findOne(tsId);
         Optional<ContentEntity> contentToCheck = findContentById(dcId.intValue());
@@ -277,7 +280,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
          // Validate existence of time slot
          // Validate existence of the referenced content
          if (timeSlotToCheck.isEmpty() || contentToCheck.isEmpty()) {
-            return new Result<>("Not found");
+            return Result.err("Not found");
         }
 
         //check if dimensions of displaydevice and content fit
@@ -286,11 +289,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         if (timeSlotEntity.getDisplayDevices() != null && !forceDimensions) {
             String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(displayContent, timeSlotEntity.getDisplayDevices());
             if(!"1".equals(checkResult)){
-                return new Result<>(checkResult);  
+                return Result.err(checkResult);  
             }
         }
         
-        return new Result<>(timeSlotRepository.findById(Math.toIntExact(tsId)).map(existingTimeSlot -> {
+        return Result.ok(timeSlotRepository.findById(Math.toIntExact(tsId)).map(existingTimeSlot -> {
             ContentEntity foundDisplayContent = null;
             if (dcType.equals("visualMedia")) {
                 foundDisplayContent = visualMediaService.findOne(dcId)
@@ -307,13 +310,13 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public Result<TimeSlotEntity> addDisplayDevice(Long id, Long displayDeviceId, Boolean forceDimensions) throws RuntimeException {
+    public Result<TimeSlotEntity, String> addDisplayDevice(Long id, Long displayDeviceId, Boolean forceDimensions) throws RuntimeException {
         Optional<TimeSlotEntity> timeSlotToCheck = findOne(id);
         Optional<DisplayDeviceEntity> displayDeviceToCheck = displayDeviceRepository.findById(displayDeviceId.intValue());
 
 
         if (timeSlotToCheck.isEmpty() || displayDeviceToCheck.isEmpty()) {
-            return new Result<>("Not found");
+            return Result.err("Not found");
         }
 
         //check if dimensions of displaydevice and content fit
@@ -323,11 +326,11 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         if (timeSlotEntity.getDisplayContent() != null && !forceDimensions) {
             String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), displayDevice);
             if(!"1".equals(checkResult)){
-                return new Result<>(checkResult);
+                return Result.err(checkResult);
             }
         }
 
-        return new Result<>(timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
+        return Result.ok(timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
             DisplayDeviceEntity foundDisplayDevice = displayDeviceRepository.findById(Math.toIntExact(displayDeviceId)).orElseThrow();
             existingTimeSlot.addDisplayDevice(foundDisplayDevice);
             existingTimeSlot.setId(Math.toIntExact(id));

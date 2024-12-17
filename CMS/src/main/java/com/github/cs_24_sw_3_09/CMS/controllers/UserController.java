@@ -102,11 +102,11 @@ public class UserController {
     //TODO: skal man kunne slette sig selv?
     @DeleteMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         if (!userService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

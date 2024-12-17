@@ -200,15 +200,15 @@ public class DisplayDeviceController {
         }
         
         // Update the display device and return the response
-        Result<DisplayDeviceEntity> updatedDisplayDeviceEntity = displayDeviceService.addFallback(id, fallbackId, forceDimensions != null ? forceDimensions : false);
+        Result<DisplayDeviceEntity, String> updatedDisplayDeviceEntity = displayDeviceService.addFallback(id, fallbackId, forceDimensions != null ? forceDimensions : false);
         if (updatedDisplayDeviceEntity.isErr()) {
-            return switch(updatedDisplayDeviceEntity.getErrMsg()) {
+            return switch(updatedDisplayDeviceEntity.getErr()) {
                 case "Not found" -> ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                default -> new ResponseEntity<>(updatedDisplayDeviceEntity.getErrMsg(), HttpStatus.CONFLICT);
+                default -> new ResponseEntity<>(updatedDisplayDeviceEntity.getErr(), HttpStatus.CONFLICT);
             };
         }
         
-        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity.getValue()));
+        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity.getOk()));
     }
 
 }

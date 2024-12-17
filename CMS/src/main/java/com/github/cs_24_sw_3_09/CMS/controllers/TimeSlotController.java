@@ -155,15 +155,15 @@ public class TimeSlotController {
                 @Valid @RequestBody TimeSlotDto timeSlotDto,
                 @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
 
-        Result<TimeSlotEntity> updatedTimeSlotEntity = timeSlotService.partialUpdate(id, timeSlotMapper.mapFrom(timeSlotDto), forceDimensions != null ? forceDimensions : false);
+        Result<TimeSlotEntity, String> updatedTimeSlotEntity = timeSlotService.partialUpdate(id, timeSlotMapper.mapFrom(timeSlotDto), forceDimensions != null ? forceDimensions : false);
         if (updatedTimeSlotEntity.isErr()) {
-            return switch (updatedTimeSlotEntity.getErrMsg()) {
+            return switch (updatedTimeSlotEntity.getErr()) {
                 case "Not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                default -> new ResponseEntity<>(updatedTimeSlotEntity.getErrMsg(), HttpStatus.CONFLICT); 
+                default -> new ResponseEntity<>(updatedTimeSlotEntity.getErr(), HttpStatus.CONFLICT); 
             };
         }
 
-        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlotEntity.getValue()), HttpStatus.OK);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlotEntity.getOk()), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
@@ -220,15 +220,15 @@ public class TimeSlotController {
         String displayContentType = validationResult.getDisplayContentType();
 
         // Update the display content
-        Result<TimeSlotEntity> updatedTimeSlotEntity = timeSlotService.setDisplayContent(id, displayContentId, displayContentType, forceDimensions != null ? forceDimensions : false);
+        Result<TimeSlotEntity, String> updatedTimeSlotEntity = timeSlotService.setDisplayContent(id, displayContentId, displayContentType, forceDimensions != null ? forceDimensions : false);
         if (updatedTimeSlotEntity.isErr()) {
-            return switch(updatedTimeSlotEntity.getErrMsg().toLowerCase()) {
+            return switch(updatedTimeSlotEntity.getErr().toLowerCase()) {
                 case "not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                default -> new ResponseEntity<>(updatedTimeSlotEntity.getErrMsg(), HttpStatus.CONFLICT);
+                default -> new ResponseEntity<>(updatedTimeSlotEntity.getErr(), HttpStatus.CONFLICT);
             };
         }
 
-        return ResponseEntity.ok(timeSlotMapper.mapTo(updatedTimeSlotEntity.getValue()));
+        return ResponseEntity.ok(timeSlotMapper.mapTo(updatedTimeSlotEntity.getOk()));
     }
 
 
@@ -243,15 +243,15 @@ public class TimeSlotController {
         }
         Long displayDeviceId = ((Integer) requestBody.get("displayDeviceId")).longValue();
         
-        Result<TimeSlotEntity> updatedTimeSlot = timeSlotService.addDisplayDevice(id, displayDeviceId, forceDimensions != null ? forceDimensions : null);
+        Result<TimeSlotEntity, String> updatedTimeSlot = timeSlotService.addDisplayDevice(id, displayDeviceId, forceDimensions != null ? forceDimensions : null);
         // If tag was not found, updatedVisualMedia will be null.
         if (updatedTimeSlot.isErr()) {
-            return switch (updatedTimeSlot.getErrMsg().toLowerCase()) {
+            return switch (updatedTimeSlot.getErr().toLowerCase()) {
                 case "not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                default -> new ResponseEntity<>(updatedTimeSlot.getErrMsg(), HttpStatus.CONFLICT);  
+                default -> new ResponseEntity<>(updatedTimeSlot.getErr(), HttpStatus.CONFLICT);  
             };
         }
-        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot.getValue()), HttpStatus.OK);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(updatedTimeSlot.getOk()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")

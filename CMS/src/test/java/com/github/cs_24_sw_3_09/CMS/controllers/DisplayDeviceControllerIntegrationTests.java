@@ -649,8 +649,8 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		Result<DisplayDeviceEntity> dd = displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
-		System.out.println(dd.getErrMsg());
+		Result<DisplayDeviceEntity, String> dd =
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		
 		assertEquals(
 			1, 

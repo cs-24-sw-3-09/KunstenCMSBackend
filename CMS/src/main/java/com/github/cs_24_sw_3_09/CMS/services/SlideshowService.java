@@ -31,7 +31,7 @@ public interface SlideshowService {
 
     void delete(Long id);
 
-    Result<SlideshowEntity> addVisualMediaInclusion(Long id, Long visualMediaInclusionId, Boolean forceDimensions);
+    Result<SlideshowEntity, String> addVisualMediaInclusion(Long id, Long visualMediaInclusionId, Boolean forceDimensions);
 
     List<Map<String, Object>> findStateOfEverySlideshow();
 
