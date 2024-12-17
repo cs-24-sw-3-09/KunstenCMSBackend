@@ -16,11 +16,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/*
+ * The code in this class is inspired, taken or modified from the following:
+ * https://www.geeksforgeeks.org/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ 
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-
     private final UserService userService;
 
     @Autowired
@@ -47,9 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             //Validate the token to check if email is correct and the token is not yet expired.
             if (jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
+                        userDetails,null, userDetails.getAuthorities()
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
