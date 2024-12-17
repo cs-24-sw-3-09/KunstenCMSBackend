@@ -122,7 +122,6 @@ public class TimeSlotController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    //todo: Maybe do it here as well -> Do we even use put? 
     @PutMapping(path = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_PLANNER')")
     public ResponseEntity<?> fullUpdateTimeSlot(@PathVariable("id") Long id,
