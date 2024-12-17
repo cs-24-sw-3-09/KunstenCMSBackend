@@ -168,7 +168,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     }
 
     @Override
-    public HttpStatus replaceFileById(Long id, MultipartFile file) throws IOException {
+    public VisualMediaEntity replaceFileById(Long id, MultipartFile file) throws IOException {
 
         VisualMediaEntity visualMediaEntity = findOne(id).orElseThrow();
         String newLocation = visualMediaEntity.getLocation().split("\\.")[0] + FileUtils.mimeToType(file.getContentType());
@@ -178,11 +178,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         //Updates the vm in database to be the new filetype
         visualMediaEntity.setFileType(file.getContentType());
         visualMediaEntity.setLocation(newLocation);
-        visualMediaRepository.save(visualMediaEntity);
+        VisualMediaEntity updatedVisualMedia = visualMediaRepository.save(visualMediaEntity);
 
         //Created the new file.
         FileUtils.createVisualMediaFile(file, String.valueOf(id));
-        return HttpStatus.OK;
+        return updatedVisualMedia;
 
     }
 
