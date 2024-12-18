@@ -52,8 +52,4 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
             "JOIN SlideshowEntity ss ON c.id = ss.id ")
     List<TimeSlotEntity> getAllTimeSlotsWithSlideshowAsContent();
 
-    @Query("SELECT ts FROM TimeSlotEntity ts WHERE ts.displayContent.type = 'slideshow'  AND ts.startDate = CURRENT_DATE  AND ts.startTime > :currentTime")
-    Set<TimeSlotEntity> getAllTimeSlotsWithSSWithCurrentDateButFutureTime(@Param("currentTime") LocalTime currentTime);
-
-
 }
