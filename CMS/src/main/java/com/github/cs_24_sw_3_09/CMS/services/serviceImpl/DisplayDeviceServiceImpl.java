@@ -9,6 +9,8 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
+import com.github.cs_24_sw_3_09.CMS.utils.ContentUtils;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+
 @Service
 public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
@@ -34,16 +37,21 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
     private final Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper;
+    private ContentUtils contentUtils;
+    private DimensionCheckService dimensionCheckService;
 
     public DisplayDeviceServiceImpl(DisplayDeviceRepository displayDeviceRepository, VisualMediaRepository visualMediaRepository, 
                                     SlideshowRepository slideshowRepository, TimeSlotService timeSlotService,
-                                    PushTSService pushTSService, Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper) {
+                                    PushTSService pushTSService, Mapper<DisplayDeviceEntity, DisplayDeviceDto> displayDeviceMapper,
+                                    ContentUtils contentUtils, DimensionCheckService dimensionCheckService) {
         this.displayDeviceRepository = displayDeviceRepository;
         this.visualMediaRepository = visualMediaRepository;
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.timeSlotService = timeSlotService;
         this.displayDeviceMapper = displayDeviceMapper;
+        this.contentUtils = contentUtils;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @Override
@@ -216,15 +224,26 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public Optional<DisplayDeviceEntity> addFallback(Long id, Long fallbackId) {
-        DisplayDeviceEntity displayDevice = displayDeviceRepository.findById(Math.toIntExact(id)).get();
-
+    public Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions) {
         Optional<ContentEntity> content = findContentById(Math.toIntExact(fallbackId));
-        if (content.isEmpty()) return Optional.empty();
+        Optional<DisplayDeviceEntity> displayDeviceToCheck = displayDeviceRepository.findById(Math.toIntExact(id)); 
+        
+        if (displayDeviceToCheck.isEmpty() || content.isEmpty()) {
+            return new Result<>("Not found");
+        }
+        
+        ContentEntity fallbackContent = content.get();
+        DisplayDeviceEntity displayDevice = displayDeviceToCheck.get();
 
-        displayDevice.setFallbackContent(content.get());
+         //check whether the dimensions of the displayDevice and the fallbackContent fit 
+        if (!forceDimensions){
+            String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
+            if(!"1".equals(checkResult)) return new Result<>(checkResult); 
+        }
+       
+        displayDevice.setFallbackContent(fallbackContent);
         DisplayDeviceEntity displayToReturn = displayDeviceRepository.save(displayDevice);
 
-        return Optional.of(displayDevice);   
+        return new Result<>(displayToReturn);   
     }
 }

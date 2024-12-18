@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.common.io.NIOUtils;
@@ -21,11 +22,9 @@ import java.awt.image.BufferedImage;
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
-import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
-import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
@@ -37,11 +36,13 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     private VisualMediaService visualMediaService;
     private VisualMediaInclusionService visualMediaInclusionService;
+
+    @Lazy
     private SlideshowService slideshowService;
 
     public DimensionCheckServiceImpl(VisualMediaService visualMediaService,
                                         VisualMediaInclusionService visualMediaInclusionService,
-                                        SlideshowService slideshowService){
+                                        @org.springframework.context.annotation.Lazy SlideshowService slideshowService){
         this.visualMediaService = visualMediaService;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.slideshowService = slideshowService;

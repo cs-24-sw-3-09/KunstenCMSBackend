@@ -8,6 +8,7 @@ import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -387,7 +388,6 @@ public class DisplayDeviceControllerIntegrationTests {
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.fallbackContent.fileType")
 								.value(savedVisualMedia.getFileType()));
-
 	}
 
 	@Test
@@ -559,9 +559,10 @@ public class DisplayDeviceControllerIntegrationTests {
 		String body = "{\"fallbackId\":1,\"type\":\"visualMedia\"}}";
 
 		mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback")
+                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
+						.param("forceDimensions", "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -585,9 +586,10 @@ public class DisplayDeviceControllerIntegrationTests {
 		String body = "{\"fallbackId\":1,\"type\":\"slideshow\"}";
 
 		mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback")
+                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
+						.param("forceDimensions", "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -607,7 +609,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		String body = "{\"fallbackId\":1,\"type\":\"slideshow\"}";
 
 		mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback")
+                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
         ).andExpect(
@@ -626,7 +628,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		String body = "{\"fallbackId\":1,\"type\":\"visualMedia\"}";
 
 		mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback")
+                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
         ).andExpect(
@@ -647,7 +649,9 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		Result<DisplayDeviceEntity> dd = displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
+		System.out.println(dd.getErrMsg());
+		
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
@@ -660,9 +664,10 @@ public class DisplayDeviceControllerIntegrationTests {
 		String body = "{\"fallbackId\":2,\"type\":\"slideshow\"}";
 
 		mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback")
+                MockMvcRequestBuilders.patch("/api/display_devices/1/fallback_content")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
+						.param("forceDimensions", "true")
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         );
@@ -684,7 +689,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
@@ -729,7 +734,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists((long) 1));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
@@ -771,7 +776,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		visualMediaService.save(visualMediaToSave);
 		assertTrue(visualMediaService.isExists(1L));
 
-		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue());
+		displayDeviceService.addFallback(displayDeviceToSave.getId().longValue(), visualMediaToSave.getId().longValue(), true);
 		assertEquals(
 			1, 
 			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()

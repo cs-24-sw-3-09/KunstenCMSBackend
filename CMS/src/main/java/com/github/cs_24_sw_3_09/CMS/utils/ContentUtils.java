@@ -29,10 +29,7 @@ public class ContentUtils {
 
     public String getContentTypeById(Integer id) {
         ContentEntity content = entityManager.find(ContentEntity.class, id);
-        if (content != null) {
-            return content.getClass().getSimpleName();
-        }
-        return null;
+        return content != null ? content.getClass().getSimpleName() : null;
     }
 
     public boolean isFallbackContentValid(String type, Long fallbackId) {

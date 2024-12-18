@@ -23,6 +23,8 @@ import org.json.JSONObject;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,28 +37,35 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
+import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class SlideshowServiceImpl implements SlideshowService {
 
-    private final VisualMediaInclusionService visualMediaInclusionService;
+    private VisualMediaInclusionRepository visualMediaInclusionRepository;
+
     private SlideshowRepository slideshowRepository;
     private PushTSService pushTSService;
     private TimeSlotRepository timeSlotRepository;
     private Mapper<SlideshowEntity, SlideshowDto> slideshowMapper;
+    private DimensionCheckService dimensionCheckService;
 
     public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
-            VisualMediaInclusionService visualMediaInclusionService, PushTSService pushTSService, TimeSlotRepository timeSlotRepository, Mapper<SlideshowEntity, SlideshowDto> slideshowMapper) {
+    VisualMediaInclusionRepository visualMediaInclusionRepository, PushTSService pushTSService, TimeSlotRepository timeSlotRepository, 
+            Mapper<SlideshowEntity, SlideshowDto> slideshowMapper, DimensionCheckService dimensionCheckService) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
-        this.visualMediaInclusionService = visualMediaInclusionService;
+        this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.slideshowMapper = slideshowMapper;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @Override
@@ -134,15 +143,34 @@ public class SlideshowServiceImpl implements SlideshowService {
     }
 
     @Override
-    public SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId) {
-        return slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
-            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionService
-                    .findOne(visualMediaInclusionId)
+    public Result<SlideshowEntity> addVisualMediaInclusion(Long id, Long visualMediaInclusionId, Boolean forceDimensions) {
+         // validate existence of slidehsow and visualMediaInclusion
+        Optional<SlideshowEntity> slideshowToCheck = findOne(id);
+        Optional<VisualMediaInclusionEntity> visualMediaInclusionToCheck = visualMediaInclusionRepository.findById(visualMediaInclusionId.intValue());
+
+
+        if (slideshowToCheck.isEmpty() || visualMediaInclusionToCheck.isEmpty()) {
+            return new Result<>("Not found");
+        }
+
+        //check whether the dimensions of the slideshow and new visualMediaInclusion fit
+        if(!forceDimensions){
+            String checkResult = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(
+            visualMediaInclusionId, id);
+            if (!"1".equals(checkResult)) {
+                return new Result<>(checkResult);
+            }
+        }
+
+        //todo: Seems kinda silly, because Slideshow and vmi have already been checked
+        return new Result<>(slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+            VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionRepository
+                    .findById(visualMediaInclusionId.intValue())
                     .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));
             existingDisplayDevice.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
 
             return slideshowRepository.save(existingDisplayDevice);
-        }).orElseThrow(() -> new RuntimeException("Slideshow does not exist"));
+        }).orElseThrow(() -> new RuntimeException("Slideshow does not exist")));
     }
     
     @Override
@@ -247,7 +275,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         .visualMedia(visualMediaInclusion.getVisualMedia())
         .build();
         
-        VisualMediaInclusionEntity visualMediaInclusionToReturn = visualMediaInclusionService.save(visualMediaInclusionToSave).get();
+        VisualMediaInclusionEntity visualMediaInclusionToReturn = visualMediaInclusionRepository.save(visualMediaInclusionToSave);
 
         return visualMediaInclusionToReturn;
     }
