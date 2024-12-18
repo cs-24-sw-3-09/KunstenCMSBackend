@@ -14,7 +14,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 public interface TimeSlotService {
-    Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity);
+    Result<TimeSlotEntity, String> save(TimeSlotEntity timeSlotEntity, Boolean forceDimensions);
 
     TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity);
 

@@ -101,7 +101,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser
     public void testThatGetTimeSlotsSuccessfullyReturnsListOfTimeSlots() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        timeSlotService.save(testTimeSlotEntity);
+        timeSlotService.save(testTimeSlotEntity, true);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/time_slots")
         ).andExpect(
@@ -120,23 +120,23 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity ts = TestDataUtil.createTimeSlotEntity();
         ts.setStartDate(Date.valueOf(LocalDate.of(2024, 11, 25)));
         ts.setEndDate(Date.valueOf(LocalDate.of(2025, 11, 25)));
-        timeSlotService.save(ts);
+        timeSlotService.save(ts, true);
         ts = TestDataUtil.createTimeSlotEntity();
         ts.setStartDate(Date.valueOf(LocalDate.of(2024, 12, 2)));
         ts.setEndDate(Date.valueOf(LocalDate.of(2025, 11, 25)));
-        timeSlotService.save(ts);
+        timeSlotService.save(ts,true);
         ts = TestDataUtil.createTimeSlotEntity();
         ts.setStartDate(Date.valueOf(LocalDate.of(2025, 2, 25)));
         ts.setEndDate(Date.valueOf(LocalDate.of(2025, 11, 25)));
-        timeSlotService.save(ts);
+        timeSlotService.save(ts,true);
         ts = TestDataUtil.createTimeSlotEntity();
         ts.setStartDate(Date.valueOf(LocalDate.of(2024, 9, 25)));
         ts.setEndDate(Date.valueOf(LocalDate.of(2024, 12, 2)));
-        timeSlotService.save(ts);
+        timeSlotService.save(ts,true);
         ts = TestDataUtil.createTimeSlotEntity();
         ts.setStartDate(Date.valueOf(LocalDate.of(2024, 12, 1)));
         ts.setEndDate(Date.valueOf(LocalDate.of(2024, 12, 2)));
-        timeSlotService.save(ts);
+        timeSlotService.save(ts,true);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/time_slots?start=2024-11-30&end=2024-12-04"))
                 .andExpect(
@@ -151,7 +151,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser
     public void testThatGetTimeSlotReturnsStatus200WhenTimeSlotsExists() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        timeSlotService.save(testTimeSlotEntity);
+        timeSlotService.save(testTimeSlotEntity, true);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/time_slots/1")
@@ -171,7 +171,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser
     public void testThatGetTimeSlotAlsoReturnsDisplayDevicesAndDisplayContent() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity).get();
+        TimeSlotEntity s = timeSlotService.save(testTimeSlotEntity, true).getOk();
 
 
         mockMvc.perform(
@@ -200,7 +200,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatDeleteTimeSlotReturnsStatus204() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
         assertTrue(timeSlotService.isExists((long) 1));
         assertTrue(displayDeviceService.isExists((long) 1));
 
@@ -257,7 +257,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatFullUpdateTimeSlotReturnsStatus200WhenTimeSlotExists() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
 
         System.out.println((timeSlotService.isExists(1L)));
 
@@ -278,7 +278,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateTimeSlotReturnsStatus200() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
 
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
@@ -316,7 +316,7 @@ public class TimeSlotControllerIntegrationTests {
     public void testThatDeletesAssociationBetweenTSAndDDWithMoreAssociationsThanOne() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         timeSlotEntity.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
         assertTrue(timeSlotService.isExists((long) 1));
         assertTrue(timeSlotEntity.getDisplayDevices().stream().allMatch(
                 displayDevice -> displayDeviceService.isExists(displayDevice.getId().longValue())
@@ -348,7 +348,7 @@ public class TimeSlotControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatDeletesAssociationBetweenTSAndDDWithOnlyOneAssociation() throws Exception {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
         assertTrue(timeSlotService.isExists((long) 1));
         assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
         assertEquals(1, timeSlotService.countDisplayDeviceAssociations((long) 1));
@@ -373,7 +373,7 @@ public class TimeSlotControllerIntegrationTests {
     public void testThatTriesToDeleteAssociationButDoesntContainAssociation() throws Exception {
         //Where Display Device does not exist
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity).get();
+        TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
         assertTrue(timeSlotService.isExists((long) 1));
         assertNotEquals(timeSlotEntity.getDisplayDevices(), null);
 
@@ -825,15 +825,15 @@ public class TimeSlotControllerIntegrationTests {
     @Test
     @WithMockUser(roles = {"PLANNER"})
     public void getAllTimeSlots() throws Exception {
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
-        timeSlotService.save(TestDataUtil.createTimeSlotEntity());
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
+        timeSlotService.save(TestDataUtil.createTimeSlotEntity(), true);
 
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(timeSlotService.isExists(2L));
@@ -921,7 +921,7 @@ public class TimeSlotControllerIntegrationTests {
             2, 
             timeSlot.getDisplayDevices().size()
         );
-        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
@@ -958,7 +958,7 @@ public class TimeSlotControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER" })
 	public void testThatFullPatchTimeSlotWithDisplayContentIds() throws Exception {
 		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(slideshowRepository.findById(1).isPresent());
 
@@ -994,7 +994,7 @@ public class TimeSlotControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER" })
 	public void testThatFullPatchTimeSlotWithNothing() throws Exception {
 		TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
-        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(slideshowRepository.findById(1).isPresent());
 
@@ -1032,7 +1032,7 @@ public class TimeSlotControllerIntegrationTests {
             2, 
             timeSlot.getDisplayDevices().size()
         );
-        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot).get();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));

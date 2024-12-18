@@ -78,24 +78,18 @@ public class TimeSlotController {
         // Done to decouple the persistence layer from the presentation and service
         // layer.
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlot);
+        Result<TimeSlotEntity, String> savedTimeSlotEntity = timeSlotService.save(
+            timeSlotEntity, 
+            forceDimensions != null ? forceDimensions : false
+        );
 
-        //check if dimensions of displaydevice and content fit
-        if (timeSlotEntity.getDisplayDevices() != null && timeSlotEntity.getDisplayContent() != null) {
-            if (forceDimensions == null || forceDimensions == false) {
-                String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(
-                        timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
-                if (!"1".equals(checkResult)) {
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);
-                }
-            }
+        if (savedTimeSlotEntity.isErr()) {
+            return switch(savedTimeSlotEntity.getErr().toLowerCase()) {
+                case "not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                default -> new ResponseEntity<>(savedTimeSlotEntity.getErr(), HttpStatus.CONFLICT);
+            };            
         }
-
-        Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-
-        if (savedTimeSlotEntity.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.CREATED);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.getOk()), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -138,6 +132,7 @@ public class TimeSlotController {
     public ResponseEntity<?> fullUpdateTimeSlot(@PathVariable("id") Long id,
             @Valid @RequestBody TimeSlotDto timeSlotDto,
             @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions) {
+        
         if (!timeSlotService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -145,18 +140,26 @@ public class TimeSlotController {
         timeSlotDto.setId(Math.toIntExact(id));
         TimeSlotEntity timeSlotEntity = timeSlotMapper.mapFrom(timeSlotDto);
         //check if dimensions of displaydevice and content fit
-        if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null) {
+        /*if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null) {
             if(forceDimensions == false){
                 String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
                 if(!"1".equals(checkResult)){
                     return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
                 }
             }
+        }*/
+        Result<TimeSlotEntity, String> savedTimeSlotEntity = timeSlotService.save(
+            timeSlotEntity,
+            forceDimensions != null ? forceDimensions : false
+        );
+        if (savedTimeSlotEntity.isErr()) {
+            return switch(savedTimeSlotEntity.getErr().toLowerCase()) {
+                case "not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                default -> new ResponseEntity<>(savedTimeSlotEntity.getErr(), HttpStatus.CONFLICT);
+            };            
         }
-        Optional<TimeSlotEntity> savedTimeSlotEntity = timeSlotService.save(timeSlotEntity);
-        if (savedTimeSlotEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.get()), HttpStatus.OK);
+        return new ResponseEntity<>(timeSlotMapper.mapTo(savedTimeSlotEntity.getOk()), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/{id}")

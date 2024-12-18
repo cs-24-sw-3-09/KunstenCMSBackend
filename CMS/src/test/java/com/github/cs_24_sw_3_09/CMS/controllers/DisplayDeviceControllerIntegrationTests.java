@@ -185,7 +185,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	public void testThatDeleteDisplayDeviceAndTimeSlotWithOnlyOneAssociation() throws Exception {
 		//Creates both a display Device and a time slot
 		TimeSlotEntity timeSlotToSave = TestDataUtil.createTimeSlotEntity();
-		timeSlotService.save(timeSlotToSave);
+		timeSlotService.save(timeSlotToSave, true);
 
 		
 		assertTrue(displayDeviceService.isExists((long) 1));
@@ -215,7 +215,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		//Creates both a display Device and a time slot
 		TimeSlotEntity timeSlotToSave = TestDataUtil.createTimeSlotEntity();
 		timeSlotToSave.getDisplayDevices().add(TestDataUtil.createDisplayDeviceEntity());
-		timeSlotService.save(timeSlotToSave);
+		timeSlotService.save(timeSlotToSave, true);
 
 
 		
@@ -412,7 +412,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "PLANNER")
 	public void testThatAddTimeSlotToDisplayDeviceReturns200OkayWhenBothExists() throws Exception {
 		TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
-		TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity).get();
+		TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity, true).getOk();
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();

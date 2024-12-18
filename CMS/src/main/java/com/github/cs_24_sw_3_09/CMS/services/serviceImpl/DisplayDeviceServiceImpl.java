@@ -14,6 +14,8 @@ import com.github.cs_24_sw_3_09.CMS.utils.Result;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -70,16 +72,26 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public Optional<DisplayDeviceEntity> save(DisplayDeviceEntity displayDeviceEntity) {
-        if (displayDeviceEntity.getFallbackContent() != null) {           
+    public Result<DisplayDeviceEntity, String> save(DisplayDeviceEntity displayDeviceEntity, Boolean forceDimensions) {
+        
+        //check whether the dimensions of the displayDevice and the fallbackContent fit
+        if (displayDeviceEntity.getFallbackContent() != null) {
+            //Assign fallback content to display device
             Optional<DisplayDeviceEntity> displayDevice = addFallbackContent(displayDeviceEntity);
-            if (displayDevice.isEmpty()) return Optional.empty();
+            if (displayDevice.isEmpty()) return Result.err("Not found");
             displayDeviceEntity = displayDevice.get();
+
+             //check whether the dimensions of the displayDevice and the fallbackContent fit
+            if(!forceDimensions){
+                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
+                if (!"1".equals(checkResult)) return Result.err(checkResult);
+            }
         }
+
 
         DisplayDeviceEntity toReturn = displayDeviceRepository.save(displayDeviceEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return Optional.of(toReturn);
+        return Result.ok(toReturn);
     }
 
     private Optional<DisplayDeviceEntity> addFallbackContent(DisplayDeviceEntity displayDeviceEntity) {

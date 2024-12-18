@@ -46,7 +46,7 @@ public class CleanUpDataBaseIntegrationTests {
     @WithMockUser
     public void testThatDeleteTSWithoutDDDoesNotDeleteValidTS() throws Exception {
         TimeSlotEntity testTimeSlotEntity = TestDataUtil.createTimeSlotEntity();
-        timeSlotService.save(testTimeSlotEntity);
+        timeSlotService.save(testTimeSlotEntity,true);
 
         int i = cleanUpDataBaseService.deleteTSWithoutDD();
         assertEquals(0, i, "Did not not delete TS");

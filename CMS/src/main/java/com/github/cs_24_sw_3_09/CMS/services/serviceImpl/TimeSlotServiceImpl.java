@@ -84,16 +84,27 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity){
+    public Result<TimeSlotEntity, String> save(TimeSlotEntity timeSlotEntity, Boolean forceDimensions){
         //Handle display devices
         Optional<TimeSlotEntity> updatedTimeSlot = addDisplayDevice(timeSlotEntity);
-        if (updatedTimeSlot.isEmpty()) return Optional.empty();
+        if (updatedTimeSlot.isEmpty()) return Result.err("Not found");
         timeSlotEntity = updatedTimeSlot.get();
+
+        //check if dimensions of displaydevice and content fit
+        if (!forceDimensions && timeSlotEntity.getDisplayDevices() != null && timeSlotEntity.getDisplayContent() != null) {
+            String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(
+                    timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices()
+            );
+            if (!"1".equals(checkResult)) {
+                return Result.err(checkResult);
+            }
+        }
+
 
         //Handle display content
         if (timeSlotEntity.getDisplayContent() != null) {
             updatedTimeSlot = addDisplayContent(timeSlotEntity);
-            if (updatedTimeSlot.isEmpty()) return Optional.empty();
+            if (updatedTimeSlot.isEmpty()) return Result.err("Not found");
             timeSlotEntity = updatedTimeSlot.get();
         }
 
@@ -101,7 +112,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
         //If time slot is active then it notifies display devices
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return Optional.of(toReturn);
+        return Result.ok(toReturn);
     }
     
     private Optional<TimeSlotEntity> addDisplayDevice(TimeSlotEntity timeSlotEntity) {

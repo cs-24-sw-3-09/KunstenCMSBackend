@@ -196,7 +196,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForDDInTSAndVMReturns1WhenMatch() throws Exception{
         TimeSlotEntity timeslot = TestDataUtil.createTimeSlotEntityWithoutContent();
-        timeSlotService.save(timeslot);
+        timeSlotService.save(timeslot,true );
         assertTrue(timeSlotService.isExists(1L));
 
         createHorizontalVisualMediaWithFile();
@@ -214,7 +214,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForDDInTSAndSSReturns1WhenMatch() throws Exception{
         TimeSlotEntity timeslot = TestDataUtil.createTimeSlotEntityWithoutContent();
-        timeSlotService.save(timeslot);
+        timeSlotService.save(timeslot,true);
 
         SlideshowEntity slideshow = createHorizontalSlideshow();
         timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow.getId().longValue(), "slideshow", false);
@@ -229,7 +229,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForDDInTSAndVMReturnsCorrectStringWhenNoMatch() throws Exception{
         TimeSlotEntity timeslot = TestDataUtil.createTimeSlotEntityWithoutContent();
-        timeSlotService.save(timeslot);
+        timeSlotService.save(timeslot,true );
 
         creatVerticalVisualMediaWithFile();
         assertTrue(visualMediaService.isExists(1L));
@@ -248,7 +248,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForDDInTSAndSSReturnsCorrectStringWhenNoMatch() throws Exception{
         TimeSlotEntity timeslot = TestDataUtil.createTimeSlotEntityWithoutContent();
-        timeSlotService.save(timeslot);
+        timeSlotService.save(timeslot, true);
 
         //case 1: display devices and slideshow have different dimensions
         SlideshowEntity slideshow = createVerticalSlideshow();
