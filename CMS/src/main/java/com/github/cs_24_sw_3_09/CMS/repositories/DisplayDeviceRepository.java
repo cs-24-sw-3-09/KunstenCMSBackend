@@ -21,4 +21,8 @@ public interface DisplayDeviceRepository extends CrudRepository<DisplayDeviceEnt
        "JOIN SlideshowEntity ss ON f.id = ss.id " +
        "WHERE ss.id = :slideshowId")
        Set<DisplayDeviceEntity> findDisplayDevicesUsingSlideshowAsFallbackBySlideshowId(@Param("slideshowId") Long slideshowId);
+
+       @Query("SELECT DISTINCT dd FROM DisplayDeviceEntity dd " +
+               "WHERE dd.fallbackContent.id = :visualMediaId")
+       List<DisplayDeviceEntity> findAllByVM(@Param("visualMediaId") Long visualMediaId);
 }

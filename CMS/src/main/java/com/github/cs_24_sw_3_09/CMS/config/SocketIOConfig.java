@@ -1,7 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.config;
 
 import com.github.cs_24_sw_3_09.CMS.socketConnection.SocketIOModule;
-import com.github.cs_24_sw_3_09.CMS.tasks.MonitorGracePeriodForDisplayDevices;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +13,7 @@ public class SocketIOConfig {
     private String socketOrigin;
 
     @Bean
-    public SocketIOModule socketIOModule(MonitorGracePeriodForDisplayDevices monitorGracePeriodForDisplayDevices) {
+    public SocketIOModule socketIOModule() {
         return new SocketIOModule("0.0.0.0", 3051, socketOrigin);
     }
 }

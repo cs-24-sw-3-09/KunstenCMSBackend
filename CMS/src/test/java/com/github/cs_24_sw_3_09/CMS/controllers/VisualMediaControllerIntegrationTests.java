@@ -542,7 +542,7 @@ public class VisualMediaControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].visualMediaId").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].color").value("grey"));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$[0].color").value("red"));
     }
 
     @Test
@@ -570,9 +570,9 @@ public class VisualMediaControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].visualMediaId").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].color").value("grey"))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$[0].color").value("red"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].visualMediaId").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].color").value("red"));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$[1].color").value("yellow"));
     }
 
 }

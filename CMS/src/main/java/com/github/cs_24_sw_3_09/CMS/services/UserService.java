@@ -10,7 +10,9 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.UserEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
-    UserEntity save(UserEntity user);
+    Optional<UserEntity> save(UserEntity user);
+
+    UserEntity forceSave(UserEntity user);
 
     List<UserEntity> findAll();
 

@@ -41,7 +41,7 @@ public interface VisualMediaService {
 
     List<TimeSlotEntity> findTimeslotsVisualMediaIsPartOf(Long id);
 
-    HttpStatus replaceFileById(Long id, MultipartFile file) throws IOException;
+    VisualMediaEntity replaceFileById(Long id, MultipartFile file) throws IOException;
 
     List<Map<String, Object>> findStateOfEveryVisualMedia();
 }
