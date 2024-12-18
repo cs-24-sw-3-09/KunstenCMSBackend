@@ -104,7 +104,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser
 	public void testThatGetDisplayDeviceSuccessfullyReturnsListOfDisplayDevices() throws Exception {
 		DisplayDeviceEntity testDisplayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(testDisplayDeviceEntity);
+		displayDeviceService.save(testDisplayDeviceEntity, true);
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.get("/api/display_devices")).andExpect(
@@ -120,7 +120,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser
 	public void testThatGetDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceEntity);
+		displayDeviceService.save(displayDeviceEntity, true);
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.get("/api/display_devices/1")).andExpect(
@@ -139,7 +139,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser
 	public void testThatGetDisplayDeviceReturnsDisplayDeviceWhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceEntity);
+		displayDeviceService.save(displayDeviceEntity, true);
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.get("/api/display_devices/" + displayDeviceEntity.getId())).andExpect(
@@ -168,7 +168,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "ADMIN")
 	public void testThatDeleteDisplayDeviceReturnsStatus204() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceEntity);
+		displayDeviceService.save(displayDeviceEntity, true);
 		assertTrue(displayDeviceService.isExists((long) 1));
 
 		mockMvc.perform(
@@ -270,7 +270,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "ADMIN")
 	public void testThatFullUpdateDisplayDeviceReturnsStatus200WhenDisplayDeviceExists() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
@@ -287,7 +287,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = "ADMIN")
 	public void testThatPatchUpdateDisplayDeviceReturnsStatus200() throws Exception {
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		DisplayDeviceDto displayDeviceDto = TestDataUtil.createDisplayDeviceDto();
 		String displayDeviceDtoJson = objectMapper.writeValueAsString(displayDeviceDto);
@@ -326,7 +326,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": " + savedSlideshowEntity.getId() + "}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -350,7 +350,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": 99}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -370,7 +370,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": " + savedVisualMedia.getId() + "}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -396,7 +396,7 @@ public class DisplayDeviceControllerIntegrationTests {
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
 		String requestBodyJson = "{\"fallbackId\": 99}";
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		mockMvc.perform(
 				MockMvcRequestBuilders
@@ -415,7 +415,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		TimeSlotEntity savedTimeSlotEntity = timeSlotService.save(timeSlotEntity, true).getOk();
 
 		DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+		DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
 		String requestBodyJson = "{\"timeSlotId\": " + savedTimeSlotEntity.getId() + "}";
 
@@ -549,7 +549,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER" })
 	public void testThatPatchDisplayDeviceWithVMIdAndReturns200() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists((long) 1)); 
 
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
@@ -576,7 +576,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER" })
 	public void testThatPatchDisplayDeviceWithSlideShowIdAndReturns200() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists((long) 1)); 
 
 		SlideshowEntity slideshowToSave = TestDataUtil.createSlideshowEntity();
@@ -603,7 +603,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER" })
 	public void testThatPatchDisplayDeviceWithFallbackIdWhenDDDoesNotExistAndReturns404() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists((long) 1)); 
 
 		String body = "{\"fallbackId\":1,\"type\":\"slideshow\"}";
@@ -642,7 +642,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER" })
 	public void testThatPatchDisplayDeviceWithFallbackIdWhenFallbackIsAlreadyAssigned() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists((long) 1)); 
 
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
@@ -682,7 +682,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER", "ADMIN" })
 	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceContainsAFallbackId() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists((long) 1)); 
 
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
@@ -727,7 +727,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER", "ADMIN" })
 	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceDoesntContainAFallback() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists((long) 1)); 
 
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
@@ -769,7 +769,7 @@ public class DisplayDeviceControllerIntegrationTests {
 	@WithMockUser(roles = { "PLANNER", "ADMIN" })
 	public void testThatFullPatchDisplayDeviceWhereDisplayDeviceDoesntContainAFallbackId() throws Exception {
 		DisplayDeviceEntity displayDeviceToSave = TestDataUtil.createDisplayDeviceEntity();
-		displayDeviceService.save(displayDeviceToSave).get();
+		displayDeviceService.save(displayDeviceToSave, true).getOk();
 		assertTrue(displayDeviceService.isExists(1L)); 
 
 		VisualMediaEntity visualMediaToSave = TestDataUtil.createVisualMediaEntity();
@@ -813,15 +813,15 @@ public class DisplayDeviceControllerIntegrationTests {
 
 	@WithMockUser(roles = { "PLANNER" })
 	public void getAllDisplayDevices() throws Exception {
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+		displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
 
 		assertTrue(displayDeviceService.isExists(1L));
 		assertTrue(displayDeviceService.isExists(2L));

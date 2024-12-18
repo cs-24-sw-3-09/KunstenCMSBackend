@@ -60,17 +60,6 @@ public class DisplayDeviceController {
             @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions ) {
         
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
-
-        //check whether the dimensions of the displayDevice and the fallbackContent fit
-        /*if (displayDeviceEntity.getFallbackContent() != null) {
-            if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
-                if(!"1".equals(checkResult)){
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-                }
-            }
-        }*/
-
         Result<DisplayDeviceEntity, String> savedDisplayDeviceEntity = displayDeviceService.save(
             displayDeviceEntity, 
             forceDimensions != null ? forceDimensions : false
@@ -120,16 +109,6 @@ public class DisplayDeviceController {
 
         displayDeviceDto.setId(Math.toIntExact(id));
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDeviceDto);
-
-        //check whether the dimensions of the displayDevice and the fallbackContent fit
-        /*if (displayDeviceEntity.getFallbackContent() != null) {
-            if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
-                if(!"1".equals(checkResult)){
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-                }
-            }
-        }*/
 
         Result<DisplayDeviceEntity, String> savedDisplayDeviceEntity = displayDeviceService.save(
             displayDeviceEntity, 

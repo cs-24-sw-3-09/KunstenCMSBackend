@@ -79,7 +79,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForAssignedFallbackReturns1WhenVMDimensionsMatchDD() throws Exception {
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDevice).get();
+        displayDeviceService.save(displayDevice, true).getOk();
         
         createHorizontalVisualMediaWithFile();
         assertTrue(visualMediaService.isExists(1L));
@@ -94,7 +94,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForAssignedFallbackReturns1WhenSSDimensionsMatchDD() throws Exception{
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDevice).get();
+        displayDeviceService.save(displayDevice, true).getOk();
         
         SlideshowEntity slideshow = createHorizontalSlideshow();
 
@@ -107,7 +107,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForAssignedFallbackReturnsCorrectStringWhenVMDimensionsDoesNotMatchDD() throws Exception{
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDevice).get();
+        displayDeviceService.save(displayDevice, true).getOk();
         
         creatVerticalVisualMediaWithFile();
         assertTrue(visualMediaService.isExists(1L));
@@ -123,7 +123,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCheckDimensionForAssignedFallbackReturnsCorrectStringWhenSSDimensionsDoesNotMatchDD() throws Exception{
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDevice).get();
+        displayDeviceService.save(displayDevice, true).getOk();
 
         //Case 1: slideshow and display device has different dimensions
        SlideshowEntity slideshow = createVerticalSlideshow();
@@ -273,7 +273,7 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles="PLANNER")
     public void testThatCorrectStringIsReturnedWhenNull() throws Exception{
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
-        displayDeviceService.save(displayDevice).get();
+        displayDeviceService.save(displayDevice, true).getOk();
 
         VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntity();
         visualMediaService.save(visualMediaWithoutPath);

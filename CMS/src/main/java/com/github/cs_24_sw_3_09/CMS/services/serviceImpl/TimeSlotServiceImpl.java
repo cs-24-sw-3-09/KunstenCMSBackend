@@ -90,6 +90,13 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         if (updatedTimeSlot.isEmpty()) return Result.err("Not found");
         timeSlotEntity = updatedTimeSlot.get();
 
+        //Handle display content
+        if (timeSlotEntity.getDisplayContent() != null) {
+            updatedTimeSlot = addDisplayContent(timeSlotEntity);
+            if (updatedTimeSlot.isEmpty()) return Result.err("Not found");
+            timeSlotEntity = updatedTimeSlot.get();
+        }
+
         //check if dimensions of displaydevice and content fit
         if (!forceDimensions && timeSlotEntity.getDisplayDevices() != null && timeSlotEntity.getDisplayContent() != null) {
             String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(
@@ -98,14 +105,6 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             if (!"1".equals(checkResult)) {
                 return Result.err(checkResult);
             }
-        }
-
-
-        //Handle display content
-        if (timeSlotEntity.getDisplayContent() != null) {
-            updatedTimeSlot = addDisplayContent(timeSlotEntity);
-            if (updatedTimeSlot.isEmpty()) return Result.err("Not found");
-            timeSlotEntity = updatedTimeSlot.get();
         }
 
         TimeSlotEntity toReturn = timeSlotRepository.save(timeSlotEntity);

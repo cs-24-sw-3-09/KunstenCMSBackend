@@ -324,7 +324,7 @@ public class VisualMediaControllerIntegrationTests {
         VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
 
         DisplayDeviceEntity displayDeviceEntity = TestDataUtil.createDisplayDeviceEntity();
-        DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity).get();
+        DisplayDeviceEntity savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity, true).getOk();
 
         DisplayDeviceEntity updatedDisplayDeviceEntity = displayDeviceService.setFallbackContent(
                 (long) savedDisplayDeviceEntity.getId(), (long) savedVisualMediaEntity.getId(), "VisualMediaEntity");

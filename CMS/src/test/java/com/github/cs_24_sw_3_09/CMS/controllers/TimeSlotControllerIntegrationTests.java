@@ -676,9 +676,9 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity();
         DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity();
 
-        displayDeviceService.save(dd1).get();
-        displayDeviceService.save(dd2).get();
-        displayDeviceService.save(dd3).get();
+        displayDeviceService.save(dd1, true).getOk();
+        displayDeviceService.save(dd2, true).getOk();
+        displayDeviceService.save(dd3, true).getOk();
 
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
@@ -740,10 +740,10 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity dd3 = TestDataUtil.createDisplayDeviceEntity("c");
         DisplayDeviceEntity dd4 = TestDataUtil.createDisplayDeviceEntity("d");
 
-        displayDeviceService.save(dd1);
-        displayDeviceService.save(dd2);
-        displayDeviceService.save(dd3);
-        displayDeviceService.save(dd4);
+        displayDeviceService.save(dd1, true);
+        displayDeviceService.save(dd2, true );
+        displayDeviceService.save(dd3, true );
+        displayDeviceService.save(dd4, true);
 
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
@@ -875,9 +875,9 @@ public class TimeSlotControllerIntegrationTests {
         DisplayDeviceEntity dd2 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
         DisplayDeviceEntity dd3 = displayDeviceRepository.save(TestDataUtil.createDisplayDeviceEntity());
 
-        displayDeviceService.save(dd1).get();
-        displayDeviceService.save(dd2).get();
-        displayDeviceService.save(dd3).get();
+        displayDeviceService.save(dd1, true).getOk();
+        displayDeviceService.save(dd2, true).getOk();
+        displayDeviceService.save(dd3, true).getOk();
 
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
@@ -926,8 +926,8 @@ public class TimeSlotControllerIntegrationTests {
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
 
-        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
-        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity());
+        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
+        displayDeviceService.save(TestDataUtil.createDisplayDeviceEntity(), true);
         assertTrue(displayDeviceService.isExists(3L));
         assertTrue(displayDeviceService.isExists(4L));
 
