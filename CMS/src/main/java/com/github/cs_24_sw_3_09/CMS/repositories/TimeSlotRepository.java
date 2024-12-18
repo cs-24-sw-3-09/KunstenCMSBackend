@@ -9,9 +9,12 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.Query;
 
 import java.sql.Date;
+import java.time.LocalTime;
 import java.util.List;
 
 import jakarta.transaction.Transactional;
+
+import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -49,6 +52,8 @@ public interface TimeSlotRepository extends CrudRepository<TimeSlotEntity, Integ
             "JOIN SlideshowEntity ss ON c.id = ss.id ")
     List<TimeSlotEntity> getAllTimeSlotsWithSlideshowAsContent();
 
+    @Query("SELECT ts FROM TimeSlotEntity ts WHERE ts.displayContent.type = 'slideshow'  AND ts.startDate = CURRENT_DATE  AND ts.startTime > :currentTime")
+    Set<TimeSlotEntity> getAllTimeSlotsWithSSWithCurrentDateButFutureTime(@Param("currentTime") LocalTime currentTime);
 
 
 }

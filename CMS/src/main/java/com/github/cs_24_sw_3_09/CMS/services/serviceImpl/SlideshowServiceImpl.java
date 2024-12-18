@@ -1,7 +1,9 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -159,13 +161,33 @@ public class SlideshowServiceImpl implements SlideshowService {
         List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
         
+        Date currentDateWithoutTime = removeTime(new Date());
+        Long currentTime = new Date().getTime();
+        System.out.println("curDate: "+currentDateWithoutTime);
+        System.out.println("curreTime "+currentTime);
+
+        LocalTime currentTimeLocal = LocalTime.now();
+        Set<TimeSlotEntity> tsCurrent = timeSlotRepository.getAllTimeSlotsWithSSWithCurrentDateButFutureTime(currentTimeLocal);
+        for(TimeSlotEntity ts : tsCurrent){
+            System.out.println("curre: "+ts.getId());
+        }
         //only get Time Slots that are currently shown or in the future
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
+            System.out.println("id: "+ts.getId());
+            System.out.println("contentId: "+ts.getDisplayContent().getId());
+            System.out.println("startDate: "+ts.getStartDate());
+            System.out.println("startTime: "+ts.getStartDate().getTime() / 1000 + ts.getStartTime().getTime() / 1000 );
+            System.out.println("1: "+ts.getStartDate().after(new Date()));
+            System.out.println("2: "+ts.getStartDate().equals(currentDateWithoutTime));
+            System.out.println("2.5: "+(ts.getStartDate().equals(currentDateWithoutTime)
+            && ts.getStartDate().getTime() / 1000 + ts.getStartTime().getTime() / 1000  > currentTime));
+            System.out.println("3: "+ (ts.getStartDate().getTime() / 1000 + ts.getStartTime().getTime() / 1000 > currentTime));
+
             if (timeSlotsCurrentlyShown.contains(ts.getId())) {
                 activeTimeSlots.add(ts);
             } else if (ts.getStartDate().after(new Date()) ||
-                    (ts.getStartDate().equals(new Date())
-                            && ts.getStartTime().after(new Time((new Date()).getTime())))) {
+                    (ts.getStartDate().equals(currentDateWithoutTime)
+                            && ts.getStartDate().getTime() / 1000 + ts.getStartTime().getTime() / 1000  > currentTime)) {
                 // If the start date is in the future OR if the start date is today and the start time is in the future
                 futureTimeSlots.add(ts);
             }
@@ -215,6 +237,17 @@ public class SlideshowServiceImpl implements SlideshowService {
             slideshowStatusList.add(slideshowStatus);
         }
         return slideshowStatusList;
+    }
+
+    private static Date removeTime(Date date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = sdf.format(date);
+            return sdf.parse(formattedDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
