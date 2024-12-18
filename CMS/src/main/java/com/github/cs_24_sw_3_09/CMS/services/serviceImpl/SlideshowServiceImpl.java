@@ -200,7 +200,7 @@ public class SlideshowServiceImpl implements SlideshowService {
             LocalDate endDate = ts.getEndDate().toLocalDate();
                      
             boolean isTodayWithinRange = startDate.isBefore(today) && endDate.isAfter(today);
-            boolean isValidToday = isTodayWithinRange && startTime.isAfter(now);
+            boolean isValidToday = today.equals(startDate) && startTime.isAfter(now);
 
             if (timeSlotsCurrentlyShown.contains(ts.getId())) {
                 activeTimeSlots.add(ts);
