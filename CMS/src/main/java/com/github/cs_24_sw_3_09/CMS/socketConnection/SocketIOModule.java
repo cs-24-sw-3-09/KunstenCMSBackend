@@ -59,7 +59,9 @@ public class SocketIOModule {
                 int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
                 client.joinRoom(String.valueOf(deviceId));
                 monitorGracePeriodForDisplayDevices.displayDeviceConnected(deviceId);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         });
     }
 
