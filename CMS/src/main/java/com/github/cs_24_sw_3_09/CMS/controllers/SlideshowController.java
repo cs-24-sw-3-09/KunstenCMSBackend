@@ -12,6 +12,7 @@ import com.github.cs_24_sw_3_09.CMS.services.DisplayDeviceService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 import org.json.JSONArray;
 import org.springframework.data.domain.Page;
@@ -154,23 +155,15 @@ public class SlideshowController {
             return ResponseEntity.badRequest().build();
         }
 
-        // validate existence of slidehsow and visualMediaInclusion
-        if (!slideshowService.isExists(id) || !visualMediaInclusionService.isExists(visualMediaInclusionId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        //check whether the dimensions of the slideshow and new visualMediaInclusion fit
-        if(forceDimensions == false){
-            String checkResult = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(
-            visualMediaInclusionId, id);
-            if (!"1".equals(checkResult)) {
-                return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT); 
-            }
-        }
         // Update the slideshow and return the response
-        SlideshowEntity updatedSlideshowEntity = slideshowService.addVisualMediaInclusion(id, visualMediaInclusionId);
-
-        return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity));
+        Result<SlideshowEntity> updatedSlideshowEntity = slideshowService.addVisualMediaInclusion(id, visualMediaInclusionId, forceDimensions != null ? forceDimensions : null);
+        if (updatedSlideshowEntity.isErr()) {
+            return switch (updatedSlideshowEntity.getErrMsg().toLowerCase()) {
+                case "not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                default -> new ResponseEntity<>(updatedSlideshowEntity.getErrMsg(), HttpStatus.CONFLICT);  
+            };
+        }
+        return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity.getValue()));
     }
 
     @PostMapping(path = "/{id}/duplicate")

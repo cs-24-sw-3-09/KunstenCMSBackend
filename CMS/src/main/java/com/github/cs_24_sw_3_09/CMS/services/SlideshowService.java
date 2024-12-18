@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.services;
 import com.github.cs_24_sw_3_09.CMS.model.dto.SlideshowDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 import org.json.JSONArray;
 import org.springframework.data.domain.Page;
@@ -30,7 +31,7 @@ public interface SlideshowService {
 
     void delete(Long id);
 
-    SlideshowEntity addVisualMediaInclusion(Long id, Long visualMediaInclusionId);
+    Result<SlideshowEntity> addVisualMediaInclusion(Long id, Long visualMediaInclusionId, Boolean forceDimensions);
 
     List<Map<String, Object>> findStateOfEverySlideshow();
 
