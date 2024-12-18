@@ -10,10 +10,13 @@ import java.util.stream.StreamSupport;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotColor;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.ContentEntity;
@@ -25,8 +28,10 @@ import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
+import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
+
 
 @Service
 public class TimeSlotServiceImpl implements TimeSlotService {
@@ -39,11 +44,13 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private VisualMediaService visualMediaService;
     private SlideshowService slideshowService;
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
+    private DimensionCheckService dimensionCheckService;
     
     public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
                             Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
                             SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, 
-                            VisualMediaService visualMediaService, SlideshowService slideshowService) {
+                            VisualMediaService visualMediaService, SlideshowService slideshowService,
+                            DimensionCheckService dimensionCheckService) {
         this.timeSlotRepository = timeSlotRepository;
         this.pushTSService = pushTSService;
         this.displayDeviceRepository = displayDeviceRepository;
@@ -52,6 +59,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         this.visualMediaService = visualMediaService;
         this.slideshowService = slideshowService;
         this.timeSlotMapper = timeSlotMapper;
+        this.dimensionCheckService = dimensionCheckService;
     }
 
     @Override
@@ -166,9 +174,21 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
-    public TimeSlotEntity partialUpdate(Long id, TimeSlotEntity timeSlotEntity) {
+    public Result<TimeSlotEntity> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions) {
+        //Error handling
+        if (!isExists(id)) {
+            return new Result<>("Not found");
+        }
+        //check if dimensions of displaydevice and content fit
+        if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null && !forceDimensions) {
+            String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
+            if(!"1".equals(checkResult)){
+                return new Result<>(checkResult);  
+            }
+        }
+
         timeSlotEntity.setId(Math.toIntExact(id));
-        return timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
+        return new Result<>(timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
             // if time slot from request has name, we set it to the existing time slot.
             // (same with other atts)
 
@@ -206,7 +226,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             TimeSlotEntity toReturn = timeSlotRepository.save(existingTimeSlot);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
             return toReturn;
-        }).orElseThrow(() -> new RuntimeException("Author does not exist"));
+        }).orElseThrow(() -> new RuntimeException("Time slot not found")));
     }
 
     @Override
@@ -251,11 +271,28 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
 
     @Override
-    public TimeSlotEntity setDisplayContent(Long tsId, Long dcId, String dcType) {
+    public Result<TimeSlotEntity> setDisplayContent(Long tsId, Long dcId, String dcType, Boolean forceDimensions) {
+        //check if dimensions of displaydevice and content fit
+        Optional<TimeSlotEntity> timeSlotToCheck = findOne(tsId);
+        Optional<ContentEntity> contentToCheck = findContentById(dcId.intValue());
 
-        return timeSlotRepository.findById(Math.toIntExact(tsId)).map(existingTimeSlot -> {
+         // Validate existence of time slot
+         // Validate existence of the referenced content
+         if (timeSlotToCheck.isEmpty() || contentToCheck.isEmpty()) {
+            return new Result<>("Not found");
+        }
 
-
+        //check if dimensions of displaydevice and content fit
+        TimeSlotEntity timeSlotEntity = timeSlotToCheck.get();
+        ContentEntity displayContent = contentToCheck.get();
+        if (timeSlotEntity.getDisplayDevices() != null && !forceDimensions) {
+            String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(displayContent, timeSlotEntity.getDisplayDevices());
+            if(!"1".equals(checkResult)){
+                return new Result<>(checkResult);  
+            }
+        }
+        
+        return new Result<>(timeSlotRepository.findById(Math.toIntExact(tsId)).map(existingTimeSlot -> {
             ContentEntity foundDisplayContent = null;
             if (dcType.equals("visualMedia")) {
                 foundDisplayContent = visualMediaService.findOne(dcId)
@@ -268,18 +305,37 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             existingTimeSlot.setDisplayContent(foundDisplayContent);
 
             return timeSlotRepository.save(existingTimeSlot);
-        }).orElseThrow(() -> new RuntimeException("Time Slot does not exist"));
+        }).orElseThrow(() -> new RuntimeException("Time Slot does not exist")));
     }
 
     @Override
-    public TimeSlotEntity addDisplayDevice(Long id, Long displayDeviceId) throws RuntimeException {
-        return timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
+    public Result<TimeSlotEntity> addDisplayDevice(Long id, Long displayDeviceId, Boolean forceDimensions) throws RuntimeException {
+        Optional<TimeSlotEntity> timeSlotToCheck = findOne(id);
+        Optional<DisplayDeviceEntity> displayDeviceToCheck = displayDeviceRepository.findById(displayDeviceId.intValue());
+
+
+        if (timeSlotToCheck.isEmpty() || displayDeviceToCheck.isEmpty()) {
+            return new Result<>("Not found");
+        }
+
+        //check if dimensions of displaydevice and content fit
+        TimeSlotEntity timeSlotEntity = timeSlotToCheck.get();
+        DisplayDeviceEntity displayDeviceEntity = displayDeviceToCheck.get(); //safe to use .get() since already validated existence
+        Set<DisplayDeviceEntity> displayDevice = Set.of(displayDeviceEntity);
+        if (timeSlotEntity.getDisplayContent() != null && !forceDimensions) {
+            String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), displayDevice);
+            if(!"1".equals(checkResult)){
+                return new Result<>(checkResult);
+            }
+        }
+
+        return new Result<>(timeSlotRepository.findById(Math.toIntExact(id)).map(existingTimeSlot -> {
             DisplayDeviceEntity foundDisplayDevice = displayDeviceRepository.findById(Math.toIntExact(displayDeviceId)).orElseThrow();
             existingTimeSlot.addDisplayDevice(foundDisplayDevice);
             existingTimeSlot.setId(Math.toIntExact(id));
             TimeSlotEntity updatedTimeslot = timeSlotRepository.save(existingTimeSlot);
             return timeSlotRepository.save(updatedTimeslot);
-        }).orElseThrow();
+        }).orElseThrow());
     }
 
     @Override

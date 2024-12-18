@@ -2,6 +2,8 @@ package com.github.cs_24_sw_3_09.CMS.services;
 
 import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -30,6 +32,6 @@ public interface DisplayDeviceService {
 
     DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId);
 
-    Optional<DisplayDeviceEntity> addFallback(Long id, Long fallbackId);
+    Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions);
 
 }

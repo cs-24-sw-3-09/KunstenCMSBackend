@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.socketConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.corundumstudio.socketio.AckRequest;
@@ -8,7 +9,6 @@ import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -26,6 +26,7 @@ public class SocketIOModule {
     private final SocketIOServer server;
 
     @Autowired
+    @Lazy
     private MonitorGracePeriodForDisplayDevices monitorGracePeriodForDisplayDevices;
 
     // Constructor with parameters for hostname and port
@@ -57,7 +58,10 @@ public class SocketIOModule {
             try {
                 int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
                 client.joinRoom(String.valueOf(deviceId));
-            } catch (Exception e) {}
+                monitorGracePeriodForDisplayDevices.displayDeviceConnected(deviceId);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         });
     }
 
@@ -66,7 +70,7 @@ public class SocketIOModule {
             try { 
                 // Extract device ID (assume it's available as part of the client or context)
                 int deviceId = Integer.parseInt(client.getHandshakeData().getSingleUrlParam("id"));
-                monitorGracePeriodForDisplayDevices.sendDisconnectMailWithGrace(deviceId);
+                monitorGracePeriodForDisplayDevices.displayDeviceDisconnected(deviceId);
             } catch (Exception e) {}
         });
     }

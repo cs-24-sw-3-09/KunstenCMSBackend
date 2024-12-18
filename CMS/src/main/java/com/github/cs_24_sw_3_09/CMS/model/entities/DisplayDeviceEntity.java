@@ -73,10 +73,6 @@ public class DisplayDeviceEntity {
             sb.append("Name: ").append(name).append("<br>");
         if (location != null)
             sb.append("Location: ").append(location).append("<br>");
-        if (displayOrientation != null)
-            sb.append("Display Orientation: ").append(displayOrientation).append("<br>");
-        if (resolution != null)
-            sb.append("Resolution: ").append(resolution).append("<br>");
 
         return sb.toString()/*.trim()*/;
     }

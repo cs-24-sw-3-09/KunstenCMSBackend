@@ -203,7 +203,7 @@ public class DimensionCheckServiceTests {
         assertTrue(visualMediaService.isExists(1L));
         ContentEntity visualMediaContent = visualMediaService.findOne(1L).get();
 
-        timeSlotService.setDisplayContent(timeslot.getId().longValue(), visualMediaContent.getId().longValue(), "visualMedia");
+        timeSlotService.setDisplayContent(timeslot.getId().longValue(), visualMediaContent.getId().longValue(), "visualMedia", false);
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
 
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
@@ -217,7 +217,7 @@ public class DimensionCheckServiceTests {
         timeSlotService.save(timeslot);
 
         SlideshowEntity slideshow = createHorizontalSlideshow();
-        timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow.getId().longValue(), "slideshow");
+        timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow.getId().longValue(), "slideshow", false);
 
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         
@@ -235,7 +235,7 @@ public class DimensionCheckServiceTests {
         assertTrue(visualMediaService.isExists(1L));
         ContentEntity visualMediaContent = visualMediaService.findOne(1L).get();
 
-        timeSlotService.setDisplayContent(timeslot.getId().longValue(), visualMediaContent.getId().longValue(), "visualMedia");
+        timeSlotService.setDisplayContent(timeslot.getId().longValue(), visualMediaContent.getId().longValue(), "visualMedia", false);
         
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
@@ -252,7 +252,7 @@ public class DimensionCheckServiceTests {
 
         //case 1: display devices and slideshow have different dimensions
         SlideshowEntity slideshow = createVerticalSlideshow();
-        timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow.getId().longValue(), "slideshow");
+        timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow.getId().longValue(), "slideshow", false);
         
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow, updatedTimeSlot.getDisplayDevices());
@@ -261,7 +261,7 @@ public class DimensionCheckServiceTests {
 
         //case 2: slideshow has mixed dimensions
         SlideshowEntity slideshow2 = createMixedSlideshow();
-        timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow2.getId().longValue(), "slideshow");
+        timeSlotService.setDisplayContent(timeslot.getId().longValue(), slideshow2.getId().longValue(), "slideshow", false);
         
         updatedTimeSlot = timeSlotService.findOne(1L).get();
         resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow2, updatedTimeSlot.getDisplayDevices());
@@ -311,7 +311,7 @@ public class DimensionCheckServiceTests {
 
         SlideshowEntity slideshow = TestDataUtil.createSlideshowEntity();
         slideshowService.save(slideshow);
-        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue());
+        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue(), true);
         
         return slideshow;
     }
@@ -327,7 +327,7 @@ public class DimensionCheckServiceTests {
 
         SlideshowEntity slideshow = TestDataUtil.createSlideshowEntity();
         slideshowService.save(slideshow);
-        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue());
+        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue(), true);
         return slideshow;
     }
 
@@ -350,8 +350,8 @@ public class DimensionCheckServiceTests {
 
         SlideshowEntity slideshow = TestDataUtil.createSlideshowEntity();
         slideshowService.save(slideshow);
-        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue());
-        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion2.getId().longValue());
+        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue(), true);
+        slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion2.getId().longValue(), true);
         return slideshow;
     }
 
