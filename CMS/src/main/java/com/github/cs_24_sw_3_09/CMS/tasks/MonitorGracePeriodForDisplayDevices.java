@@ -25,7 +25,7 @@ public class MonitorGracePeriodForDisplayDevices {
 
     @Async("asyncTaskExecutor")
     @Scheduled(fixedRate = 1000 * 60, initialDelay = 1000 * 60) // Runs every minute
-    private void sendDisconnectMailWithGrace() {
+    public void sendDisconnectMailWithGrace() {
         // Check if the device ID is present in the map
         for (Integer ddId : timeWhenDisconnected.keySet()) {
             long disconnectTime = timeWhenDisconnected.get(ddId);
