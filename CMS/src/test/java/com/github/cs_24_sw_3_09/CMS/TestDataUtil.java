@@ -104,7 +104,6 @@ public class TestDataUtil {
                 .description("dkaoidkao test descpt")
                 //.lastDateModified("30/10/2003")
                 .location("/djao/dhau.jpg")
-                .fileType("image/jpg")
                 .name("Test_name")
                 .build();
     }
