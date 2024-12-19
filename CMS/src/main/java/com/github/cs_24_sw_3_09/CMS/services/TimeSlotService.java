@@ -14,7 +14,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 public interface TimeSlotService {
-    Optional<TimeSlotEntity> save(TimeSlotEntity timeSlotEntity);
+    Result<TimeSlotEntity, String> save(TimeSlotEntity timeSlotEntity, Boolean forceDimensions);
 
     TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity);
 
@@ -30,7 +30,7 @@ public interface TimeSlotService {
 
     Set<TimeSlotDto> findSetOfTimeSlotsSlideshowIsAPartOf(Long id);
 
-    Result<TimeSlotEntity> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions);
+    Result<TimeSlotEntity, String> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions);
 
     int countDisplayDeviceAssociations(Long timeSlotId);
 
@@ -38,9 +38,9 @@ public interface TimeSlotService {
 
     void deleteRelation(Long tsId, Long ddId);
 
-    Result<TimeSlotEntity> setDisplayContent(Long tsId, Long dcId, String type, Boolean forceDimensions);
+    Result<TimeSlotEntity, String> setDisplayContent(Long tsId, Long dcId, String type, Boolean forceDimensions);
   
-    Result<TimeSlotEntity> addDisplayDevice(Long id, Long displayDeviceId, Boolean forceDimensions) throws RuntimeException;
+    Result<TimeSlotEntity, String> addDisplayDevice(Long id, Long displayDeviceId, Boolean forceDimensions) throws RuntimeException;
 
     List<TimeSlotEntity> findOverlappingTimeSlots(Long id);
 

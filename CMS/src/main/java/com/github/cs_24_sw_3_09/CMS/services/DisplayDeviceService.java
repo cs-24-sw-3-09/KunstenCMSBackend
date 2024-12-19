@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface DisplayDeviceService {
-    Optional<DisplayDeviceEntity> save(DisplayDeviceEntity displayDevice);
+    Result<DisplayDeviceEntity, String> save(DisplayDeviceEntity displayDevice, Boolean forceDimensions);
 
     List<DisplayDeviceEntity> findAll();
 
@@ -32,6 +32,6 @@ public interface DisplayDeviceService {
 
     DisplayDeviceEntity addTimeSlot(Long id, Long timeslotId);
 
-    Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions);
+    Result<DisplayDeviceEntity, String> addFallback(Long id, Long fallbackId, Boolean forceDimensions);
 
 }

@@ -60,22 +60,19 @@ public class DisplayDeviceController {
             @RequestParam(value = "forceDimensions", required = false) Boolean forceDimensions ) {
         
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDevice);
-
-        //check whether the dimensions of the displayDevice and the fallbackContent fit
-        if (displayDeviceEntity.getFallbackContent() != null) {
-            if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
-                if(!"1".equals(checkResult)){
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-                }
-            }
+        Result<DisplayDeviceEntity, String> savedDisplayDeviceEntity = displayDeviceService.save(
+            displayDeviceEntity, 
+            forceDimensions != null ? forceDimensions : false
+        );
+        
+        if (savedDisplayDeviceEntity.isErr()) {
+            return switch(savedDisplayDeviceEntity.getErr().toLowerCase()) {
+                case "not found" ->  new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+                default -> new ResponseEntity<>(savedDisplayDeviceEntity.getErr(), HttpStatus.CONFLICT);
+            };
         }
-
-        Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
         
-        if (savedDisplayDeviceEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        
-        return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity.get()), HttpStatus.CREATED);
+        return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity.getOk()), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -113,21 +110,19 @@ public class DisplayDeviceController {
         displayDeviceDto.setId(Math.toIntExact(id));
         DisplayDeviceEntity displayDeviceEntity = displayDeviceMapper.mapFrom(displayDeviceDto);
 
-        //check whether the dimensions of the displayDevice and the fallbackContent fit
-        if (displayDeviceEntity.getFallbackContent() != null) {
-            if(forceDimensions == false){
-                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
-                if(!"1".equals(checkResult)){
-                    return new ResponseEntity<>(checkResult, HttpStatus.CONFLICT);  
-                }
-            }
+        Result<DisplayDeviceEntity, String> savedDisplayDeviceEntity = displayDeviceService.save(
+            displayDeviceEntity, 
+            forceDimensions != null ? forceDimensions : false
+        );
+
+        if (savedDisplayDeviceEntity.isErr()) {
+            return switch(savedDisplayDeviceEntity.getErr().toLowerCase()) {
+                case "not found" ->  new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+                default -> new ResponseEntity<>(savedDisplayDeviceEntity.getErr(), HttpStatus.CONFLICT);
+            };
         }
 
-        Optional<DisplayDeviceEntity> savedDisplayDeviceEntity = displayDeviceService.save(displayDeviceEntity);
-        if (savedDisplayDeviceEntity.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-
-        return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity.get()), HttpStatus.OK);
+        return new ResponseEntity<>(displayDeviceMapper.mapTo(savedDisplayDeviceEntity.getOk()), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/{id}")
@@ -200,15 +195,15 @@ public class DisplayDeviceController {
         }
         
         // Update the display device and return the response
-        Result<DisplayDeviceEntity> updatedDisplayDeviceEntity = displayDeviceService.addFallback(id, fallbackId, forceDimensions != null ? forceDimensions : false);
+        Result<DisplayDeviceEntity, String> updatedDisplayDeviceEntity = displayDeviceService.addFallback(id, fallbackId, forceDimensions != null ? forceDimensions : false);
         if (updatedDisplayDeviceEntity.isErr()) {
-            return switch(updatedDisplayDeviceEntity.getErrMsg()) {
+            return switch(updatedDisplayDeviceEntity.getErr()) {
                 case "Not found" -> ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                default -> new ResponseEntity<>(updatedDisplayDeviceEntity.getErrMsg(), HttpStatus.CONFLICT);
+                default -> new ResponseEntity<>(updatedDisplayDeviceEntity.getErr(), HttpStatus.CONFLICT);
             };
         }
         
-        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity.getValue()));
+        return ResponseEntity.ok(displayDeviceMapper.mapTo(updatedDisplayDeviceEntity.getOk()));
     }
 
 }

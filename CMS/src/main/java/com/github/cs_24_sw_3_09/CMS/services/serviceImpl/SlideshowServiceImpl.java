@@ -146,14 +146,14 @@ public class SlideshowServiceImpl implements SlideshowService {
     }
 
     @Override
-    public Result<SlideshowEntity> addVisualMediaInclusion(Long id, Long visualMediaInclusionId, Boolean forceDimensions) {
+    public Result<SlideshowEntity, String> addVisualMediaInclusion(Long id, Long visualMediaInclusionId, Boolean forceDimensions) {
          // validate existence of slidehsow and visualMediaInclusion
         Optional<SlideshowEntity> slideshowToCheck = findOne(id);
         Optional<VisualMediaInclusionEntity> visualMediaInclusionToCheck = visualMediaInclusionRepository.findById(visualMediaInclusionId.intValue());
 
 
         if (slideshowToCheck.isEmpty() || visualMediaInclusionToCheck.isEmpty()) {
-            return new Result<>("Not found");
+            return Result.err("Not found");
         }
 
         //check whether the dimensions of the slideshow and new visualMediaInclusion fit
@@ -161,12 +161,12 @@ public class SlideshowServiceImpl implements SlideshowService {
             String checkResult = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(
             visualMediaInclusionId, id);
             if (!"1".equals(checkResult)) {
-                return new Result<>(checkResult);
+                return Result.err(checkResult);
             }
         }
 
         //todo: Seems kinda silly, because Slideshow and vmi have already been checked
-        return new Result<>(slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+        return Result.ok(slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
             VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionRepository
                     .findById(visualMediaInclusionId.intValue())
                     .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));

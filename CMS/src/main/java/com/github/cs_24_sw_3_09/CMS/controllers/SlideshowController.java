@@ -156,14 +156,14 @@ public class SlideshowController {
         }
 
         // Update the slideshow and return the response
-        Result<SlideshowEntity> updatedSlideshowEntity = slideshowService.addVisualMediaInclusion(id, visualMediaInclusionId, forceDimensions != null ? forceDimensions : null);
+        Result<SlideshowEntity, String> updatedSlideshowEntity = slideshowService.addVisualMediaInclusion(id, visualMediaInclusionId, forceDimensions != null ? forceDimensions : null);
         if (updatedSlideshowEntity.isErr()) {
-            return switch (updatedSlideshowEntity.getErrMsg().toLowerCase()) {
+            return switch (updatedSlideshowEntity.getErr().toLowerCase()) {
                 case "not found" -> new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                default -> new ResponseEntity<>(updatedSlideshowEntity.getErrMsg(), HttpStatus.CONFLICT);  
+                default -> new ResponseEntity<>(updatedSlideshowEntity.getErr(), HttpStatus.CONFLICT);  
             };
         }
-        return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity.getValue()));
+        return ResponseEntity.ok(slideshowMapper.mapTo(updatedSlideshowEntity.getOk()));
     }
 
     @PostMapping(path = "/{id}/duplicate")

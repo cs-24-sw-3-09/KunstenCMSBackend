@@ -72,16 +72,26 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public Optional<DisplayDeviceEntity> save(DisplayDeviceEntity displayDeviceEntity) {
-        if (displayDeviceEntity.getFallbackContent() != null) {           
+    public Result<DisplayDeviceEntity, String> save(DisplayDeviceEntity displayDeviceEntity, Boolean forceDimensions) {
+        
+        //check whether the dimensions of the displayDevice and the fallbackContent fit
+        if (displayDeviceEntity.getFallbackContent() != null) {
+            //Assign fallback content to display device
             Optional<DisplayDeviceEntity> displayDevice = addFallbackContent(displayDeviceEntity);
-            if (displayDevice.isEmpty()) return Optional.empty();
+            if (displayDevice.isEmpty()) return Result.err("Not found");
             displayDeviceEntity = displayDevice.get();
+
+             //check whether the dimensions of the displayDevice and the fallbackContent fit
+            if(!forceDimensions){
+                String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDeviceEntity, displayDeviceEntity.getFallbackContent());
+                if (!"1".equals(checkResult)) return Result.err(checkResult);
+            }
         }
+
 
         DisplayDeviceEntity toReturn = displayDeviceRepository.save(displayDeviceEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
-        return Optional.of(toReturn);
+        return Result.ok(toReturn);
     }
 
     private Optional<DisplayDeviceEntity> addFallbackContent(DisplayDeviceEntity displayDeviceEntity) {
@@ -224,12 +234,12 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
     }
 
     @Override
-    public Result<DisplayDeviceEntity> addFallback(Long id, Long fallbackId, Boolean forceDimensions) {
+    public Result<DisplayDeviceEntity, String> addFallback(Long id, Long fallbackId, Boolean forceDimensions) {
         Optional<ContentEntity> content = findContentById(Math.toIntExact(fallbackId));
         Optional<DisplayDeviceEntity> displayDeviceToCheck = displayDeviceRepository.findById(Math.toIntExact(id)); 
         
         if (displayDeviceToCheck.isEmpty() || content.isEmpty()) {
-            return new Result<>("Not found");
+            return Result.err("Not found");
         }
         
         ContentEntity fallbackContent = content.get();
@@ -238,12 +248,12 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
          //check whether the dimensions of the displayDevice and the fallbackContent fit 
         if (!forceDimensions){
             String checkResult = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, fallbackContent);
-            if(!"1".equals(checkResult)) return new Result<>(checkResult); 
+            if(!"1".equals(checkResult)) return Result.err(checkResult); 
         }
        
         displayDevice.setFallbackContent(fallbackContent);
         DisplayDeviceEntity displayToReturn = displayDeviceRepository.save(displayDevice);
 
-        return new Result<>(displayToReturn);   
+        return Result.ok(displayToReturn);   
     }
 }
