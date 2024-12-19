@@ -1,10 +1,16 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+// JCodec imports
+import org.jcodec.api.FrameGrab;
+import java.nio.channels.SeekableByteChannel;
+import org.jcodec.common.io.NIOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,10 +58,40 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
     }
 
     private Optional<VisualMediaInclusionEntity> getVisualMedia(VisualMediaInclusionEntity visualMediaInclusionEntity) {
-        Optional<VisualMediaEntity> visualMedia = visualMediaService.findOne((long) visualMediaInclusionEntity.getVisualMedia().getId());
-        if (visualMedia.isEmpty()) return Optional.empty();
-        visualMediaInclusionEntity.setVisualMedia(visualMedia.get());
+        Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne((long) visualMediaInclusionEntity.getVisualMedia().getId());
+        if (optionalVisualMedia.isEmpty()) return Optional.empty();
+        VisualMediaEntity visualMedia = optionalVisualMedia.get();
+        visualMediaInclusionEntity.setVisualMedia(visualMedia);
+
+        //if the visual media is a video, the slideDuration field should have the length of the video
+        if (visualMedia.getFileType().equals("video/mp4") || visualMedia.getFileType().equals("mp4")) {
+            Integer videoDuration = findVideoDuration(visualMedia.getLocation());
+            visualMediaInclusionEntity.setSlideDuration(videoDuration);
+        }
+
         return Optional.of(visualMediaInclusionEntity);
+    }
+
+    private Integer findVideoDuration(String visualMediaPath){
+        String rootPath = System.getProperty("user.dir"); 
+        String relativePath = visualMediaPath;
+        String absolutePath = Paths.get(rootPath, relativePath).toString();
+
+        try {
+            File videoFile = new File(absolutePath);
+            //SeekableByteChannel -> used to read video file efficiently
+            SeekableByteChannel channel = NIOUtils.readableChannel(videoFile);
+            // Get frame-level access to video
+            FrameGrab grab = FrameGrab.createFrameGrab(channel);
+            // Get the video duration in seconds, must return a double
+            double durationInSeconds = grab.getVideoTrack().getMeta().getTotalDuration();
+            //convert to field type Integer
+            Integer durationsInSecondsInteger = Integer.valueOf((int) Math.round(durationInSeconds));
+            return durationsInSecondsInteger;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Override
@@ -85,12 +121,22 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
             // if display device from request has name, we set it to the existing display
             // device. (same with other atts)
             Optional.ofNullable(visualMediaInclusionEntity.getId()).ifPresent(existingVisualMediaInclusion::setId);
-            Optional.ofNullable(visualMediaInclusionEntity.getSlideDuration())
-                    .ifPresent(existingVisualMediaInclusion::setSlideDuration);
             Optional.ofNullable(visualMediaInclusionEntity.getSlideshowPosition())
                     .ifPresent(existingVisualMediaInclusion::setSlideshowPosition);
             Optional.ofNullable(visualMediaInclusionEntity.getVisualMedia())
                     .ifPresent(existingVisualMediaInclusion::setVisualMedia);
+
+            Optional.ofNullable(visualMediaInclusionEntity.getSlideDuration())
+                    .ifPresent(slideDuration -> {
+                        // Check if visual media exists and has file type "mp4"
+                        VisualMediaEntity visualMedia = visualMediaInclusionEntity.getVisualMedia();
+                        if (visualMedia != null && visualMedia.getFileType().equals("video/mp4") 
+                        || visualMedia.getFileType().equals("mp4")) {
+                            // Calculate the slide duration using the method
+                            slideDuration = findVideoDuration(visualMedia.getLocation());
+                        }
+                        existingVisualMediaInclusion.setSlideDuration(slideDuration);
+                    });
 
             VisualMediaInclusionEntity toReturn = visualMediaInclusionRepository.save(existingVisualMediaInclusion);
             pushTSService.updateDisplayDevicesToNewTimeSlots();
@@ -130,6 +176,14 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
             VisualMediaEntity foundVisualMediaEntity = visualMediaService.findOne(visualMediaId)
                     .orElseThrow(() -> new RuntimeException("Visual Media does not exist"));
             existingVisualMediaInclusion.setVisualMedia(foundVisualMediaEntity);
+
+            //if the visual media is a video -> calculate duration
+            if (foundVisualMediaEntity != null && foundVisualMediaEntity.getFileType().equals("video/mp4") 
+                || foundVisualMediaEntity.getFileType().equals("mp4")) {
+                // Calculate the slide duration
+                Integer slideDuration = findVideoDuration(foundVisualMediaEntity.getLocation());
+                existingVisualMediaInclusion.setSlideDuration(slideDuration);
+            }
 
             return visualMediaInclusionRepository.save(existingVisualMediaInclusion);
         }).orElseThrow(() -> new RuntimeException("Visual Media inclusion does not exist"));
