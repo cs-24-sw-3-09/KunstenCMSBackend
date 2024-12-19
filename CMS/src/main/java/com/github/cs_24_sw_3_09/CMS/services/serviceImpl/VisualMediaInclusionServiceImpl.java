@@ -9,7 +9,7 @@ import java.util.Set;
 
 // JCodec imports
 import org.jcodec.api.FrameGrab;
-import java.nio.channels.SeekableByteChannel;
+import org.jcodec.common.io.SeekableByteChannel;
 import org.jcodec.common.io.NIOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
