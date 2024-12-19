@@ -92,7 +92,7 @@ public class TestDataUtil {
     public static VisualMediaDto createVisualMediaDto() {
         return VisualMediaDto.builder()
                 .description("dkaoidkao test descpt")
-                .fileType("jpg")
+                .fileType("image/jpg")
                 // .lastDateModified("30/10/2003")
                 .location("/djao/dhau1")
                 .name("Billede navn1")
@@ -100,6 +100,16 @@ public class TestDataUtil {
     }
 
     public static VisualMediaEntity createVisualMediaEntity() {
+        return VisualMediaEntity.builder()
+                .description("dkaoidkao test descpt")
+                //.lastDateModified("30/10/2003")
+                .fileType("image/png")
+                .location("/djao/dhau.jpg")
+                .name("Test_name")
+                .build();
+    }
+
+    public static VisualMediaEntity createVisualMediaEntityWithoutFiletype() {
         return VisualMediaEntity.builder()
                 .description("dkaoidkao test descpt")
                 //.lastDateModified("30/10/2003")
@@ -111,7 +121,7 @@ public class TestDataUtil {
     public static VisualMediaEntity createVisualMediaEntityWithTags() {
         return VisualMediaEntity.builder()
                 .description("dkaoidkao test descpt")
-                .fileType("jpg")
+                .fileType("image/jpg")
                 // .lastDateModified("30/10/2003")
                 .location("/djao/dhau")
                 .name("Billede navn")
