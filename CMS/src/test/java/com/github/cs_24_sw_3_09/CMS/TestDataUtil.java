@@ -103,6 +103,16 @@ public class TestDataUtil {
         return VisualMediaEntity.builder()
                 .description("dkaoidkao test descpt")
                 //.lastDateModified("30/10/2003")
+                .fileType("image/png")
+                .location("/djao/dhau.jpg")
+                .name("Test_name")
+                .build();
+    }
+
+    public static VisualMediaEntity createVisualMediaEntityWithoutFiletype() {
+        return VisualMediaEntity.builder()
+                .description("dkaoidkao test descpt")
+                //.lastDateModified("30/10/2003")
                 .location("/djao/dhau.jpg")
                 .name("Test_name")
                 .build();

@@ -275,7 +275,7 @@ public class DimensionCheckServiceTests {
         DisplayDeviceEntity displayDevice = TestDataUtil.createDisplayDeviceEntity();
         displayDeviceService.save(displayDevice, true).getOk();
 
-        VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntity();
+        VisualMediaEntity visualMediaWithoutPath = TestDataUtil.createVisualMediaEntityWithoutFiletype();
         visualMediaService.save(visualMediaWithoutPath);
         
         String resultString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, visualMediaWithoutPath);
