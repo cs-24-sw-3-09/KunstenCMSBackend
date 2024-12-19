@@ -98,7 +98,7 @@ public class VisualMediaInclusionController {
         if (!visualMediaInclusionService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
+       
         VisualMediaInclusionEntity visualMediaInclusionEntity = visualMediaInclusionMapper
                 .mapFrom(visualMediaInclusionDto);
         VisualMediaInclusionEntity updatedVisualMediaInclusionEntity = visualMediaInclusionService.partialUpdate(id,
