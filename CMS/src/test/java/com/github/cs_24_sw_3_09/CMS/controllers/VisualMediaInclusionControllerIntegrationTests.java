@@ -231,6 +231,11 @@ public class VisualMediaInclusionControllerIntegrationTests {
     public void testThatFullUpdateVisualMediaInclusionReturnsStatus200WhenVisualMediaInclusionExists() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
+        System.out.println(visualMediaInclusionEntity.getVisualMedia() == null); 
+
+        
+        assertTrue(visualMediaInclusionService.isExists(1L));
+        assertTrue(visualMediaService.isExists(1L));
 
         VisualMediaInclusionDto visualMediaInclusionDto = TestDataUtil.createVisualMediaInclusionDto();
         String visualMediaInclusionDtoJson = objectMapper.writeValueAsString(visualMediaInclusionDto);
@@ -247,11 +252,18 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateVisualMediaInclusionReturnsStatus200() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
+        System.out.println(visualMediaInclusionEntity);
+        System.out.println("vm i test: "+visualMediaInclusionEntity.getVisualMedia().getFileType());
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
-        VisualMediaInclusionDto visualMediaInclusionDto = TestDataUtil.createVisualMediaInclusionDto();
-        String visualMediaInclusionDtoJson = objectMapper.writeValueAsString(visualMediaInclusionDto);
+        assertTrue(visualMediaInclusionService.isExists(1L));
+        assertTrue(visualMediaService.isExists(1L));
 
+        VisualMediaInclusionDto visualMediaInclusionDto = TestDataUtil.createVisualMediaInclusionDto();
+        visualMediaInclusionDto.setVisualMedia(null);
+        
+        String visualMediaInclusionDtoJson = objectMapper.writeValueAsString(visualMediaInclusionDto);
+        System.out.println("mapper: "+visualMediaInclusionDtoJson);
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/visual_media_inclusions/" + savedVisualMediaInclusionEntity.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
