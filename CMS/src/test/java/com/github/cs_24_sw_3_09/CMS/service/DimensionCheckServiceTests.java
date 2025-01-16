@@ -1,5 +1,6 @@
 package com.github.cs_24_sw_3_09.CMS.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy.Content;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -353,6 +355,50 @@ public class DimensionCheckServiceTests {
         slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion1.getId().longValue(), true);
         slideshowService.addVisualMediaInclusion(slideshow.getId().longValue(), visualMediaInclusion2.getId().longValue(), true);
         return slideshow;
+    }
+
+    @Test
+    @WithMockUser(roles = { "PLANNER" })
+    public void testThatOrientationMessageWorksWhenChangingAssignedDisplayDevices() throws Exception {
+            
+    TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntityWithoutContent();
+
+    assertEquals(
+            1, 
+            timeSlot.getDisplayDevices().size()
+    );
+    
+    creatVerticalVisualMediaWithFile();
+
+
+    TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
+    DisplayDeviceEntity dd = TestDataUtil.createSecDisplayDeviceEntity();
+    dd.setDisplayOrientation("horizontal");
+    displayDeviceService.save(dd, true).getOk();
+
+    assertTrue(timeSlotService.isExists(1L));
+    assertTrue(visualMediaService.isExists(1L));
+    assertTrue(displayDeviceService.isExists(1L));
+    assertTrue(displayDeviceService.isExists(2L));
+
+    
+    tsToSend.getDisplayDevices().clear();
+    String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
+    json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
+
+    System.out.println(json);
+
+    String res = mockMvc.perform(
+            MockMvcRequestBuilders.patch("/api/time_slots/1")
+            .param("forceDimensions", "false")    
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+    ).andExpect(
+            MockMvcResultMatchers.status().isConflict()
+    ).andReturn().getResponse().getContentAsString();
+
+    assert(!res.contains("null"));
+
     }
 
 }

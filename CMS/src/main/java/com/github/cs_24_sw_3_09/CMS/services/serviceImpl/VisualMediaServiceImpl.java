@@ -228,10 +228,12 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                         visualMediaStatus.put("color", "green");
                         return;
                     case "yellow":
-                        visualMediaStatus.put("color", "yellow");
+                        if (VMcolor != "green") {
+                            visualMediaStatus.put("color", "yellow");
+                        }
                         break;
                     case "red":
-                        if (VMcolor != "yellow") {
+                        if (VMcolor != "yellow" && VMcolor != "green") {
                             visualMediaStatus.put("color", "yellow");
                         }
                         break;

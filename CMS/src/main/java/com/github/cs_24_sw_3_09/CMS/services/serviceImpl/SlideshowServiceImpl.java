@@ -136,11 +136,14 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public void delete(Long id) {
-        SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
+        slideshowRepository.findById(Math.toIntExact(id)).orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
 
-        //slideshow.getVisualMediaInclusionCollection().clear();
-        //slideshowRepository.save(slideshow);
+        Set<TimeSlotEntity> timeSlots = timeSlotRepository.findSetOfTimeSlotsBySlideshowId(id);
+        if(timeSlots.size() > 0){
+            for (TimeSlotEntity ts : timeSlots){
+                ts.setDisplayContent(null);
+            }
+        }
         slideshowRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
@@ -238,12 +241,19 @@ public class SlideshowServiceImpl implements SlideshowService {
                     break;
                 }
             }
+
             if (slideshowStatus.get("color").equals("red")) {
                 for (TimeSlotEntity ts : futureTimeSlots) {
-                    if (ts.getDisplayContent().getId().equals(slideshowId)) {
-                        slideshowStatus.put("color", "yellow");
-                        break;
+                    // Check for the time slot happen
+                    LocalDate tsDate = ts.getEndDate().toLocalDate();
+                    if (tsDate.isBefore(today)) {
+                        continue;
                     }
+                    if (!ts.getDisplayContent().getId().equals(slideshowId)) {
+                        continue;
+                    }
+                    slideshowStatus.put("color", "yellow");
+                    break;
                 }
             }
 
