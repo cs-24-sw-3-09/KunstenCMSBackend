@@ -24,6 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.http.MediaType;
@@ -1058,5 +1060,43 @@ public class TimeSlotControllerIntegrationTests {
 			timeSlotService.findOne(1L).get().getDisplayDevices().size()
 		);
 	}
+
+        @Test
+        @WithMockUser(roles = { "PLANNER" })
+        public void testThatOrientationMessageWorksWhenChangingAssignedDisplayDevices() throws Exception {
+                
+        TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
+       
+
+
+        assertEquals(
+                1, 
+                timeSlot.getDisplayDevices().size()
+        );
+        
+
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
+        DisplayDeviceEntity dd = displayDeviceService.save(TestDataUtil.createSecDisplayDeviceEntity(), true).getOk();
+
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
+
+        tsToSend.getDisplayDevices().clear();
+        String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
+
+                MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                .param("forceDimensions", "false")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isConflict()
+        ).andReturn();
+
+        String res = result.getResponse().getContentAsString();
+
+        assert(!res.contains("null"));
+        }
 
 }
