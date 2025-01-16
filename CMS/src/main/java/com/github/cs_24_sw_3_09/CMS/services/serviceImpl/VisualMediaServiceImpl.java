@@ -153,6 +153,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         visualMediaRepository.save(VM);
         visualMediaRepository.deleteById(Math.toIntExact(id));
+        FileUtils.removeVisualMediaFile(VM);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
