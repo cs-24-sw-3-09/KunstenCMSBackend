@@ -128,6 +128,20 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         return Optional.of(timeSlotEntity);
     }
 
+
+    private Optional<Set<DisplayDeviceEntity>> getDisplayDevices(TimeSlotEntity timeSlotEntity) {
+        Set<DisplayDeviceEntity> displayDevices = timeSlotEntity.getDisplayDevices();
+        if (displayDevices == null) return Optional.empty();
+
+        Set<DisplayDeviceEntity> newDisplayDevices = new HashSet<>();
+        for (DisplayDeviceEntity displayDevice : displayDevices) {
+            DisplayDeviceEntity newDisplayDevice = displayDevice.getId() == null ? displayDevice : displayDeviceRepository.findById(displayDevice.getId()).orElse(null);
+            if (newDisplayDevice == null) continue;
+            newDisplayDevices.add(newDisplayDevice);
+        }
+        return Optional.of(newDisplayDevices);
+    }
+
     private Optional<TimeSlotEntity> addDisplayContent(TimeSlotEntity timeSlotEntity) {
         Integer currentContentId = timeSlotEntity.getDisplayContent().getId();
         Optional<ContentEntity> optionalContent = currentContentId == null ? Optional.of(timeSlotEntity.getDisplayContent()) : findContentById(currentContentId);
@@ -191,9 +205,13 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         if (!isExists(id)) {
             return Result.err("Not found");
         }
+
+        Optional<Set<DisplayDeviceEntity>> optionalDisplayDevices = getDisplayDevices(timeSlotEntity);
         //check if dimensions of displaydevice and content fit
-        if (timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayContent() != null && !forceDimensions) {
-            String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(timeSlotEntity.getDisplayContent(), timeSlotEntity.getDisplayDevices());
+        if (timeSlotEntity.getDisplayContent() != null && optionalDisplayDevices.isPresent() && !forceDimensions) {
+            String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(
+                timeSlotEntity.getDisplayContent(), optionalDisplayDevices.get()
+            );
             if(!"1".equals(checkResult)){
                 return Result.err(checkResult);  
             }

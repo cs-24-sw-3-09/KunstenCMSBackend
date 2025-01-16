@@ -422,7 +422,7 @@ public class TestDataUtil {
                 .build();
     }    
 
-    public static String createTSJsonWithDDIds(String json, int[] ids) {
+    public static String createTSJsonWithDDIds(String json, int... ids) {
         String res = "\"displayDevices\":[";
         for (int i = 0; i < ids.length; i++) {
             res += "{\"id\":"+ids[i]+"}";
