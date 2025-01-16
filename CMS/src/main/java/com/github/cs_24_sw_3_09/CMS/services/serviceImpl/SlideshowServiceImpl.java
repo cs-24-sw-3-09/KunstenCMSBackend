@@ -136,17 +136,12 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public void delete(Long id) {
-        SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
+        slideshowRepository.findById(Math.toIntExact(id)).orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
 
-        //slideshow.getVisualMediaInclusionCollection().clear();
-        //slideshowRepository.save(slideshow);
         Set<TimeSlotEntity> timeSlots = timeSlotRepository.findSetOfTimeSlotsBySlideshowId(id);
         if(timeSlots.size() > 0){
-            System.out.println("entered if: "+timeSlots.size());
             for (TimeSlotEntity ts : timeSlots){
                 ts.setDisplayContent(null);
-                System.out.println("new dc: "+ts.getDisplayContent());
             }
         }
         slideshowRepository.deleteById(Math.toIntExact(id));
