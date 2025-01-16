@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 //import java.lang.classfile.ClassFile.Option;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -140,14 +142,17 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     @Override
     public String checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(ContentEntity displayContent, Set<DisplayDeviceEntity> displayDevices){
        
-        Set<String> displayDeviceOrientation = new HashSet<>();
+        List<String> displayDeviceOrientationList = new ArrayList<>();
+        Set<String> displayDeviceOrientationSet = new HashSet<>();
         for (DisplayDeviceEntity device : displayDevices){
             String orientation = device.getDisplayOrientation();
-            displayDeviceOrientation.add(orientation);
-            System.out.println("o: "+orientation);
+            displayDeviceOrientationList.add(device.getName() + ": " + orientation);
+            displayDeviceOrientationSet.add(orientation);
+
         }
-        if(displayDeviceOrientation.size() > 1) {
-            return "The dimensions of display devices are mixed";
+        if(displayDeviceOrientationSet.size() > 1) {
+            return "The dimensions of display devices are mixed\n" 
+            + createErrorMessageWithDDList(displayDeviceOrientationList);
         }
 
         String displayContentOrientation;
@@ -164,9 +169,10 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
             displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
                           
-            if(!displayDeviceOrientation.contains(displayContentOrientation)){
-                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
-                "\nthe visual media orientation: "+ displayContentOrientation;
+            if(!displayDeviceOrientationSet.contains(displayContentOrientation)){
+                return "The dimension do not match:\nDisplay Device orientation:\n" + 
+                createErrorMessageWithDDList(displayDeviceOrientationList) + 
+                "The visual media orientation: "+ displayContentOrientation;
             }
             return "1";
 
@@ -184,8 +190,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                 return "The dimensions of slideshow are mixed";
             }
         
-            if (!displayDeviceOrientation.contains(displayContentOrientation)) {
-                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
+            if (!displayDeviceOrientationSet.contains(displayContentOrientation)) {
+                return "The dimension do not match:\nDisplay Device orientation:\n" + 
+                createErrorMessageWithDDList(displayDeviceOrientationList) + 
                 "\nthe visual media orientation: "+ displayContentOrientation;
             }
 
@@ -193,6 +200,10 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         }
 
         return "Display content not set";
+    }
+
+    private String createErrorMessageWithDDList(List<String> displayDevices) {
+        return displayDevices.stream().map(dd -> "\t" + dd).collect(java.util.stream.Collectors.joining("\n"));
     }
 
     private String getVisualMediaVideoOrientation(String visualMediaPath) {

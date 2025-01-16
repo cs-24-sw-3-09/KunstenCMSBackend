@@ -359,7 +359,7 @@ public class DimensionCheckServiceTests {
 
     @Test
     @WithMockUser(roles = { "PLANNER" })
-    public void testThatOrientationMessageWorksWhenChangingAssignedDisplayDevices() throws Exception {
+    public void testThatOrientationMessageWorksWhenPatchingAndChangingDisplayDevices() throws Exception {
             
     TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntityWithoutContent();
 
@@ -386,7 +386,7 @@ public class DimensionCheckServiceTests {
     String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
     json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
 
-    System.out.println(json);
+    //System.out.println(json);
 
     String res = mockMvc.perform(
             MockMvcRequestBuilders.patch("/api/time_slots/1")
