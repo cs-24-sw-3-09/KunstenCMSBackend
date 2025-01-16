@@ -146,8 +146,8 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
             //Fallback content
             Optional.ofNullable(displayDeviceEntity.getFallbackContent()).ifPresent(fallback -> {
-                if (fallback.getId() == null) {
-                    existingDisplayDevice.setFallbackContent(fallback);
+                if (fallback.getId() == 0) {
+                    existingDisplayDevice.setFallbackContent(null);
                     return;
                 }
                 Optional<ContentEntity> content = findContentById(fallback.getId());
