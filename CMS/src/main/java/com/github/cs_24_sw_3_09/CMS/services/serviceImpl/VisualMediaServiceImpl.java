@@ -11,6 +11,7 @@ import java.util.stream.StreamSupport;
 
 import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.repositories.*;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.utils.FileUtils;
 
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
@@ -37,15 +38,16 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final PushTSService pushTSService;
     private final SlideshowRepository slideshowRepository;
     private final DisplayDeviceRepository displayDeviceRepository;
+    private final TimeSlotService timeSlotService;
 
     @Lazy
     private final SlideshowService slideshowService;
 
     public VisualMediaServiceImpl(VisualMediaRepository visualMediaRepository, TagServiceImpl tagService,
-            TagRepository tagRepository, VisualMediaInclusionRepository visualMediaInclusionRepository,
-            PushTSService pushTSService, SlideshowRepository slideshowRepository,
-            @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
-            DisplayDeviceRepository displayDeviceRepository) {
+                                  TagRepository tagRepository, VisualMediaInclusionRepository visualMediaInclusionRepository,
+                                  PushTSService pushTSService, SlideshowRepository slideshowRepository,
+                                  @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
+                                  DisplayDeviceRepository displayDeviceRepository, @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService) {
         this.visualMediaRepository = visualMediaRepository;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
@@ -53,6 +55,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.slideshowService = slideshowService;
         this.displayDeviceRepository = displayDeviceRepository;
+        this.timeSlotService = timeSlotService;
     }
 
     @Override
@@ -145,14 +148,21 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         List<DisplayDeviceEntity> displayDeviceEntitiesWithVMAsFallback = displayDeviceRepository.findAllByVM(id);
 
-        for(DisplayDeviceEntity dd : displayDeviceEntitiesWithVMAsFallback) {
+        for (DisplayDeviceEntity dd : displayDeviceEntitiesWithVMAsFallback) {
             dd.setFallbackContent(null);
             displayDeviceRepository.save(dd);
-        };
+        }
+
+
+        List<TimeSlotEntity> timeSlotEntitiesWithVMPartOf = visualMediaRepository.getTimeslotsPartOfVisualMedia(Long.valueOf(VM.getId()));
+        for (TimeSlotEntity ts : timeSlotEntitiesWithVMPartOf) {
+            timeSlotService.delete(Long.valueOf(ts.getId()));
+        }
 
 
         visualMediaRepository.save(VM);
         visualMediaRepository.deleteById(Math.toIntExact(id));
+        FileUtils.removeVisualMediaFile(VM);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
