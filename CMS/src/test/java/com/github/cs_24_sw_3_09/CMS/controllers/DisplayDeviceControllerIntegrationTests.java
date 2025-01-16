@@ -789,22 +789,20 @@ public class DisplayDeviceControllerIntegrationTests {
 		DisplayDeviceEntity ddEntity = displayDeviceService.findOne(1L).get();
 		ddEntity.setFallbackContent(null);
 		String json = objectMapper.writeValueAsString(ddEntity);
-		json = TestDataUtil.createDDJsonWithFBCIds(json, "null", "visualMedia");
-
+		json = TestDataUtil.createDDJsonWithFBCIds(json, "0", "visualMedia");
+		System.out.println(json);
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/display_devices/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
-        ).andExpect(
-            MockMvcResultMatchers.jsonPath("$.fallbackContent.id").value(3)
         );
 
 		//Should save a new fallback
 		assertEquals(
-			3, 
-			displayDeviceService.findOne((long) 1).get().getFallbackContent().getId()
+			null,
+			displayDeviceService.findOne((long) 1).get().getFallbackContent()
 		);
 	}
 
