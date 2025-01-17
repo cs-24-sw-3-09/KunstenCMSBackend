@@ -170,9 +170,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
                           
             if(!displayDeviceOrientationSet.contains(displayContentOrientation)){
-                return "The dimension do not match:\nDisplay Device orientation:\n" + 
-                createErrorMessageWithList(displayDeviceOrientationList) + 
-                "The visual media orientation: "+ displayContentOrientation;
+                return "The dimension do not match:\n\tDisplay Devices orientation: " 
+                + (displayContentOrientation.equals("vertical") ? "horizontal" : "vertical")
+                + "\n\tThe visual media orientation: "+ displayContentOrientation;
             }
             return "1";
 

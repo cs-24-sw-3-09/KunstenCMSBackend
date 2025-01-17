@@ -434,30 +434,30 @@ public class DimensionCheckServiceTests {
             
         TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntityWithoutContent();
 
-        assertEquals(
-                1, 
-                timeSlot.getDisplayDevices().size()
-        );
-        
         creatVerticalVisualMediaWithFile();
 
 
         TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
-        DisplayDeviceEntity dd = TestDataUtil.createSecDisplayDeviceEntity();
-        dd.setDisplayOrientation("horizontal");
-        displayDeviceService.save(dd, true).getOk();
+
+        DisplayDeviceEntity dd1 = TestDataUtil.createDisplayDeviceEntity();
+        dd1.setName("screen1");
+        DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity();
+        dd2.setName("screen2");
+
+        displayDeviceService.save(dd1, true);
+        displayDeviceService.save(dd2, true);
 
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(visualMediaService.isExists(1L));
-        assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(displayDeviceService.isExists(3L));
 
         
         tsToSend.getDisplayDevices().clear();
-        String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
+        String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2, 3);
         json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
 
-        //System.out.println(json);
+        System.out.println(json);
 
         String res = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")
@@ -468,8 +468,8 @@ public class DimensionCheckServiceTests {
                 MockMvcResultMatchers.status().isConflict()
         ).andReturn().getResponse().getContentAsString();
 
-        assert(!res.contains("null"));
-
+        assertTrue(res.contains("Display Devices orientation: horizontal"));
+        assertTrue(res.contains("The visual media orientation: vertical"));
     }
 
 }
