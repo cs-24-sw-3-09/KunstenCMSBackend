@@ -83,6 +83,17 @@ public class TestDataUtil {
                 .build();
     }
 
+    public static DisplayDeviceEntity createDisplayDeviceEntityWithSSFallback(String name) {
+        return DisplayDeviceEntity.builder()
+                .displayOrientation("horizontal")
+                .location("Esbjerg")
+                .name(name)
+                .resolution("1920x1080")
+                .timeSlots(new ArrayList<>())
+                .fallbackContent(createSlideshowWithVisualMediaEntity())
+                .build();
+    }
+
     public static TagDto createTagDto() {
         return TagDto.builder()
                 .text("Test Tag")
@@ -210,13 +221,7 @@ public class TestDataUtil {
         return TimeSlotEntity.builder()
                 .id(id)
                 .build();
-    }
-
-
-    
-
-
-    
+    }    
 
     public static HashSet<DisplayDeviceEntity> createDisplayDeviceWithOnlyId() {
         HashSet<DisplayDeviceEntity> displayDevices = new HashSet<>();
@@ -394,7 +399,7 @@ public class TestDataUtil {
                 .build();
     }
 
-
+    
 
     public static TimeSlotEntity createTimeSlotEntityFromData(int weekdaysChosen, String startDate, String endDate, String startTime, String endTime) throws ParseException {
 
