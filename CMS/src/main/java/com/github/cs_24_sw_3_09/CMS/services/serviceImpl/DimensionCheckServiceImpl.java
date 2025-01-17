@@ -85,6 +85,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             fallbackOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
 
             if(fallbackOrientation.equals("mixed")){
+                //todo: Print the first ten elements with a mix of vertical and horizontal
+
                 return "The media in the slideshow has mixed orientation"; 
             } else if (!fallbackOrientation.equals(displayDeviceOrientation)) {
                 return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
