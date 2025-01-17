@@ -151,8 +151,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
         }
         if(displayDeviceOrientationSet.size() > 1) {
-            return "The dimensions of display devices are mixed\n" 
-            + createErrorMessageWithDDList(displayDeviceOrientationList);
+            return "The dimensions of display devices are mixed:\n" 
+            + createErrorMessageWithList(displayDeviceOrientationList);
         }
 
         String displayContentOrientation;
@@ -171,7 +171,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
                           
             if(!displayDeviceOrientationSet.contains(displayContentOrientation)){
                 return "The dimension do not match:\nDisplay Device orientation:\n" + 
-                createErrorMessageWithDDList(displayDeviceOrientationList) + 
+                createErrorMessageWithList(displayDeviceOrientationList) + 
                 "The visual media orientation: "+ displayContentOrientation;
             }
             return "1";
@@ -187,12 +187,12 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             
             //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
             if(displayContentOrientation.equals("mixed")) {
-                return "The dimensions of slideshow are mixed";
+                return "The dimensions of slideshow are mixed\n";
             }
         
             if (!displayDeviceOrientationSet.contains(displayContentOrientation)) {
                 return "The dimension do not match:\nDisplay Device orientation:\n" + 
-                createErrorMessageWithDDList(displayDeviceOrientationList) + 
+                createErrorMessageWithList(displayDeviceOrientationList) + 
                 "\nthe visual media orientation: "+ displayContentOrientation;
             }
 
@@ -202,8 +202,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         return "Display content not set";
     }
 
-    private String createErrorMessageWithDDList(List<String> displayDevices) {
-        return displayDevices.stream().map(dd -> "\t" + dd).collect(java.util.stream.Collectors.joining("\n"));
+    private String createErrorMessageWithList(List<String> list) {
+        return list.stream().map(el -> "\t" + el).collect(java.util.stream.Collectors.joining("\n"));
     }
 
     private String getVisualMediaVideoOrientation(String visualMediaPath) {
