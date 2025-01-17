@@ -34,7 +34,7 @@ import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 
 
-@AllArgsConstructor
+
 @Service
 public class TimeSlotServiceImpl implements TimeSlotService {
 
@@ -48,7 +48,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private final Mapper<TimeSlotEntity, TimeSlotDto> timeSlotMapper;
     private DimensionCheckService dimensionCheckService;
     
-    /*public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
+    public TimeSlotServiceImpl(TimeSlotRepository timeSlotRepository, PushTSService pushTSService, 
                             Mapper<TimeSlotEntity, TimeSlotDto>  timeSlotMapper, DisplayDeviceRepository displayDeviceRepository,
                             SlideshowRepository slideshowRepository, VisualMediaRepository visualMediaRepository, 
                             VisualMediaService visualMediaService, SlideshowService slideshowService,
@@ -62,7 +62,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         this.slideshowService = slideshowService;
         this.timeSlotMapper = timeSlotMapper;
         this.dimensionCheckService = dimensionCheckService;
-    }*/
+    }
 
     @Override
     public TimeSlotEntity saveWithOnlyId(TimeSlotEntity timeSlotEntity) {

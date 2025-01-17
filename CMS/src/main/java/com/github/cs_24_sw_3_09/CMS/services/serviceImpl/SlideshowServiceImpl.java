@@ -44,6 +44,7 @@ import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
@@ -59,16 +60,19 @@ public class SlideshowServiceImpl implements SlideshowService {
     private TimeSlotRepository timeSlotRepository;
     private Mapper<SlideshowEntity, SlideshowDto> slideshowMapper;
     private DimensionCheckService dimensionCheckService;
+    private TimeSlotService timeSlotService;
 
     public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
     VisualMediaInclusionRepository visualMediaInclusionRepository, PushTSService pushTSService, TimeSlotRepository timeSlotRepository, 
-            Mapper<SlideshowEntity, SlideshowDto> slideshowMapper, DimensionCheckService dimensionCheckService) {
+            Mapper<SlideshowEntity, SlideshowDto> slideshowMapper, DimensionCheckService dimensionCheckService, @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.slideshowMapper = slideshowMapper;
         this.dimensionCheckService = dimensionCheckService;
+        this.timeSlotService = timeSlotService;
+
     }
 
     @Override
@@ -141,7 +145,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         Set<TimeSlotEntity> timeSlots = timeSlotRepository.findSetOfTimeSlotsBySlideshowId(id);
         if(timeSlots.size() > 0){
             for (TimeSlotEntity ts : timeSlots){
-                ts.setDisplayContent(null);
+                timeSlotService.delete(Long.valueOf(ts.getId()));
             }
         }
         slideshowRepository.deleteById(Math.toIntExact(id));

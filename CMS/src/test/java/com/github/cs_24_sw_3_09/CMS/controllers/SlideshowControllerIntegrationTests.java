@@ -11,7 +11,6 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaRepository;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
-import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,18 +48,16 @@ public class SlideshowControllerIntegrationTests {
     private ObjectMapper objectMapper;
     private SlideshowService slideshowService;
     private VisualMediaInclusionService visualMediaInclusionService;
-    private TimeSlotService timeSlotService;
     private VisualMediaRepository visualMediaRepository;
 
     @Autowired
     public SlideshowControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, SlideshowService slideshowService,
-                                               VisualMediaInclusionService visualMediaInclusionService, TimeSlotService timeSlotService,
+                                               VisualMediaInclusionService visualMediaInclusionService,
                                                VisualMediaRepository visualMediaRepository) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.slideshowService = slideshowService;
         this.visualMediaInclusionService = visualMediaInclusionService;
-        this.timeSlotService = timeSlotService;
         this.visualMediaRepository = visualMediaRepository;
     }
 
