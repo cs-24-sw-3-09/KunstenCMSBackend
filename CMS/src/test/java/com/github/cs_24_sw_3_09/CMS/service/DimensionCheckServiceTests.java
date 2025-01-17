@@ -432,43 +432,43 @@ public class DimensionCheckServiceTests {
     @WithMockUser(roles = { "PLANNER" })
     public void testMessageWhenDisplayDevicesAndContentDimensionsDontMatch() throws Exception {
             
-    TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntityWithoutContent();
+        TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntityWithoutContent();
 
-    assertEquals(
-            1, 
-            timeSlot.getDisplayDevices().size()
-    );
-    
-    creatVerticalVisualMediaWithFile();
+        assertEquals(
+                1, 
+                timeSlot.getDisplayDevices().size()
+        );
+        
+        creatVerticalVisualMediaWithFile();
 
 
-    TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
-    DisplayDeviceEntity dd = TestDataUtil.createSecDisplayDeviceEntity();
-    dd.setDisplayOrientation("horizontal");
-    displayDeviceService.save(dd, true).getOk();
+        TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
+        DisplayDeviceEntity dd = TestDataUtil.createSecDisplayDeviceEntity();
+        dd.setDisplayOrientation("horizontal");
+        displayDeviceService.save(dd, true).getOk();
 
-    assertTrue(timeSlotService.isExists(1L));
-    assertTrue(visualMediaService.isExists(1L));
-    assertTrue(displayDeviceService.isExists(1L));
-    assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(timeSlotService.isExists(1L));
+        assertTrue(visualMediaService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(1L));
+        assertTrue(displayDeviceService.isExists(2L));
 
-    
-    tsToSend.getDisplayDevices().clear();
-    String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
-    json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
+        
+        tsToSend.getDisplayDevices().clear();
+        String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
+        json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
 
-    //System.out.println(json);
+        //System.out.println(json);
 
-    String res = mockMvc.perform(
-            MockMvcRequestBuilders.patch("/api/time_slots/1")
-            .param("forceDimensions", "false")    
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json)
-    ).andExpect(
-            MockMvcResultMatchers.status().isConflict()
-    ).andReturn().getResponse().getContentAsString();
+        String res = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/time_slots/1")
+                .param("forceDimensions", "false")    
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        ).andExpect(
+                MockMvcResultMatchers.status().isConflict()
+        ).andReturn().getResponse().getContentAsString();
 
-    assert(!res.contains("null"));
+        assert(!res.contains("null"));
 
     }
 
