@@ -83,17 +83,6 @@ public class TestDataUtil {
                 .build();
     }
 
-    public static DisplayDeviceEntity createDisplayDeviceEntityWithSSFallback(String name) {
-        return DisplayDeviceEntity.builder()
-                .displayOrientation("horizontal")
-                .location("Esbjerg")
-                .name(name)
-                .resolution("1920x1080")
-                .timeSlots(new ArrayList<>())
-                .fallbackContent(createSlideshowWithVisualMediaEntity())
-                .build();
-    }
-
     public static TagDto createTagDto() {
         return TagDto.builder()
                 .text("Test Tag")

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotColor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotColor;
 import com.github.cs_24_sw_3_09.CMS.model.dto.TimeSlotDto;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.utils.Result;
@@ -29,6 +29,8 @@ public interface TimeSlotService {
     boolean isExists(Long id);
 
     Set<TimeSlotDto> findSetOfTimeSlotsSlideshowIsAPartOf(Long id);
+
+    Set<TimeSlotDto>findSetOfTimeSlotsDisplayDeviceIsAPartOf(Long id);
 
     Result<TimeSlotEntity, String> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions);
 
