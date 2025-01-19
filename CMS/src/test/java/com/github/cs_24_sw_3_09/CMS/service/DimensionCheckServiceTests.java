@@ -131,15 +131,24 @@ public class DimensionCheckServiceTests {
        SlideshowEntity slideshow = createVerticalSlideshow();
 
         String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow);
-        assertTrue(returnString.equals("The dimension do not match:\nDisplay Device orientation: horizontal" + 
-                "\nFallback Slide show orientation: vertical"));
+        assertEquals(
+            "The dimension do not match:\nDisplay Device orientation: horizontal" + 
+            "\nFallback slideshow orientation: vertical", 
+            returnString
+        );
 
 
         //Case 2: the Visual Media Inclusions in the Slideshow has mixed dimensions
         SlideshowEntity slideshow2 = createMixedSlideshow();
 
         returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow2);
-        assertTrue(returnString.equals("The media in the slideshow has mixed orientation"));
+        assertEquals(
+            "The dimensions of slideshow are mixed\n"+
+            "\ttest-image.jpeg: horizontal\n"+
+            "\ttest-image.jpeg: vertical\n",
+            returnString
+        );
+        
     }
 
     @Test
@@ -242,8 +251,10 @@ public class DimensionCheckServiceTests {
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
         System.out.println(resultString);
-        assertTrue(resultString.equals("The dimension do not match:\nDisplay Device orientation: [horizontal]" + 
-                "\nthe visual media orientation: vertical"));
+
+        assertEquals("The dimension do not match:\n\tDisplay Devices orientation: horizontal" + 
+                "\n\tThe visual media orientation: vertical", resultString);
+
     }
 
     @Test
@@ -258,8 +269,13 @@ public class DimensionCheckServiceTests {
         
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow, updatedTimeSlot.getDisplayDevices());
-        assertTrue(resultString.equals("The dimension do not match:\nDisplay Device orientation: [horizontal]" + 
-                "\nthe visual media orientation: vertical"));
+        
+        assertEquals(
+            "The dimension do not match:\n"+
+            "Display Device orientation: horizontal\n"+
+            "Display content slideshow orientation: vertical",
+            resultString
+        );
 
         //case 2: slideshow has mixed dimensions
         SlideshowEntity slideshow2 = createMixedSlideshow();
@@ -267,8 +283,10 @@ public class DimensionCheckServiceTests {
         
         updatedTimeSlot = timeSlotService.findOne(1L).get();
         resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow2, updatedTimeSlot.getDisplayDevices());
-        assertTrue(resultString.equals("The dimensions of slideshow are mixed"));
-
+        assertEquals("The dimensions of slideshow are mixed\n\t" +
+                      "test-image.jpeg: horizontal\n\t" +
+                      "test-image.jpeg: vertical\n", 
+                      resultString);
     }
     
     @Test
