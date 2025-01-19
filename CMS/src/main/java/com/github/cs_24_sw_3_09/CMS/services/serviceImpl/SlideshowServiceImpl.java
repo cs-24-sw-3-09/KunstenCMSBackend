@@ -211,7 +211,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
         
         LocalDate today = LocalDate.now();
-        LocalTime now = LocalTime.now();
+        LocalTime now = LocalTime.now().plusHours(1);
         //only get Time Slots that are currently shown or in the future
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
 

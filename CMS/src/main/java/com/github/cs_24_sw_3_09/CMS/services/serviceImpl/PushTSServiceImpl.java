@@ -41,7 +41,7 @@ public class PushTSServiceImpl implements PushTSService {
 
         // Get the current date and time
         LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
+        LocalTime currentTime = LocalTime.now().plusHours(1);
         DayOfWeek currentDay = currentDate.getDayOfWeek();
 
         // Check if current date and time fall within the TimeSlotEntity's range for all
