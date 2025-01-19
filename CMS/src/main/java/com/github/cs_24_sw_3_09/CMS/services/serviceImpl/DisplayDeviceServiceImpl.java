@@ -76,6 +76,7 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
         
         //check whether the dimensions of the displayDevice and the fallbackContent fit
         if (displayDeviceEntity.getFallbackContent() != null) {
+
             //Assign fallback content to display device
             Optional<DisplayDeviceEntity> displayDevice = addFallbackContent(displayDeviceEntity);
             if (displayDevice.isEmpty()) return Result.err("Not found");
@@ -88,9 +89,9 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
             }
         }
 
-
         DisplayDeviceEntity toReturn = displayDeviceRepository.save(displayDeviceEntity);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
+
         return Result.ok(toReturn);
     }
 
@@ -146,8 +147,8 @@ public class DisplayDeviceServiceImpl implements DisplayDeviceService {
 
             //Fallback content
             Optional.ofNullable(displayDeviceEntity.getFallbackContent()).ifPresent(fallback -> {
-                if (fallback.getId() == null) {
-                    existingDisplayDevice.setFallbackContent(fallback);
+                if (fallback.getId() == 0) {
+                    existingDisplayDevice.setFallbackContent(null);
                     return;
                 }
                 Optional<ContentEntity> content = findContentById(fallback.getId());

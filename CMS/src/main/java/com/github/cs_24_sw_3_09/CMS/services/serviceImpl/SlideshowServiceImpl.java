@@ -38,12 +38,14 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.SlideshowEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.TimeSlotEntity;
 import com.github.cs_24_sw_3_09.CMS.model.entities.VisualMediaInclusionEntity;
+import com.github.cs_24_sw_3_09.CMS.repositories.DisplayDeviceRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.SlideshowRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.TimeSlotRepository;
 import com.github.cs_24_sw_3_09.CMS.repositories.VisualMediaInclusionRepository;
 import com.github.cs_24_sw_3_09.CMS.services.DimensionCheckService;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
+import com.github.cs_24_sw_3_09.CMS.services.TimeSlotService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
@@ -59,16 +61,22 @@ public class SlideshowServiceImpl implements SlideshowService {
     private TimeSlotRepository timeSlotRepository;
     private Mapper<SlideshowEntity, SlideshowDto> slideshowMapper;
     private DimensionCheckService dimensionCheckService;
+    private TimeSlotService timeSlotService;
+    private DisplayDeviceRepository displayDeviceRepository;
 
     public SlideshowServiceImpl(SlideshowRepository slideshowRepository,
     VisualMediaInclusionRepository visualMediaInclusionRepository, PushTSService pushTSService, TimeSlotRepository timeSlotRepository, 
-            Mapper<SlideshowEntity, SlideshowDto> slideshowMapper, DimensionCheckService dimensionCheckService) {
+            Mapper<SlideshowEntity, SlideshowDto> slideshowMapper, DimensionCheckService dimensionCheckService, 
+            @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService,
+            DisplayDeviceRepository displayDeviceRepository) {
         this.slideshowRepository = slideshowRepository;
         this.pushTSService = pushTSService;
         this.visualMediaInclusionRepository = visualMediaInclusionRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.slideshowMapper = slideshowMapper;
         this.dimensionCheckService = dimensionCheckService;
+        this.timeSlotService = timeSlotService;
+        this.displayDeviceRepository = displayDeviceRepository;
     }
 
     @Override
@@ -136,11 +144,23 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public void delete(Long id) {
-        SlideshowEntity slideshow = slideshowRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
+        slideshowRepository.findById(Math.toIntExact(id)).orElseThrow(() -> new EntityNotFoundException("Slideshow with id " + id + " not found"));
 
-        //slideshow.getVisualMediaInclusionCollection().clear();
-        //slideshowRepository.save(slideshow);
+        Set<VisualMediaInclusionEntity> inclusionsInSlideShow = visualMediaInclusionRepository.findAllVisualMediaInclusionForSlideshow(id);
+        for (VisualMediaInclusionEntity vmi : inclusionsInSlideShow){
+            visualMediaInclusionRepository.delete(vmi);
+        }
+        
+        Set<TimeSlotEntity> timeSlotsWithSS = timeSlotRepository.findSetOfTimeSlotsBySlideshowId(id);
+            for (TimeSlotEntity ts : timeSlotsWithSS){
+                timeSlotService.delete(Long.valueOf(ts.getId()));
+            }
+
+        Set<DisplayDeviceEntity> displayDevicesWithSSAsFallback = displayDeviceRepository.findDisplayDevicesUsingSlideshowAsFallbackBySlideshowId(id); 
+        for (DisplayDeviceEntity dd : displayDevicesWithSSAsFallback) {
+            dd.setFallbackContent(null);
+        }
+        
         slideshowRepository.deleteById(Math.toIntExact(id));
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
@@ -238,12 +258,19 @@ public class SlideshowServiceImpl implements SlideshowService {
                     break;
                 }
             }
+
             if (slideshowStatus.get("color").equals("red")) {
                 for (TimeSlotEntity ts : futureTimeSlots) {
-                    if (ts.getDisplayContent().getId().equals(slideshowId)) {
-                        slideshowStatus.put("color", "yellow");
-                        break;
+                    // Check for the time slot happen
+                    LocalDate tsDate = ts.getEndDate().toLocalDate();
+                    if (tsDate.isBefore(today)) {
+                        continue;
                     }
+                    if (!ts.getDisplayContent().getId().equals(slideshowId)) {
+                        continue;
+                    }
+                    slideshowStatus.put("color", "yellow");
+                    break;
                 }
             }
 
