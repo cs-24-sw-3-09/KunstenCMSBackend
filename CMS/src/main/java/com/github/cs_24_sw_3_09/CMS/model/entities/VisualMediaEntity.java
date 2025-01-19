@@ -2,6 +2,7 @@ package com.github.cs_24_sw_3_09.CMS.model.entities;
 
 import java.util.Set;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -51,6 +52,6 @@ public class VisualMediaEntity extends ContentEntity {
     @PrePersist
     @PreUpdate
     public void prePersistOrUpdated() {
-        lastDateModified = LocalDateTime.now();
+        lastDateModified = LocalDateTime.now(ZoneId.of("Europe/Copenhagen"));
     }
 }
