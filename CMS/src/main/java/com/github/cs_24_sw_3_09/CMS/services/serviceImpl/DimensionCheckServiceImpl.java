@@ -62,9 +62,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         Long id = fallbackContent.getId().longValue();
 
         if (fallbackContent instanceof VisualMediaEntity) {
-            return checkDisplayDeviceBetweenVisualMedia(orientation, id, "Fallback");
+            return checkDisplayDeviceBetweenVisualMedia(orientation, id, "Fallback ");
         } else if(fallbackContent instanceof SlideshowEntity) {
-            return checkDisplayDeviceBetweenSlideshow(orientation, id, "Fallback");
+            return checkDisplayDeviceBetweenSlideshow(orientation, id, "Fallback ");
         } else {
             return "Fallback content not set"; 
         }
@@ -131,9 +131,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         Long id = displayContent.getId().longValue();
 
         if (displayContent instanceof VisualMediaEntity) {
-            return checkDisplayDeviceBetweenVisualMedia(orientation, id, "Display content");
+            return checkDisplayDeviceBetweenVisualMedia(orientation, id, "");
         } else if(displayContent instanceof SlideshowEntity) {
-            return checkDisplayDeviceBetweenSlideshow(orientation, id, "Display content");
+            return checkDisplayDeviceBetweenSlideshow(orientation, id, "");
         } else {
             return "Display content not set"; 
         }
@@ -153,9 +153,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         String displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
                         
         if(!displayDeviceOrientation.contains(displayContentOrientation)){
-            return "The dimension do not match:\n\tDisplay Devices orientation: " 
+            return "The dimensions do not match:\n\tDisplay Device orientation: " 
             + (displayContentOrientation.equals("vertical") ? "horizontal" : "vertical")
-            + "\n\t"+ contentType + " visual media orientation: "+ displayContentOrientation;
+            + "\n\t"+ contentType + "Visual Media orientation: "+ displayContentOrientation;
         }
         return "1";
     }
@@ -182,8 +182,8 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     
         //If the display device and slideshow conflict
         if(!slideshowOrientationString.equals(displayDeviceOrientation)) {
-            return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
-            "\n" + contentType +  " slideshow orientation: "+ slideshowOrientationString;
+            return "The dimensions do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
+            "\n" + contentType +  "Slideshow orientation: "+ slideshowOrientationString;
         }
 
         return "1";

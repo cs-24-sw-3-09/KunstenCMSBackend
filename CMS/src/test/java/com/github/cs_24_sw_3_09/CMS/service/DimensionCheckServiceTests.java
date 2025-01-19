@@ -117,8 +117,10 @@ public class DimensionCheckServiceTests {
     
         String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, visualMediaContent);
         
-        assertTrue(returnString.equals("The dimension do not match:\nDisplay Device orientation: horizontal" + 
-                "\nFallback Visual Media orientation: vertical"));
+        assertEquals("The dimensions do not match:\n\tDisplay Device orientation: horizontal" + 
+                "\n\tFallback Visual Media orientation: vertical", 
+                returnString
+                );
     }
     
     @Test
@@ -132,8 +134,8 @@ public class DimensionCheckServiceTests {
 
         String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow);
         assertEquals(
-            "The dimension do not match:\nDisplay Device orientation: horizontal" + 
-            "\nFallback slideshow orientation: vertical", 
+            "The dimensions do not match:\nDisplay Device orientation: horizontal" + 
+            "\nFallback Slideshow orientation: vertical", 
             returnString
         );
 
@@ -252,8 +254,8 @@ public class DimensionCheckServiceTests {
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
         System.out.println(resultString);
 
-        assertEquals("The dimension do not match:\n\tDisplay Devices orientation: horizontal" + 
-                "\n\tThe visual media orientation: vertical", resultString);
+        assertEquals("The dimensions do not match:\n\tDisplay Device orientation: horizontal" + 
+                "\n\tVisual Media orientation: vertical", resultString);
 
     }
 
@@ -271,9 +273,9 @@ public class DimensionCheckServiceTests {
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow, updatedTimeSlot.getDisplayDevices());
         
         assertEquals(
-            "The dimension do not match:\n"+
+            "The dimensions do not match:\n"+
             "Display Device orientation: horizontal\n"+
-            "Display content slideshow orientation: vertical",
+            "Slideshow orientation: vertical",
             resultString
         );
 
@@ -486,8 +488,7 @@ public class DimensionCheckServiceTests {
                 MockMvcResultMatchers.status().isConflict()
         ).andReturn().getResponse().getContentAsString();
 
-        assertTrue(res.contains("Display Devices orientation: horizontal"));
-        assertTrue(res.contains("The visual media orientation: vertical"));
+        assertTrue(res.contains("Display Device orientation: horizontal"));
+        assertTrue(res.contains("Visual Media orientation: vertical"));
     }
-
 }
