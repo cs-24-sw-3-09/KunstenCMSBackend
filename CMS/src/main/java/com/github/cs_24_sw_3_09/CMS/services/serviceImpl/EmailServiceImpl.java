@@ -66,7 +66,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public String sendDDDisconnectMail(int id) {
-        Time currentTime = Time.valueOf(LocalTime.now());
+        Time currentTime = Time.valueOf(LocalTime.now().plusHours(1));
         return sendDDDisconnectMail(id, currentTime);
     }
 
