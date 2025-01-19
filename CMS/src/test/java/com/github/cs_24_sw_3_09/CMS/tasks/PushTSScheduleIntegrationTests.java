@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -28,8 +29,8 @@ public class PushTSScheduleIntegrationTests {
         TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntityWithCurrentTime();
 
         // Get the current date and time
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
+        LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Copenhagen"));
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Europe/Copenhagen"));
         DayOfWeek currentDay = currentDate.getDayOfWeek();
         PushTSServiceImpl pushTSServiceImpl = new PushTSServiceImpl(null, null, null);
 
@@ -42,8 +43,8 @@ public class PushTSScheduleIntegrationTests {
         TimeSlotEntity timeSlot = TestDataUtil.createTimeSlotEntity();
 
         // Get the current date and time
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
+        LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Copenhagen"));
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Europe/Copenhagen"));
         DayOfWeek currentDay = currentDate.getDayOfWeek();
         PushTSServiceImpl pushTSServiceImpl = new PushTSServiceImpl(null, null, null);
 

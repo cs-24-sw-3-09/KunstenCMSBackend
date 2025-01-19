@@ -9,6 +9,7 @@ import java.util.Set;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -258,7 +259,7 @@ public class TestDataUtil {
     }
 
     public static TimeSlotEntity createTimeSlotEntityWithCurrentTime() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Copenhagen"));
         LocalDateTime startDateTime = now.minusMinutes(2);
         LocalDateTime endDateTime = now.plusMinutes(2);
 

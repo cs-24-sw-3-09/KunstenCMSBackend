@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -210,8 +211,8 @@ public class SlideshowServiceImpl implements SlideshowService {
         List<TimeSlotEntity> activeTimeSlots = new ArrayList<>();
         List<TimeSlotEntity> futureTimeSlots = new ArrayList<>();
         
-        LocalDate today = LocalDate.now();
-        LocalTime now = LocalTime.now().plusHours(1);
+        LocalDate today = LocalDate.now(ZoneId.of("Europe/Copenhagen"));
+        LocalTime now = LocalTime.now(ZoneId.of("Europe/Copenhagen"));
         //only get Time Slots that are currently shown or in the future
         for (TimeSlotEntity ts : allTimeSlotsWithSlideshowAsContent) {
 

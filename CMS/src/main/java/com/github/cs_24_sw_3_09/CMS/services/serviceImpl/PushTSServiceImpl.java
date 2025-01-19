@@ -3,6 +3,7 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,8 +41,8 @@ public class PushTSServiceImpl implements PushTSService {
         List<TimeSlotEntity> currentTimeSlots = new ArrayList<>();
 
         // Get the current date and time
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now().plusHours(1);
+        LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Copenhagen"));
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Europe/Copenhagen"));
         DayOfWeek currentDay = currentDate.getDayOfWeek();
 
         // Check if current date and time fall within the TimeSlotEntity's range for all

@@ -2,7 +2,9 @@ package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public String sendDDDisconnectMail(int id) {
-        Time currentTime = Time.valueOf(LocalTime.now().plusHours(1));
+        Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of("Europe/Copenhagen")));
         return sendDDDisconnectMail(id, currentTime);
     }
 
@@ -79,7 +81,7 @@ public class EmailServiceImpl implements EmailService {
         DisplayDeviceEntity dd = displayDeviceService.findOne((long) id).get();
 
         // Making sure that it should be on
-        if (!shallDDSendMailForWeek(dd, currentTime, LocalDate.now().getDayOfWeek()))
+        if (!shallDDSendMailForWeek(dd, currentTime, LocalDate.now(ZoneId.of("Europe/Copenhagen")).getDayOfWeek()))
             return "Did not sent mail, as DD should be off";
 
         // Set up the email data
