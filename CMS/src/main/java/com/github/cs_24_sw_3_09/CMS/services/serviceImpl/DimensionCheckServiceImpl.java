@@ -5,10 +5,12 @@ import java.io.IOException;
 //import java.lang.classfile.ClassFile.Option;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.ArrayDeque;
 
 import javax.imageio.ImageIO;
 
@@ -52,49 +54,20 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
 
     @Override
     public String checkDimensionForAssignedFallback(DisplayDeviceEntity displayDevice, ContentEntity fallbackContent){
-        String displayDeviceOrientation = displayDevice.getDisplayOrientation();
-    
-        String fallbackOrientation;
+        String displayDeviceOrientation = displayDevice.getDisplayOrientation();    
         if (fallbackContent instanceof VisualMediaEntity) {
-            Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(fallbackContent.getId().longValue());
-            if(optionalVisualMedia.isEmpty()){
-                
-                throw new IllegalArgumentException("Visual Media with ID " + fallbackContent.getId() + " does not exist.");   
-            }
-            VisualMediaEntity visualMedia = optionalVisualMedia.get();
-            
-            if (visualMedia.getLocation() == null || visualMedia.getFileType() == null) {
-                return "File not correctly configured";
-            }
-
-            fallbackOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
-            if(!fallbackOrientation.equals(displayDeviceOrientation)){
-                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
-                "\nFallback Visual Media orientation: "+ fallbackOrientation;
-            }
-            //1 is returned if the orientations match, therefore the service logic can continue
-            return "1";
-
+            return checkDisplayDeviceBetweenVisualMedia(
+                displayDeviceOrientation, 
+                fallbackContent.getId().longValue()
+            );
         } else if (fallbackContent instanceof SlideshowEntity){
-            Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(fallbackContent.getId().longValue());
-            if(optionalSlideshow.isEmpty()){
-                throw new IllegalArgumentException("Slideshow with ID " + fallbackContent.getId() + " does not exist.");   
-            } 
-            SlideshowEntity slideshow = optionalSlideshow.get();
-            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshow.getId().longValue());
-            fallbackOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
-
-            if(fallbackOrientation.equals("mixed")){
-                //todo: Print the first ten elements with a mix of vertical and horizontal
-
-                return "The media in the slideshow has mixed orientation"; 
-            } else if (!fallbackOrientation.equals(displayDeviceOrientation)) {
-                return "The dimension do not match:\nDisplay Device orientation: " + displayDeviceOrientation + 
-                "\nFallback Slide show orientation: "+ fallbackOrientation;
-            } 
-            return "1";
-        } 
-        return "Fallback content not set";      
+            return checkDisplayDeviceBetweenSlideshow(
+                displayDeviceOrientation, 
+                fallbackContent.getId().longValue()
+            );
+        } else {
+            return "Fallback content not set"; 
+        }      
     }
 
     private String getVisualMediaOrientation(String filetype, String path) {
@@ -114,8 +87,9 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             return "1";
         }
 
-        String slideshowOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
-        if (slideshowOrientation.equals("mixed")) {
+        Deque<String> slideshowOrientations = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
+        if (!slideshowOrientations.peekFirst().split(": ")[1].equals(
+            slideshowOrientations.peekLast().split(": ")[1])) {
             return "The media in the slideshow has mixed orientation";
         }
 
@@ -150,59 +124,76 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             String orientation = device.getDisplayOrientation();
             displayDeviceOrientationList.add(device.getName() + ": " + orientation);
             displayDeviceOrientationSet.add(orientation);
-
         }
         if(displayDeviceOrientationSet.size() > 1) {
             return "The dimensions of display devices are mixed:\n" 
             + createErrorMessageWithList(displayDeviceOrientationList);
         }
 
-        String displayContentOrientation;
         if (displayContent instanceof VisualMediaEntity) {
-            Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(displayContent.getId().longValue());
-            if(optionalVisualMedia.isEmpty()) {
-                throw new IllegalArgumentException("Visual Media with ID " + displayContent.getId() + " does not exist.");
-            }
-            VisualMediaEntity visualMedia = optionalVisualMedia.get();
-
-            if (visualMedia.getLocation() == null || visualMedia.getFileType() == null) {
-                return "File not correctly configured";
-            }
-
-            displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
-                          
-            if(!displayDeviceOrientationSet.contains(displayContentOrientation)){
-                return "The dimension do not match:\n\tDisplay Devices orientation: " 
-                + (displayContentOrientation.equals("vertical") ? "horizontal" : "vertical")
-                + "\n\tThe visual media orientation: "+ displayContentOrientation;
-            }
-            return "1";
-
+            return checkDisplayDeviceBetweenVisualMedia(
+                displayDeviceOrientationSet.iterator().next(), 
+                displayContent.getId().longValue()
+            );
         } else if(displayContent instanceof SlideshowEntity) {
-            Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(displayContent.getId().longValue());
-            if(optionalSlideshow.isEmpty()){
-                throw new IllegalArgumentException("Slideshow with ID " + displayContent.getId() + " does not exist.");
-            }
-            SlideshowEntity slideshow = optionalSlideshow.get();
-            Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshow.getId().longValue());
-            displayContentOrientation = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
-            
-            //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
-            if(displayContentOrientation.equals("mixed")) {
-                return "The dimensions of slideshow are mixed\n";
-            }
-        
-            if (!displayDeviceOrientationSet.contains(displayContentOrientation)) {
-                return "The dimension do not match:\nDisplay Device orientation:\n" + 
-                createErrorMessageWithList(displayDeviceOrientationList) + 
-                "\nthe visual media orientation: "+ displayContentOrientation;
-            }
+            return checkDisplayDeviceBetweenSlideshow(
+                displayDeviceOrientationSet.iterator().next(), displayContent.getId().longValue()
+            );
+        } else {
+            return "Display content not set"; 
+        }
+    }
 
-            return "1";
+    String checkDisplayDeviceBetweenVisualMedia(String displayDeviceOrientation, Long id) { 
+        Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(id);
+        if(optionalVisualMedia.isEmpty()) {
+            throw new IllegalArgumentException("Visual Media with ID " + id + " does not exist.");
+        }
+        VisualMediaEntity visualMedia = optionalVisualMedia.get();
+
+        if (visualMedia.getLocation() == null || visualMedia.getFileType() == null) {
+            return "File not correctly configured";
         }
 
-        return "Display content not set";
+        String displayContentOrientation = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
+                        
+        if(!displayDeviceOrientation.contains(displayContentOrientation)){
+            return "The dimension do not match:\n\tDisplay Devices orientation: " 
+            + (displayContentOrientation.equals("vertical") ? "horizontal" : "vertical")
+            + "\n\tThe visual media orientation: "+ displayContentOrientation;
+        }
+        return "1";
     }
+
+    String checkDisplayDeviceBetweenSlideshow(String displayDeviceOrientation, Long id) { 
+        Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(id);
+        if(optionalSlideshow.isEmpty()){
+            throw new IllegalArgumentException("Slideshow with ID " + id + " does not exist.");
+        }
+        SlideshowEntity slideshow = optionalSlideshow.get();
+        Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow = visualMediaInclusionService.findAllVisualMediaInclusionInSlideshow(slideshow.getId().longValue());
+        Deque<String> displayContentOrientations = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
+        
+        //todo: handle if empty
+
+        //If the slideshow has mixed dimensions or the displaydevices are mixed pass check
+        if(!displayContentOrientations.peekFirst().split(": ")[1].equals(
+            displayContentOrientations.peekLast().split(": ")[1])
+        ) {
+
+            //TODO: Print the user defined amount of slideshows with different dimensions.
+            return "The dimensions of slideshow are mixed\n";
+        }
+    
+        if (!displayDeviceOrientation.contains(displayContentOrientation)) {
+            return "The dimension do not match:\nDisplay Device orientation:\n" + 
+            createErrorMessageWithList(displayDeviceOrientationList) + 
+            "\nthe visual media orientation: "+ displayContentOrientation;
+        }
+
+        return "1";
+    }
+
 
     private String createErrorMessageWithList(List<String> list) {
         return list.stream().map(el -> "\t" + el).collect(java.util.stream.Collectors.joining("\n"));
@@ -234,29 +225,32 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     }
 
     
-    private String getSlideshowOrientation(Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow){    
-        Set<String> visualMediasInSlideshowOrientation = new HashSet<>();
+    private Deque<String> getSlideshowOrientation(Set<VisualMediaInclusionEntity> visualMediaInclusionsInSlideshow){  
+        ArrayDeque<String> visualMediasInSlideshowOrientation = new ArrayDeque<>();
+        
         for(VisualMediaInclusionEntity vmi : visualMediaInclusionsInSlideshow){
             VisualMediaEntity visualMediaPartOfSlideshow = vmi.getVisualMedia();
 
             if (visualMediaPartOfSlideshow.getLocation() == null 
             || visualMediaPartOfSlideshow.getFileType() == null) {
-                return "File not correctly configured";
+                //todo: Find lige ud af, om det her skal error handles
+                continue;
             }
 
-            visualMediasInSlideshowOrientation.add(
-                getVisualMediaOrientation(
-                    visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()
-                )
+            String orientation = visualMediaPartOfSlideshow.getName() +
+            ": " + getVisualMediaOrientation(
+                visualMediaPartOfSlideshow.getFileType(), visualMediaPartOfSlideshow.getLocation()
             ); 
+
+
+            if (orientation.contains("vertical")) {
+                visualMediasInSlideshowOrientation.addLast(orientation);
+            } else {
+                visualMediasInSlideshowOrientation.addFirst(orientation);
+            }
         }
-        if (visualMediasInSlideshowOrientation.size() > 1) {
-            return "mixed";
-        } else if (visualMediasInSlideshowOrientation.contains("horizontal")){
-            return "horizontal";
-        } else {
-            return "vertical";
-        }
+
+        return visualMediasInSlideshowOrientation;
     }
 
     private String getVisualMediaImageOrientation(String visualMediaPath){
