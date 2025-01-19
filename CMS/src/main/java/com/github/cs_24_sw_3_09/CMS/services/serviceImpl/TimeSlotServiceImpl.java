@@ -206,9 +206,10 @@ public class TimeSlotServiceImpl implements TimeSlotService {
             return Result.err("Not found");
         }
 
-        Optional<Set<DisplayDeviceEntity>> optionalDisplayDevices = getDisplayDevices(timeSlotEntity);
+        
         //check if dimensions of displaydevice and content fit
-        if (timeSlotEntity.getDisplayContent() != null && optionalDisplayDevices.isPresent() && !forceDimensions) {
+        if (!forceDimensions && timeSlotEntity.getDisplayContent() != null && timeSlotEntity.getDisplayDevices() != null) {
+            Optional<Set<DisplayDeviceEntity>> optionalDisplayDevices = getDisplayDevices(timeSlotEntity);
             String checkResult = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(
                 timeSlotEntity.getDisplayContent(), optionalDisplayDevices.get()
             );
