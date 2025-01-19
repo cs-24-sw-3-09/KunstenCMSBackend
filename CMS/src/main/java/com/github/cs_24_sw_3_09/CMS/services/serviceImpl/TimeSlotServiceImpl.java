@@ -200,6 +200,20 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     }
 
     @Override
+    public Set<TimeSlotDto> findSetOfTimeSlotsDisplayDeviceIsAPartOf(Long id){
+        Set<TimeSlotEntity> setOfTimeSlotEntities = timeSlotRepository.findSetOfTimeSlotsByDisplayDeviceId(id);
+        if (setOfTimeSlotEntities == null) {
+            return Collections.emptySet();
+        }
+        Set<TimeSlotDto> setOfTimeSlotDtos = new HashSet<>();
+        for (TimeSlotEntity entity : setOfTimeSlotEntities) {
+            TimeSlotDto timeSlotDto = timeSlotMapper.mapTo(entity);
+            setOfTimeSlotDtos.add(timeSlotDto);
+        }
+        return setOfTimeSlotDtos;
+    }
+
+    @Override
     public Result<TimeSlotEntity, String> partialUpdate(Long id, TimeSlotEntity timeSlotEntity, Boolean forceDimensions) {
         //Error handling
         if (!isExists(id)) {
