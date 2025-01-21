@@ -51,7 +51,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                                   @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
             DisplayDeviceRepository displayDeviceRepository,
             @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService,
-            VisualMediaInclusionService visualMediaInclusionService) {
+            @org.springframework.context.annotation.Lazy VisualMediaInclusionService visualMediaInclusionService) {
         this.visualMediaRepository = visualMediaRepository;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.tagRepository = tagRepository;
