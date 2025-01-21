@@ -109,7 +109,7 @@ public class SlideshowControllerIntegrationTests {
     @WithMockUser
     public void testThatGetSlideshowsSuccessfullyReturnsListOfSlideshows() throws Exception {
         SlideshowEntity testSlideshowEntity = TestDataUtil.createSlideshowEntity();
-        System.out.println(slideshowService.save(testSlideshowEntity));
+        slideshowService.save(testSlideshowEntity);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/slideshows"))

@@ -231,7 +231,6 @@ public class VisualMediaInclusionControllerIntegrationTests {
     public void testThatFullUpdateVisualMediaInclusionReturnsStatus200WhenVisualMediaInclusionExists() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
-        System.out.println(visualMediaInclusionEntity.getVisualMedia() == null); 
 
         
         assertTrue(visualMediaInclusionService.isExists(1L));
@@ -252,8 +251,6 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateVisualMediaInclusionReturnsStatus200() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
-        System.out.println(visualMediaInclusionEntity);
-        System.out.println("vm i test: "+visualMediaInclusionEntity.getVisualMedia().getFileType());
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         assertTrue(visualMediaInclusionService.isExists(1L));
@@ -263,7 +260,6 @@ public class VisualMediaInclusionControllerIntegrationTests {
         visualMediaInclusionDto.setVisualMedia(null);
         
         String visualMediaInclusionDtoJson = objectMapper.writeValueAsString(visualMediaInclusionDto);
-        System.out.println("mapper: "+visualMediaInclusionDtoJson);
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/visual_media_inclusions/" + savedVisualMediaInclusionEntity.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -393,9 +389,6 @@ public class VisualMediaInclusionControllerIntegrationTests {
 		});
 
 		slideshowService.save(savedSlideshowEntity);
-		/*for (VisualMediaInclusionEntity vmi : savedSlideshowEntity.getVisualMediaInclusionCollection()) {
-			System.out.println("Visual Media Id: "+ vmi.getId()+"\nPosition: "+ vmi.getSlideshowPosition());
-		}*/
 		
 		assertTrue(visualMediaInclusionService.isExists(1l));
 		assertTrue(visualMediaInclusionService.isExists(2l));

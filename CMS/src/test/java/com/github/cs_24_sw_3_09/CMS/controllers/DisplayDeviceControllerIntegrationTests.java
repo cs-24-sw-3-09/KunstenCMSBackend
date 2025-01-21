@@ -702,9 +702,7 @@ public class DisplayDeviceControllerIntegrationTests {
 		DisplayDeviceEntity ddEntity = displayDeviceService.findOne(1L).get();
 		ddEntity.setFallbackContent(null);
 		String json = objectMapper.writeValueAsString(ddEntity);
-		System.out.println(json);
 		json = TestDataUtil.createDDJsonWithFBCIds(json, "2", "slideshow");
-		System.out.println(json);
 
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/display_devices/1")
@@ -790,7 +788,6 @@ public class DisplayDeviceControllerIntegrationTests {
 		ddEntity.setFallbackContent(null);
 		String json = objectMapper.writeValueAsString(ddEntity);
 		json = TestDataUtil.createDDJsonWithFBCIds(json, "0", "visualMedia");
-		System.out.println(json);
 		mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/display_devices/1")
                         .contentType(MediaType.APPLICATION_JSON)

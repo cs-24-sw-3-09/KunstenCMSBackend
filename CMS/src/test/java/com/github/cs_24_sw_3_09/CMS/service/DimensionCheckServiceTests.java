@@ -167,7 +167,6 @@ public class DimensionCheckServiceTests {
         visualMediaInclusionService.setVisualMedia(visualMediaInclusion2.getId().longValue(), visualMediaContent2.getId().longValue());
         
         String resultString = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(visualMediaInclusion2.getId().longValue(), slideshow.getId().longValue());
-        System.out.println(resultString);
         assertTrue(resultString.equals("1"));
     }
     
@@ -252,7 +251,6 @@ public class DimensionCheckServiceTests {
         
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
-        System.out.println(resultString);
 
         assertEquals("The dimensions do not match:\n\tDisplay Device orientation: horizontal" + 
                 "\n\tVisual Media orientation: vertical", resultString);
@@ -406,7 +404,6 @@ public class DimensionCheckServiceTests {
     String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2);
     json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
 
-    //System.out.println(json);
 
     String res = mockMvc.perform(
             MockMvcRequestBuilders.patch("/api/time_slots/1")
@@ -476,8 +473,6 @@ public class DimensionCheckServiceTests {
         tsToSend.getDisplayDevices().clear();
         String json = TestDataUtil.createTSJsonWithDDIds(objectMapper.writeValueAsString(tsToSend), 2, 3);
         json = TestDataUtil.createTSJsonWithDCIds(json, "1", "visualMedia");
-
-        //System.out.println(json);
 
         String res = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/api/time_slots/1")

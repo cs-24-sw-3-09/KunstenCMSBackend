@@ -469,8 +469,6 @@ public class VisualMediaControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
         VisualMediaEntity vm = visualMediaService.findOne(1L).get();
-
-        System.out.println(vm.getName() + " " + vm.getFileType() + " " + vm.getLocation());
         
         // Step 2: Replace the file
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/visual_medias/1/file")

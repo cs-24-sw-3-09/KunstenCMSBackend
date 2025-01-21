@@ -71,8 +71,6 @@ public class FileUtils {
             boolean deleted = fileToDelete.delete();
             if (!deleted) {
                 System.err.println("Failed to delete file: " + fileToDelete.getAbsolutePath());
-            } else {
-                System.out.println("File deleted successfully: " + fileToDelete.getAbsolutePath());
             }
         } else {
             System.err.println("File does not exist: " + fileToDelete.getAbsolutePath());
