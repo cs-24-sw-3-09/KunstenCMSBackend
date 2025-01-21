@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.github.cs_24_sw_3_09.CMS.services.PushTSService;
 import com.github.cs_24_sw_3_09.CMS.services.SlideshowService;
 import com.github.cs_24_sw_3_09.CMS.services.VisualMediaService;
+import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 
 import java.util.Set;
 
@@ -34,6 +35,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
     private final VisualMediaRepository visualMediaRepository;
     private final VisualMediaInclusionRepository visualMediaInclusionRepository;
+    private final VisualMediaInclusionService visualMediaInclusionService;
     private final TagRepository tagRepository;
     private final PushTSService pushTSService;
     private final SlideshowRepository slideshowRepository;
@@ -47,8 +49,11 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                                   TagRepository tagRepository, VisualMediaInclusionRepository visualMediaInclusionRepository,
                                   PushTSService pushTSService, SlideshowRepository slideshowRepository,
                                   @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
-                                  DisplayDeviceRepository displayDeviceRepository, @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService) {
+            DisplayDeviceRepository displayDeviceRepository,
+            @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService,
+            VisualMediaInclusionService visualMediaInclusionService) {
         this.visualMediaRepository = visualMediaRepository;
+        this.visualMediaInclusionService = visualMediaInclusionService;
         this.tagRepository = tagRepository;
         this.pushTSService = pushTSService;
         this.slideshowRepository = slideshowRepository;
@@ -144,7 +149,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
         VM.getTags().clear();
         List<VisualMediaInclusionEntity> inclusions = visualMediaInclusionRepository.findAllByVisualMedia(VM);
-        inclusions.forEach(visualMediaInclusionRepository::delete);
+        inclusions.forEach(visualMediaInclusionService::delete);
 
         List<DisplayDeviceEntity> displayDeviceEntitiesWithVMAsFallback = displayDeviceRepository.findAllByVM(id);
 
