@@ -56,6 +56,7 @@ public class SecurityConfig {
         this.authFilter = authFilter;
         this.allowedOrigins = new ArrayList<>();
         this.allowedOrigins.add("http://localhost:5173");
+        this.allowedOrigins.add("http://kunsten2.stjernholm.cloud");
         this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
         this.allowedOrigins.add("https://kunsten2.stjernholm.cloud");
 
