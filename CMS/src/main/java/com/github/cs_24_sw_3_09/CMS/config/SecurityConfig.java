@@ -59,6 +59,7 @@ public class SecurityConfig {
         this.allowedOrigins.add("http://kunsten2.stjernholm.cloud");
         this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
         this.allowedOrigins.add("https://kunsten2.stjernholm.cloud");
+        this.allowedOrigins.add("https://demo.stjernholm.cloud");
 
     }
 
