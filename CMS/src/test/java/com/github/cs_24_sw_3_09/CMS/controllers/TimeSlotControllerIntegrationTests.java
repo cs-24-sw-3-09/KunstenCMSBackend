@@ -261,13 +261,10 @@ public class TimeSlotControllerIntegrationTests {
         TimeSlotEntity timeSlotEntity = TestDataUtil.createTimeSlotEntity();
         TimeSlotEntity savedTimeSlotEntitiy = timeSlotService.save(timeSlotEntity, true).getOk();
 
-        System.out.println((timeSlotService.isExists(1L)));
-
         TimeSlotDto timeSlotDto = TestDataUtil.createTimeSlotDto();
         String timeSlotDtoToJson = objectMapper.writeValueAsString(timeSlotDto);
         int [] array = {1};
         timeSlotDtoToJson = TestDataUtil.createTSJsonWithDDIds(timeSlotDtoToJson, array);
-        System.out.println(timeSlotDtoToJson);
         mockMvc.perform(
                 MockMvcRequestBuilders.put("/api/time_slots/" + savedTimeSlotEntitiy.getId())
                         .contentType(MediaType.APPLICATION_JSON)

@@ -83,9 +83,6 @@ public class AuthControllerIntegrationTests {
 
 		String passwordAfter = userService.findByEmail(email).get().getPassword();
 
-		System.out.println(passwordAfter);		
-		System.out.println(passwordBefore);
-
 		assertFalse(passwordBefore.equals(passwordAfter));
 	}
 
