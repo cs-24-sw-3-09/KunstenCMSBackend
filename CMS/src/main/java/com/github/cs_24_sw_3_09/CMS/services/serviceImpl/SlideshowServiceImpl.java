@@ -187,13 +187,14 @@ public class SlideshowServiceImpl implements SlideshowService {
         }
 
         //todo: Seems kinda silly, because Slideshow and vmi have already been checked
-        return Result.ok(slideshowRepository.findById(Math.toIntExact(id)).map(existingDisplayDevice -> {
+        return Result.ok(slideshowRepository.findById(Math.toIntExact(id)).map(existingSlideshow -> {
             VisualMediaInclusionEntity foundVisualMediaInclusionEntity = visualMediaInclusionRepository
                     .findById(visualMediaInclusionId.intValue())
                     .orElseThrow(() -> new RuntimeException("Visual media inclusion does not exist"));
-            existingDisplayDevice.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
-
-            return slideshowRepository.save(existingDisplayDevice);
+            existingSlideshow.addVisualMediaInclusion(foundVisualMediaInclusionEntity);
+            SlideshowEntity savedSlideshow = slideshowRepository.save(existingSlideshow);
+            pushTSService.updateDisplayDevicesToNewTimeSlots();
+            return savedSlideshow;
         }).orElseThrow(() -> new RuntimeException("Slideshow does not exist")));
     }
     

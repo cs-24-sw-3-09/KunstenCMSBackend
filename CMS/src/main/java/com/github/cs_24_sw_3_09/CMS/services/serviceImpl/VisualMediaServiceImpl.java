@@ -205,6 +205,8 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
         //Created the new file.
         FileUtils.createVisualMediaFile(file, String.valueOf(id));
+
+        pushTSService.updateDisplayDevicesToNewTimeSlots();
         return updatedVisualMedia;
 
     }
