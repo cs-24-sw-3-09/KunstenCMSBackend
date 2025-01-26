@@ -107,7 +107,7 @@ public class PushTSServiceImpl implements PushTSService {
 
     @Override
     public Set<Integer> updateDisplayDevicesToNewTimeSlots(boolean sendToDisplayDevices) {
-        // Fetch the list of connected display devices
+        // Fetch the list of display devices
         Iterable<DisplayDeviceEntity> displayDevices = displayDeviceRepository.findAll();
         // Holder for the TS id's that is shown
         Set<Integer> timeSlotsInUse = new HashSet<>();
