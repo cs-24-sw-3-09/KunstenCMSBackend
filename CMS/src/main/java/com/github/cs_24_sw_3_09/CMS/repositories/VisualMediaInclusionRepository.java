@@ -36,4 +36,6 @@ public interface VisualMediaInclusionRepository extends CrudRepository<VisualMed
         void updatePositionsAfterDeletion(@Param("slideshowId") Long slideshowId,
                         @Param("deletedPosition") Integer deletedPosition);
 
+        
+
 }

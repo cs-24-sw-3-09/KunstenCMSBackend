@@ -1,6 +1,7 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.io.IOException;
+import java.lang.classfile.ClassFile.Option;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,10 @@ import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import java.util.Set;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.persistence.EntityManager;
 
 @Service
 public class VisualMediaServiceImpl implements VisualMediaService {
@@ -41,6 +45,8 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final SlideshowRepository slideshowRepository;
     private final DisplayDeviceRepository displayDeviceRepository;
     private final TimeSlotService timeSlotService;
+    private final EntityManager entityManager;
+
 
     @Lazy
     private final SlideshowService slideshowService;
@@ -51,7 +57,8 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                                   @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
             DisplayDeviceRepository displayDeviceRepository,
             @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService,
-            @org.springframework.context.annotation.Lazy VisualMediaInclusionService visualMediaInclusionService) {
+            @org.springframework.context.annotation.Lazy VisualMediaInclusionService visualMediaInclusionService,
+            EntityManager entityManager) {
         this.visualMediaRepository = visualMediaRepository;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.tagRepository = tagRepository;
@@ -61,6 +68,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         this.slideshowService = slideshowService;
         this.displayDeviceRepository = displayDeviceRepository;
         this.timeSlotService = timeSlotService;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -143,11 +151,20 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         return Optional.of(foundVisualMedia);
     }
 
+    @Transactional
+    void deleteTagRelations(Long id) {
+        visualMediaRepository.deleteTagRelations(id);
+    }
+
     @Override
     public void delete(Long id) {
+
         VisualMediaEntity VM = visualMediaRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
-        VM.getTags().clear();
+        
+        
+        
+
         List<VisualMediaInclusionEntity> inclusions = visualMediaInclusionRepository.findAllByVisualMedia(VM);
         inclusions.forEach(visualMediaInclusionService::delete);
 
@@ -164,10 +181,14 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             timeSlotService.delete(Long.valueOf(ts.getId()));
         }
 
-
-        visualMediaRepository.save(VM);
-        visualMediaRepository.deleteById(Math.toIntExact(id));
         FileUtils.removeVisualMediaFile(VM);
+        
+
+        VM.getTags().clear();
+        visualMediaRepository.save(VM);
+        visualMediaRepository.delete(VM);
+
+
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
 
