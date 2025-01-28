@@ -90,6 +90,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         Deque<String> slideshowOrientations = getSlideshowOrientation(visualMediaInclusionsInSlideshow);
         if (!slideshowOrientations.peekFirst().split(": ")[1].equals(
             slideshowOrientations.peekLast().split(": ")[1])) {
+            //todo: print this first 10 elements
             return "The media in the slideshow has mixed orientation";
         }
 
