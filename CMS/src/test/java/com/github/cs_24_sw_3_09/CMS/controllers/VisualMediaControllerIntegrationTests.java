@@ -7,6 +7,7 @@ import com.github.cs_24_sw_3_09.CMS.model.entities.*;
 import com.github.cs_24_sw_3_09.CMS.services.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -246,6 +247,37 @@ public class VisualMediaControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/visual_medias/" + savedVisualMediaEntity.getId())).andExpect(
                         MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(roles = "PLANNER")
+    public void testThatDeleteVisualMediaWithTagsReturnsStatus200() throws Exception {
+        VisualMediaEntity visualMediaEntity = TestDataUtil.createVisualMediaEntity();
+        
+
+        visualMediaEntity.setTags(new HashSet<>());
+        visualMediaEntity.addTag(TestDataUtil.createTagEntity());
+        visualMediaEntity.addTag(TestDataUtil.createTagEntity2());
+
+        VisualMediaEntity savedVisualMediaEntity = visualMediaService.save(visualMediaEntity);
+
+        assertTrue(visualMediaService.isExists(1L));
+        assertTrue(tagService.isExists(1L));
+        assertTrue(tagService.isExists(2L));
+
+        //System.out.println(objectMapper.writeValueAsString(savedVisualMediaEntity));
+        //visualMediaService.findOne(1l).get().getTags().stream().forEach(tagEx -> System.out.println(tagEx.getId()));
+        
+
+
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/visual_medias/" + savedVisualMediaEntity.getId())).andExpect(
+                        MockMvcResultMatchers.status().isNoContent());
+
+        assertFalse(visualMediaService.isExists(1l));
+        assertTrue(tagService.isExists(1L));
+        assertTrue(tagService.isExists(2L));
     }
 
     @Test
