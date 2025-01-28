@@ -29,10 +29,10 @@ import com.github.cs_24_sw_3_09.CMS.services.VisualMediaInclusionService;
 import java.util.Set;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 import org.springframework.web.multipart.MultipartFile;
-import jakarta.persistence.EntityManager;
 
 @Service
 public class VisualMediaServiceImpl implements VisualMediaService {
@@ -45,8 +45,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     private final SlideshowRepository slideshowRepository;
     private final DisplayDeviceRepository displayDeviceRepository;
     private final TimeSlotService timeSlotService;
-    private final EntityManager entityManager;
-
 
     @Lazy
     private final SlideshowService slideshowService;
@@ -57,8 +55,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
                                   @org.springframework.context.annotation.Lazy SlideshowService slideshowService,
             DisplayDeviceRepository displayDeviceRepository,
             @org.springframework.context.annotation.Lazy TimeSlotService timeSlotService,
-            @org.springframework.context.annotation.Lazy VisualMediaInclusionService visualMediaInclusionService,
-            EntityManager entityManager) {
+            @org.springframework.context.annotation.Lazy VisualMediaInclusionService visualMediaInclusionService) {
         this.visualMediaRepository = visualMediaRepository;
         this.visualMediaInclusionService = visualMediaInclusionService;
         this.tagRepository = tagRepository;
@@ -68,7 +65,6 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         this.slideshowService = slideshowService;
         this.displayDeviceRepository = displayDeviceRepository;
         this.timeSlotService = timeSlotService;
-        this.entityManager = entityManager;
     }
 
     @Override
@@ -151,16 +147,13 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         return Optional.of(foundVisualMedia);
     }
 
-    @Transactional
-    void deleteTagRelations(Long id) {
-        visualMediaRepository.deleteTagRelations(id);
-    }
-
     @Override
     public void delete(Long id) {
 
         VisualMediaEntity VM = visualMediaRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
+                .orElse(null);
+
+        if(VM == null) return; 
         
         
         
@@ -190,6 +183,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
 
 
         pushTSService.updateDisplayDevicesToNewTimeSlots();
+
     }
 
     @Override

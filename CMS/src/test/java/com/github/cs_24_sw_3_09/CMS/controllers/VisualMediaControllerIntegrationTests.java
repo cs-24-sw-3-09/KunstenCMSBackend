@@ -279,6 +279,7 @@ public class VisualMediaControllerIntegrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.delete("/api/visual_medias/" + savedVisualMediaEntity.getId())).andExpect(
                         MockMvcResultMatchers.status().isNoContent());
+        //mockMvc.perform(MockMvcRequestBuilders.delete("/api/visual_medias/" + savedVisualMediaEntity.getId())).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         assertFalse(visualMediaService.isExists(2l));
         assertTrue(tagService.isExists(1L));

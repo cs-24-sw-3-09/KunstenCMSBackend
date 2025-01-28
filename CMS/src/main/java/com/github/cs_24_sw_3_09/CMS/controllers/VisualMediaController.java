@@ -208,6 +208,7 @@ public class VisualMediaController {
         }
 
         visualMediaService.delete(id);
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

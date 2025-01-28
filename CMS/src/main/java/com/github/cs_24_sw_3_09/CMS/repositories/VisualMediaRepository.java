@@ -26,9 +26,4 @@ public interface VisualMediaRepository extends CrudRepository<VisualMediaEntity,
     @Query("SELECT vm.id FROM VisualMediaEntity vm")
     List<Integer> getAllVisualMediaIds();
 
-    @Transactional
-    @Modifying
-    @Query(value = "DELETE FROM visual_media_tag WHERE visual_media_id = :id", nativeQuery = true)
-    void deleteTagRelations(@Param("id") Long id);
-
 }
