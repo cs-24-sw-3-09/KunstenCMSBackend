@@ -1,15 +1,15 @@
 package com.github.cs_24_sw_3_09.CMS.services;
 
-import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
-import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
-import com.github.cs_24_sw_3_09.CMS.utils.Result;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.github.cs_24_sw_3_09.CMS.model.dto.DisplayDeviceDto;
+import com.github.cs_24_sw_3_09.CMS.model.entities.DisplayDeviceEntity;
+import com.github.cs_24_sw_3_09.CMS.utils.Result;
 
 public interface DisplayDeviceService {
     Result<DisplayDeviceEntity, String> save(DisplayDeviceEntity displayDevice, Boolean forceDimensions);
