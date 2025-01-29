@@ -147,7 +147,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
     public void delete(Long id) {
         VisualMediaEntity VM = visualMediaRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media with id " + id + " not found"));
-        VM.getTags().clear();
+
         List<VisualMediaInclusionEntity> inclusions = visualMediaInclusionRepository.findAllByVisualMedia(VM);
         inclusions.forEach(visualMediaInclusionService::delete);
 
@@ -164,9 +164,9 @@ public class VisualMediaServiceImpl implements VisualMediaService {
             timeSlotService.delete(Long.valueOf(ts.getId()));
         }
 
+        visualMediaRepository.deleteVisualMediaTags(VM.getId());
+        visualMediaRepository.deleteVisualMedia(VM.getId());
 
-        visualMediaRepository.save(VM);
-        visualMediaRepository.deleteById(Math.toIntExact(id));
         FileUtils.removeVisualMediaFile(VM);
         pushTSService.updateDisplayDevicesToNewTimeSlots();
     }
