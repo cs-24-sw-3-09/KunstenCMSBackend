@@ -1,17 +1,10 @@
 package com.github.cs_24_sw_3_09.CMS.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy.Content;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -117,8 +110,8 @@ public class DimensionCheckServiceTests {
     
         String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, visualMediaContent);
         
-        assertEquals("The dimensions do not match:\n\tDisplay Device orientation: horizontal" + 
-                "\n\tFallback Visual Media orientation: vertical", 
+        assertEquals("The dimensions do not match:\n\tDisplay Device Skærm Esbjerg has resolution: 200x100"+
+                "\n\tFallback Visual Media resolution: 100x200", 
                 returnString
                 );
     }
@@ -134,8 +127,8 @@ public class DimensionCheckServiceTests {
 
         String returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow);
         assertEquals(
-            "The dimensions do not match:\nDisplay Device orientation: horizontal" + 
-            "\nFallback Slideshow orientation: vertical", 
+            "The dimensions do not match:\nDisplay Device Skærm Esbjerg has resolution: 200x100" + 
+            "\nFallback Slideshow orientation: 100x200", 
             returnString
         );
 
@@ -145,9 +138,9 @@ public class DimensionCheckServiceTests {
 
         returnString = dimensionCheckService.checkDimensionForAssignedFallback(displayDevice, slideshow2);
         assertEquals(
-            "The dimensions of slideshow are mixed\n"+
-            "\ttest-image.jpeg: horizontal\n"+
-            "\ttest-image.jpeg: vertical\n",
+            "The dimensions of slideshow are mixed. The resolution of the first 10 visual medias are:\n"+
+            "\t100x200\n"+
+            "\t200x100\n",
             returnString
         );
         
@@ -186,8 +179,8 @@ public class DimensionCheckServiceTests {
         visualMediaInclusionService.setVisualMedia(visualMediaInclusion2.getId().longValue(), visualMediaContent2.getId().longValue());
         
         String resultString = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(visualMediaInclusion2.getId().longValue(),slideshow.getId().longValue());
-        assertTrue(resultString.equals("The dimension do not match:\nSlideshow orientation: horizontal" + 
-            "\nVisual Media orientation: vertical"));
+        assertTrue(resultString.equals("The dimensions do not match:\nVisual Media resolution: 100x200" 
+                +"\nSlideshow orientation: 200x100"));
 
         //Case 2: the visual media inclusions in the slideshow already has mixed dimensions
         SlideshowEntity slideshow2 = createMixedSlideshow();
@@ -201,7 +194,8 @@ public class DimensionCheckServiceTests {
         visualMediaInclusionService.setVisualMedia(visualMediaInclusion3.getId().longValue(), visualMediaContent3.getId().longValue());
 
         resultString = dimensionCheckService.checkDimensionForAssignedVisualMediaToSlideshow(visualMediaInclusion3.getId().longValue(), slideshow2.getId().longValue());
-        assertTrue(resultString.equals("The media in the slideshow has mixed orientation"));
+        assertEquals("The dimensions of slideshow are mixed. The resolution of the first 10 visual medias are:\n" +
+                        "\t200x100\n"+"\t100x200\n", resultString);
     }
 
     @Test
@@ -219,7 +213,7 @@ public class DimensionCheckServiceTests {
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
 
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
-        assertTrue(resultString.equals("1"));
+        assertEquals("1", resultString);
     }
 
     @Test
@@ -252,8 +246,8 @@ public class DimensionCheckServiceTests {
         TimeSlotEntity updatedTimeSlot = timeSlotService.findOne(1L).get();
         String resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(visualMediaContent, updatedTimeSlot.getDisplayDevices());
 
-        assertEquals("The dimensions do not match:\n\tDisplay Device orientation: horizontal" + 
-                "\n\tVisual Media orientation: vertical", resultString);
+        assertEquals("The dimensions do not match:\n\tDisplay Device Skærm Esbjerg1 has resolution: 200x100" + 
+                "\n\tVisual Media resolution: 100x200", resultString);
 
     }
 
@@ -272,8 +266,8 @@ public class DimensionCheckServiceTests {
         
         assertEquals(
             "The dimensions do not match:\n"+
-            "Display Device orientation: horizontal\n"+
-            "Slideshow orientation: vertical",
+            "Display Device Skærm Esbjerg1 has resolution: 200x100\n"+
+            "Slideshow orientation: 100x200",
             resultString
         );
 
@@ -283,9 +277,9 @@ public class DimensionCheckServiceTests {
         
         updatedTimeSlot = timeSlotService.findOne(1L).get();
         resultString = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(slideshow2, updatedTimeSlot.getDisplayDevices());
-        assertEquals("The dimensions of slideshow are mixed\n\t" +
-                      "test-image.jpeg: horizontal\n\t" +
-                      "test-image.jpeg: vertical\n", 
+        assertEquals("The dimensions of slideshow are mixed. The resolution of the first 10 visual medias are:\n\t" +
+                      "100x200\n\t" +
+                      "200x100\n", 
                       resultString);
     }
     
@@ -427,8 +421,7 @@ public class DimensionCheckServiceTests {
         dd1.setDisplayOrientation("vertical");
         dd1.setName("screen1");
         timeSlot.getDisplayDevices().add(dd1);
-        DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity();
-        dd2.setName("screen2");
+        DisplayDeviceEntity dd2 = TestDataUtil.createDisplayDeviceEntity("screen2");
         timeSlot.getDisplayDevices().add(dd2);
 
         TimeSlotEntity tsToSend = timeSlotService.save(timeSlot, true).getOk();
@@ -437,11 +430,12 @@ public class DimensionCheckServiceTests {
         assertTrue(timeSlotService.isExists(1L));
         assertTrue(displayDeviceService.isExists(1L));
         assertTrue(displayDeviceService.isExists(2L));
+        assertTrue(slideshowService.isExists((long) timeSlot.getDisplayContent().getId()));
 
-        String res = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(null, tsToSend.getDisplayDevices());
+        String res = dimensionCheckService.checkDimensionBetweenDisplayDeviceAndContentInTimeSlot(tsToSend.getDisplayContent(), tsToSend.getDisplayDevices());
 
-        assertTrue(res.contains("screen2: horizontal"));
-        assertTrue(res.contains("screen1: vertical"));
+        assertEquals("The dimensions of display devices are mixed:\n\tscreen1: 200x100\n\tscreen2: 1920x1080", res);
+        
 
     }
 
@@ -483,7 +477,7 @@ public class DimensionCheckServiceTests {
                 MockMvcResultMatchers.status().isConflict()
         ).andReturn().getResponse().getContentAsString();
 
-        assertTrue(res.contains("Display Device orientation: horizontal"));
-        assertTrue(res.contains("Visual Media orientation: vertical"));
+        assertEquals("The dimensions do not match:\n\tDisplay Device screen2 has resolution: 200x100\n\tVisual Media resolution: 100x200", res);
+     
     }
 }
