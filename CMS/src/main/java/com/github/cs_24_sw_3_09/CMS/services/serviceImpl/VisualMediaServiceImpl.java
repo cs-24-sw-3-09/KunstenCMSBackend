@@ -1,6 +1,8 @@
 package com.github.cs_24_sw_3_09.CMS.services.serviceImpl;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -196,6 +198,7 @@ public class VisualMediaServiceImpl implements VisualMediaService {
         //Updates the vm in database to be the new filetype
         visualMediaEntity.setFileType(file.getContentType());
         visualMediaEntity.setLocation(newLocation);
+        visualMediaEntity.setLastDateModified(LocalDateTime.now(ZoneId.of("Europe/Copenhagen")));
         VisualMediaEntity updatedVisualMedia = visualMediaRepository.save(visualMediaEntity);
 
         //Created the new file.
