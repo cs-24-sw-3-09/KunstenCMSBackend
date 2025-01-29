@@ -33,6 +33,5 @@ public class EnsureAdminExistTask {
         .notificationState(false)
         .build();
         userService.save(adminEntity);
-        System.out.println("Admin user created");
     }
 }

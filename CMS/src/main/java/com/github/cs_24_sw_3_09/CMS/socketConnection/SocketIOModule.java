@@ -94,7 +94,6 @@ public class SocketIOModule {
     @PreDestroy
     public void stop() {
         if (server != null) {
-            System.out.println("Stopping SocketIO server...");
             server.stop();
         }
     }

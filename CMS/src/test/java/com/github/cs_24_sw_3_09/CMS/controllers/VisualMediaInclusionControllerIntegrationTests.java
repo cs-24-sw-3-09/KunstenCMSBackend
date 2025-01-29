@@ -251,6 +251,8 @@ public class VisualMediaInclusionControllerIntegrationTests {
     @WithMockUser(roles = "PLANNER")
     public void testThatPatchUpdateVisualMediaInclusionReturnsStatus200() throws Exception {
         VisualMediaInclusionEntity visualMediaInclusionEntity = TestDataUtil.createVisualMediaInclusionWithVisualMediaEntity();
+        System.out.println(visualMediaInclusionEntity);
+        System.out.println("vm i test: "+visualMediaInclusionEntity.getVisualMedia().getFileType());
         VisualMediaInclusionEntity savedVisualMediaInclusionEntity = visualMediaInclusionService.save(visualMediaInclusionEntity).get();
 
         assertTrue(visualMediaInclusionService.isExists(1L));
