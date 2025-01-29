@@ -23,6 +23,8 @@ public interface VisualMediaInclusionService {
 
     void delete(Long id);
 
+    void delete(VisualMediaInclusionEntity vmi);
+
     void updatePositionsAfterDeletion(Long slideshowId, Integer deletedPosition);
 
     VisualMediaInclusionEntity setVisualMedia(Long id, Long visualMediaId);

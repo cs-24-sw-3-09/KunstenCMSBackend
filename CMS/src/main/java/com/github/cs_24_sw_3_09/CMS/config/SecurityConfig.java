@@ -3,6 +3,8 @@ package com.github.cs_24_sw_3_09.CMS.config;
 import com.github.cs_24_sw_3_09.CMS.filter.JwtAuthFilter;
 import com.github.cs_24_sw_3_09.CMS.services.UserService;
 
+import jakarta.annotation.PostConstruct;
+
 import java.util.Arrays;
 
 import java.util.ArrayList;
@@ -55,11 +57,11 @@ public class SecurityConfig {
         this.userService = userService;
         this.authFilter = authFilter;
         this.allowedOrigins = new ArrayList<>();
-        this.allowedOrigins.add("http://localhost:5173");
-        this.allowedOrigins.add("http://kunsten2.stjernholm.cloud");
-        this.allowedOrigins.add("https://kunsten.stjernholm.cloud");
-        this.allowedOrigins.add("https://kunsten2.stjernholm.cloud");
+    }
 
+    @PostConstruct
+    public void init() {
+        this.allowedOrigins.add(frontendUrl);
     }
 
     @Bean

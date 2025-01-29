@@ -255,7 +255,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
                     if (foundDisplayDevice.isEmpty()) return;
                     updatedDisplayDevices.add(displayDevice);
                 });
-                existingTimeSlot.setDisplayDevices(displayDevices);
+                existingTimeSlot.setDisplayDevices(updatedDisplayDevices);
             });
             //Display Content
             Optional.ofNullable(timeSlotEntity.getDisplayContent()).ifPresent(displayContent -> {

@@ -147,6 +147,13 @@ public class VisualMediaInclusionServiceImpl implements VisualMediaInclusionServ
 
     @Transactional
     @Override
+    public void delete(VisualMediaInclusionEntity vmi) {
+        Long id = (long) vmi.getId();
+        this.delete(id);
+    }
+
+    @Transactional
+    @Override
     public void delete(Long id) {
         VisualMediaInclusionEntity visualMediaInclusion = visualMediaInclusionRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new EntityNotFoundException("Visual Media Inclusion with id " + id + " not found"));
