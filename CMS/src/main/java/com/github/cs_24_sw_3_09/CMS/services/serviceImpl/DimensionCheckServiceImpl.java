@@ -61,12 +61,13 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
     @Override
     public String checkDimensionForAssignedFallback(DisplayDeviceEntity displayDevice, ContentEntity fallbackContent){
         String resolution = displayDevice.getResolution();
+        String name = displayDevice.getName();
         Long id = fallbackContent.getId().longValue();
 
         if (fallbackContent instanceof VisualMediaEntity) {
-            return checkDisplayDeviceBetweenVisualMedia(resolution, id, "Fallback ");
+            return checkDisplayDeviceBetweenVisualMedia(resolution, name, id, "Fallback ");
         } else if(fallbackContent instanceof SlideshowEntity) {
-            return checkDisplayDeviceBetweenSlideshow(resolution, id, "Fallback ");
+            return checkDisplayDeviceBetweenSlideshow(resolution, name, id, "Fallback ");
         } else {
             return "Fallback content not set"; 
         }
@@ -118,7 +119,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         List<String> displayDeviceOrientationList = new ArrayList<>();
         Set<String> displayDeviceOrientationSet = new HashSet<>();
         for (DisplayDeviceEntity device : displayDevices){
-            String orientation = device.getDisplayOrientation();
+            String orientation = device.getResolution();
             displayDeviceOrientationList.add(device.getName() + ": " + orientation);
             displayDeviceOrientationSet.add(orientation);
         }
@@ -127,19 +128,23 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
             + createErrorMessageWithList(displayDeviceOrientationList);
         }
 
-        String orientation = displayDeviceOrientationSet.iterator().next();
-        Long id = displayContent.getId().longValue();
+        for (DisplayDeviceEntity dd: displayDevices) {
+            String orientation = dd.getResolution();
+            String name = dd.getName();
+            Long id = displayContent.getId().longValue();
 
-        if (displayContent instanceof VisualMediaEntity) {
-            return checkDisplayDeviceBetweenVisualMedia(orientation, id, "");
-        } else if(displayContent instanceof SlideshowEntity) {
-            return checkDisplayDeviceBetweenSlideshow(orientation, id, "");
-        } else {
-            return "Display content not set"; 
-        }
+            if (displayContent instanceof VisualMediaEntity) {
+                return checkDisplayDeviceBetweenVisualMedia(orientation, name, id, "");
+            } else if(displayContent instanceof SlideshowEntity) {
+                return checkDisplayDeviceBetweenSlideshow(orientation, name, id, "");
+            } else {
+                return "Display content not set"; 
+            }
+        }  
+        return "1";      
     }
 
-    String checkDisplayDeviceBetweenVisualMedia(String displayDeviceResolution, Long id, String contentType) { 
+    String checkDisplayDeviceBetweenVisualMedia(String displayDeviceResolution, String name, Long id, String contentType) { 
         Optional<VisualMediaEntity> optionalVisualMedia = visualMediaService.findOne(id);
         if(optionalVisualMedia.isEmpty()) {
             throw new IllegalArgumentException("Visual Media with ID " + id + " does not exist.");
@@ -153,14 +158,14 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         String displayContentResolution = getVisualMediaOrientation(visualMedia.getFileType(), visualMedia.getLocation());
                         
         if(!displayDeviceResolution.equals(displayContentResolution)){
-            return "The dimensions do not match:\n\tDisplay Device resolution: "+ 
+            return "The dimensions do not match:\n\tDisplay Device " + name + " has resolution: "+ 
             displayDeviceResolution
             + "\n\t"+ contentType + "Visual Media resolution: "+ displayContentResolution;
         }
         return "1";
     }
 
-    String checkDisplayDeviceBetweenSlideshow(String displayDeviceOrientation, Long id, String contentType) { 
+    String checkDisplayDeviceBetweenSlideshow(String displayDeviceOrientation, String name, Long id, String contentType) { 
       
         Optional<SlideshowEntity> optionalSlideshow = slideshowService.findOne(id);
         if(optionalSlideshow.isEmpty()){
@@ -187,7 +192,7 @@ public class DimensionCheckServiceImpl implements DimensionCheckService{
         //If the display device and slideshow conflict
         for (String vm : visualMediasOrientation){
             if(!vm.equals(displayDeviceOrientation)) {
-                return "The dimensions do not match:\nDisplay Device resolution: " + displayDeviceOrientation + 
+                return "The dimensions do not match:\nDisplay Device "+ name +" has resolution: " + displayDeviceOrientation + 
                 "\n" + contentType +  "Slideshow orientation: "+ vm;
              }
         }
