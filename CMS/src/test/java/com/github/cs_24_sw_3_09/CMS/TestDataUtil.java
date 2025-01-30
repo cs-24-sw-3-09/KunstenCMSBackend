@@ -57,7 +57,7 @@ public class TestDataUtil {
                 .displayOrientation("horizontal")
                 .location("Esbjerg")
                 .name("Skærm Esbjerg")
-                .resolution("1920x1080")
+                .resolution("200x100")
                 .timeSlots(new ArrayList<>())
                 .build();
     }
@@ -252,7 +252,7 @@ public class TestDataUtil {
                 .displayOrientation("horizontal")
                 .location("Aalborg")
                 .name("Skærm Esbjerg1")
-                .resolution("1920x1080")
+                .resolution("200x100")
                 .build();
         displayDevices.add(dd);
         return displayDevices;
